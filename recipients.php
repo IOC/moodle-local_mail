@@ -1,0 +1,109 @@
+<?php
+
+require_once('../../config.php');
+require_once('locallib.php');
+require_once('recipients_selector.php');
+
+$messageid = required_param('id', PARAM_INT);
+
+// Fetch message
+
+$message = local_mail_message::fetch($messageid);
+if (!$message or !$message->editable($USER->id)) {
+    print_error('invalidmessage', 'local_mail');
+}
+
+// Set up page
+
+$params = array('id' => $messageid);
+$url = new moodle_url('/local/mail/recipients.php', $params);
+$activeurl = new moodle_url('/local/mail/compose.php', $params);
+local_mail_setup_page($message->course(), $url);
+navigation_node::override_active_url($activeurl);
+
+// Set up selector
+
+$groupid = groups_get_course_group($COURSE, true);
+
+$options = array('courseid' => $COURSE->id, 'groupid' => $groupid);
+$participants = new mail_recipients_selector('recipients', $options);
+$participants->exclude(array_keys($message->recipients()));
+
+// Process data
+
+if ($data = data_submitted()) {
+    require_sesskey();
+
+    // Cancel
+    if (!empty($data->cancel)) {
+        $params = array('id' => $messageid);
+        $url = new moodle_url('/local/mail/compose.php', $params);
+        redirect($url);
+    }
+
+    // Add
+    $userids = array_keys($participants->get_selected_users());    
+    if (!empty($data->addto)) {
+        foreach ($userids as $userid) {
+            $message->add_recipient('to', $userid);
+        }
+    } elseif (!empty($data->addcc)) {
+        foreach ($userids as $userid) {
+            $message->add_recipient('cc', $userid);
+        }
+    } elseif (!empty($data->addbcc)) {
+        foreach ($userids as $userid) {
+            $message->add_recipient('bcc', $userid);
+        }
+    }
+
+    $params = array('id' => $messageid);
+    $url = new moodle_url('/local/mail/compose.php', $params);
+    redirect($url);
+}
+
+// Display page
+
+echo $OUTPUT->header();
+
+echo $OUTPUT->container_start('mail-recipients');
+
+echo $OUTPUT->heading(get_string('addrecipients', 'local_mail'), 2);
+
+groups_print_course_menu($COURSE, $PAGE->url);
+
+echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
+
+$participants->display();
+
+echo $OUTPUT->container_start('buttons');
+
+$label = get_string('addto', 'local_mail');
+$attributes = array('type' => 'submit', 'name' => 'addto', 'value' => $label);
+echo html_writer::empty_tag('input', $attributes);
+
+$label = get_string('addcc', 'local_mail');
+$attributes = array('type' => 'submit', 'name' => 'addcc', 'value' => $label);
+echo html_writer::empty_tag('input', $attributes);
+
+$label = get_string('addbcc', 'local_mail');
+$attributes = array('type' => 'submit', 'name' => 'addbcc', 'value' => $label);
+echo html_writer::empty_tag('input', $attributes);
+
+$label = get_string('cancel');
+$attributes = array('type' => 'submit', 'name' => 'cancel', 'value' => $label);
+echo html_writer::empty_tag('input', $attributes);
+
+echo html_writer::empty_tag('input', array(
+    'type' => 'hidden',
+    'name' => 'sesskey',
+    'value' => sesskey(),
+));
+
+echo $OUTPUT->container_end();
+
+echo html_writer::end_tag('form');
+
+echo $OUTPUT->container_end();
+
+echo $OUTPUT->footer();

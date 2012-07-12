@@ -1,0 +1,138 @@
+#maincontent {
+    height: 0;
+}
+
+/* Recipients */
+
+.mail_recipient {
+    float: left;
+    border: 1px solid #ddd;
+    margin: 0 0.5em 0.5em 0 !important;
+}
+
+.mail_recipient .userpicture {
+    border-right: 1px solid #ddd;
+    vertical-align: middle;
+}
+
+.mail_recipient span  {
+    margin: 0 1em;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.mail_recipient input {
+    padding: 12px 4px;
+    vertical-align: middle;
+    background-color: #eee;
+}
+
+/* Add recipients */
+
+.mail-recipients {
+    max-width: 40em;
+}
+
+.mail-recipients .groupselect {
+    margin-bottom: 0.2em;
+}
+
+.mail-recipients .userselector {
+    margin-bottom: 0.5em;
+}
+
+.mail-recipients .buttons {
+    margin-bottom: 1em;
+}
+
+.mail-recipients .buttons input {
+    margin-right: 0.5em;
+}
+
+.mail-recipients .buttons input[name=cancel] {
+    margin-right: 0;
+}
+
+/* Mail list */
+
+.mail_list {
+    background-color: white;
+    border: 1px solid #ddd;
+}
+
+
+.mail_list .mail_item {
+    display: block;
+    border-top: 1px solid #ddd;
+}
+
+
+.mail_list .mail_item:first-child {
+    border: 0;
+}
+
+.mail_list .mail_item:focus {
+    outline: 0;
+}
+
+.mail_list .mail_item,
+.mail_list .mail_item:hover,
+.mail_list .mail_item:active, 
+.mail_list .mail_item:visited {
+    color: black;
+    text-decoration: none;
+}
+
+.mail_list .mail_item:active {
+    background-color: #eee;
+}
+
+.mail_list .mail_users, .mail_list .mail_summary, .mail_list .mail_date {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0.5em 1%;
+    vertical-align: middle;
+}
+
+
+.mail_list .mail_users {
+    width: 32%;
+    text-overflow: ellipsis;
+}
+
+.mail_list .mail_summary {
+    width: 52%;
+    text-overflow: ellipsis;
+}
+
+.mail_list .mail_label {
+    background-color: #eee;
+    padding: 0.2em 0.4em;
+    margin: 0 0.2em;
+    border-radius: 0.2em;
+}
+
+.mail_list .mail_label.mail_draft {
+    background-color: transparent;
+    color: red;
+}
+
+.mail_list .mail_date {
+    width: 10%;
+    text-align: center;
+}
+
+/* Toolbar */
+
+.mail_toolbar {
+    margin-bottom: 0.5em;
+}
+
+.mail_toolbar .mail_paging {
+    float: right;
+}
+
+.mail_toolbar .singlebutton {
+    display: inline-block;
+}
