@@ -2,7 +2,7 @@
 
 require_once($CFG->dirroot . '/local/mail/locallib.php');
 
-function mail_extends_navigation($root) {
+function local_mail_extends_navigation($root) {
     global $COURSE, $PAGE, $SESSION, $USER;
 
     if (!get_config('local_mail', 'version')) {
