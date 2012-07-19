@@ -2,6 +2,10 @@
 
 require_once($CFG->dirroot . '/local/mail/locallib.php');
 
+function local_mail_course_deleted($course) {
+    local_mail_message::delete_course($course->id);
+}
+
 function local_mail_extends_navigation($root) {
     global $COURSE, $PAGE, $SESSION, $USER;
 
