@@ -60,9 +60,7 @@
     border: 1px solid #ddd;
 }
 
-
 .mail_list .mail_item {
-    display: block;
     border-top: 1px solid #ddd;
 }
 
@@ -71,23 +69,23 @@
     border: 0;
 }
 
-.mail_list .mail_item:focus {
+.mail_list .mail_link:focus {
     outline: 0;
 }
 
-.mail_list .mail_item,
-.mail_list .mail_item:hover,
-.mail_list .mail_item:active, 
-.mail_list .mail_item:visited {
+.mail_list .mail_link,
+.mail_list .mail_link:hover,
+.mail_list .mail_link:active,
+.mail_list .mail_link:visited {
     color: black;
     text-decoration: none;
 }
 
-.mail_list .mail_item:active {
+.mail_list .mail_link:active {
     background-color: #eee;
 }
 
-.mail_list .mail_users, .mail_list .mail_summary, .mail_list .mail_date {
+.mail_list .mail_users, .mail_list .mail_summary, .mail_list .mail_date,.mail_list .mail_checkbox{
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -95,14 +93,18 @@
     vertical-align: middle;
 }
 
+.mail_list .mail_checkbox {
+    width: 2%;
+    text-overflow: ellipsis;
+}
 
 .mail_list .mail_users {
-    width: 32%;
+    width: 29%;
     text-overflow: ellipsis;
 }
 
 .mail_list .mail_summary {
-    width: 52%;
+    width: 50%;
     text-overflow: ellipsis;
 }
 
@@ -123,10 +125,23 @@
     text-align: center;
 }
 
+.mail_list .mail_unread {
+  font-weight: bold;
+}
+
+.mail_list .mail_flags {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  vertical-align: middle;
+  width:18px;
+  height:18px;
+}
+
 /* Toolbar */
 
-.mail_toolbar {
-    margin-bottom: 0.5em;
+.mail_toolbar .singlebutton{
+  margin-top:0.4em;
 }
 
 .mail_toolbar .mail_paging {
@@ -135,4 +150,66 @@
 
 .mail_toolbar .singlebutton {
     display: inline-block;
+    margin-right: 0.5em;
+}
+
+/* View mail */
+
+
+.mail_subject {
+ margin-bottom: 1em;
+}
+
+.mail_subject .mail_flags{
+ margin-left: 0.5em;
+ vertical-align:middle;
+}
+
+.mail_subject h3{
+ display:inline;
+}
+
+.mail_header {
+ display:block;
+}
+
+.mail_info {
+ margin-left: 43px;
+}
+
+.mail_info .mail_date {
+ float: right;
+}
+
+.mail_header {
+ margin-botton: 1em;
+ /*border-bottom: 1px solid #aaa;*/
+}
+.mail_header .left, .mail_subject .left{
+ float: left;
+}
+
+.user_from {
+ font-size: 1.1em;
+ font-weight: bold;
+}
+
+.mail_recipients {
+  border-bottom: 1px solid #aaa;
+  font-size: 0.95em;
+}
+
+.mail_recipients .mail_role {
+  display: inline-block;
+  min-width: 1.5em;
+  margin-right: 0.5em;
+}
+
+.mail_body {
+  margin-left: 43px;
+}
+
+.mail_content {
+ margin: 1em 0 0.2em;
+ border-bottom: 2px solid #aaa;
 }

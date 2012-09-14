@@ -28,6 +28,7 @@ $groupid = groups_get_course_group($COURSE, true);
 $options = array('courseid' => $COURSE->id, 'groupid' => $groupid);
 $participants = new mail_recipients_selector('recipients', $options);
 $participants->exclude(array_keys($message->recipients()));
+$participants->exclude(array($message->sender()->id));
 
 // Process data
 
