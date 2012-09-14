@@ -68,7 +68,7 @@ class local_mail_message_test extends local_mail_testcase {
     function test_add_label() {
         $label1 = local_mail_label::create(201, 'name1');
         $label2 = local_mail_label::create(202, 'name2');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->send();
 
@@ -91,7 +91,7 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_add_recipient() {
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
 
         $message->add_recipient('to', 202);
         $message->add_recipient('cc', 203);
@@ -110,13 +110,13 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_count_index() {
-        $message1 = local_mail_message::create(201, 101, 'subject1', 'content1', 0);
+        $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
         $message1->send();
-        $message2 = local_mail_message::create(201, 102, 'subject2', 'content2', 0);
+        $message2 = local_mail_message::create(201, 102);
         $message2->add_recipient('to', 202);
         $message2->send();
-        $other = local_mail_message::create(202, 101, 'subject', 'content', 0);
+        $other = local_mail_message::create(202, 101);
 
         $result = local_mail_message::count_index(202, 'inbox');
 
@@ -124,14 +124,14 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_count_index_unread() {
-        $message1 = local_mail_message::create(201, 101, 'subject1', 'content1', 0);
+        $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
         $message1->send();
         $message1->set_unread(202, false);
-        $message2 = local_mail_message::create(201, 102, 'subject2', 'content2', 0);
+        $message2 = local_mail_message::create(201, 102);
         $message2->add_recipient('to', 202);
         $message2->send();
-        $message3 = local_mail_message::create(201, 102, 'subject2', 'content2', 0);
+        $message3 = local_mail_message::create(201, 102);
         $message3->add_recipient('to', 202);
         $message3->send();
 
@@ -141,13 +141,13 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_create() {
-        $result = local_mail_message::create(201, 101, 'subject', 'content', 301, 1234567890);
+        $result = local_mail_message::create(201, 101, 1234567890);
 
         $this->assertNotEquals(false, $result->id());
         $this->assertEquals($this->course1, $result->course());
-        $this->assertEquals('subject', $result->subject());
-        $this->assertEquals('content', $result->content());
-        $this->assertEquals(301, $result->format());
+        $this->assertEquals('', $result->subject());
+        $this->assertEquals('', $result->content());
+        $this->assertEquals(-1, $result->format());
         $this->assertEquals(0, $result->reference());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
@@ -161,11 +161,11 @@ class local_mail_message_test extends local_mail_testcase {
 
     function test_delete_course() {
         $label = local_mail_label::create(201, 'name');
-        $message1 = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
         $message1->add_label($label);
-        $message2 = local_mail_message::create(202, 101, 'subject', 'content', 301);
-        $other = local_mail_message::create(201, 102, 'subject', 'content', 301);
+        $message2 = local_mail_message::create(202, 101);
+        $other = local_mail_message::create(201, 102);
         $other->add_label($label);
 
         local_mail_message::delete_course(101);
@@ -184,10 +184,10 @@ class local_mail_message_test extends local_mail_testcase {
 
     function test_discard() {
         $label = local_mail_label::create(201, 'name');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->add_label($label);
-        $other = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $other = local_mail_message::create(201, 101);
         $other->add_label($label);
 
         $message->discard();
@@ -203,7 +203,7 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_editable() {
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
 
         $this->assertTrue($message->editable(201));
@@ -272,13 +272,16 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_fetch_index() {
-        $message1 = local_mail_message::create(201, 101, 'subject1', 'content1', 0);
+        $message1 = local_mail_message::create(201, 101);
+        $message1->save('subject1', 'content1', 301);
         $message1->add_recipient('to', 202);
         $message1->send(12345567890);
-        $message2 = local_mail_message::create(201, 102, 'subject2', 'content2', 0);
+        $message2 = local_mail_message::create(201, 102);
+        $message2->save('subject2', 'content2', 302);
         $message2->add_recipient('to', 202);
         $message2->send(12345567891);
-        $other = local_mail_message::create(202, 101, 'subject', 'content', 0);
+        $other = local_mail_message::create(202, 101);
+        $other->save('subject', 'content', 0);
 
         $result = local_mail_message::fetch_index(202, 'inbox');
 
@@ -291,9 +294,11 @@ class local_mail_message_test extends local_mail_testcase {
     function test_fetch_many() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(202, 'label2');
-        $message1 = local_mail_message::create(201, 101, 'subject1', 'content1', 301);
+        $message1 = local_mail_message::create(201, 101);
+        $message1->save('subject1', 'content1', 301);
         $message1->add_recipient('to', 202);
-        $message2 = local_mail_message::create(201, 101, 'subject2', 'content2', 302);
+        $message2 = local_mail_message::create(201, 101);
+        $message2->save('subject2', 'content2', 302);
         $message2->add_recipient('to', 202);
         $message2->add_recipient('cc', 203);
         $message2->send();
@@ -310,17 +315,17 @@ class local_mail_message_test extends local_mail_testcase {
     function test_fetch_menu() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(201, 'label2');
-        $message1 = local_mail_message::create(201, 101, 'subject1', 'content1', 301);
-        $message2 = local_mail_message::create(202, 101, 'subject2', 'content2', 302);
+        $message1 = local_mail_message::create(201, 101);
+        $message2 = local_mail_message::create(202, 101);
         $message2->add_recipient('to', 201);
         $message2->send();
         $message2->set_unread(201, false);
         $message2->add_label($label1);
         $message2->add_label($label2);
-        $message3 = local_mail_message::create(201, 102, 'subject3', 'content3', 303);
+        $message3 = local_mail_message::create(201, 102);
         $message3->add_recipient('to', 202);
         $message3->send();
-        $message4 = local_mail_message::create(202, 101, 'subject4', 'content4', 304);
+        $message4 = local_mail_message::create(202, 101);
         $message4->add_recipient('to', 201);
         $message4->send();
         $message4->add_label($label1);
@@ -337,7 +342,8 @@ class local_mail_message_test extends local_mail_testcase {
 
     function test_forward() {
         $label = local_mail_label::create(202, 'label');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject', 'content', 301);
         $message->add_recipient('to', 202);
         $message->send();
         $message->add_label($label);
@@ -367,7 +373,7 @@ class local_mail_message_test extends local_mail_testcase {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(202, 'label2');
         $label3 = local_mail_label::create(202, 'label3');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->send();
         $message->add_label($label1);
@@ -393,7 +399,7 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_remove_recipient() {
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->add_recipient('cc', 203);
 
@@ -412,7 +418,8 @@ class local_mail_message_test extends local_mail_testcase {
 
     function test_reply() {
         $label = local_mail_label::create(202, 'label');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject', 'content', 301);
         $message->add_recipient('to', 202);
         $message->add_recipient('to', 203);
         $message->send();
@@ -441,7 +448,7 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_reply_all() {
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->add_recipient('to', 203);
         $message->send();
@@ -455,23 +462,23 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_save() {
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
-        $message->save(102, 'changed subject', 'changed content', 302, 1234567890);
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject', 'content', 301, 1234567890);
 
-        $this->assertEquals($this->course2, $message->course());
-        $this->assertEquals('changed subject', $message->subject());
-        $this->assertEquals('changed content', $message->content());
-        $this->assertEquals(302, $message->format());
+        $this->assertEquals($this->course1, $message->course());
+        $this->assertEquals('subject', $message->subject());
+        $this->assertEquals('content', $message->content());
+        $this->assertEquals(301, $message->format());
         $this->assertTrue($message->draft());
         $this->assertEquals(1234567890, $message->time());
         $this->assertMessage($message);
         $this->assertIndex(201, 'drafts', 0, 1234567890, $message->id(), false);
-        $this->assertIndex(201, 'course', 102, 1234567890, $message->id(), false);
+        $this->assertIndex(201, 'course', 101, 1234567890, $message->id(), false);
     }
 
     function test_send() {
         $label = local_mail_label::create(201, 'label');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->add_label($label);
 
@@ -490,7 +497,7 @@ class local_mail_message_test extends local_mail_testcase {
 
     function test_send_with_reference() {
         $label = local_mail_label::create(201, 'label');
-        $reference = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $reference = local_mail_message::create(201, 101);
         $reference->add_recipient('to', 202);
         $reference->send();
         $reference->add_label($label);
@@ -506,7 +513,7 @@ class local_mail_message_test extends local_mail_testcase {
     function test_set_deleted() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(202, 'label2');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->send();
         $message->add_label($label1);
@@ -547,7 +554,7 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_set_starred() {
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->send();
 
@@ -572,7 +579,7 @@ class local_mail_message_test extends local_mail_testcase {
 
     function test_set_unread() {
         $label = local_mail_label::create(201, 'label');
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_label($label);
         $message->set_starred(201, true);
 
@@ -594,7 +601,7 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     function test_viewable() {
-        $message = local_mail_message::create(201, 101, 'subject', 'content', 301);
+        $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
 
         $this->assertTrue($message->viewable(201));

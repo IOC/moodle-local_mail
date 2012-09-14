@@ -7,7 +7,7 @@ function local_mail_course_deleted($course) {
 }
 
 function local_mail_extends_navigation($root) {
-    global $COURSE, $PAGE, $SESSION, $USER;
+    global $COURSE, $PAGE, $SESSION, $SITE, $USER;
 
     if (!get_config('local_mail', 'version')) {
         return;
@@ -29,14 +29,19 @@ function local_mail_extends_navigation($root) {
 
     $text = get_string('compose', 'local_mail');
     $url = new moodle_url('/local/mail/compose.php');
-    $urlrecipients = new moodle_url('/local/mail/recipients.php');
-    if ($PAGE->url->compare($url, URL_MATCH_BASE)) {
-        $url = $PAGE->url;
-    } elseif ($PAGE->url->compare($urlrecipients, URL_MATCH_BASE)) {
+    $url_recipients = new moodle_url('/local/mail/recipients.php');
+
+    if ($PAGE->url->compare($url, URL_MATCH_BASE) or
+        $PAGE->url->compare($url_recipients, URL_MATCH_BASE)) {
         $url->param('id', $PAGE->url->param('id'));
     } else {
-        $url->param('course', $COURSE->id);
+        $url = new moodle_url('/local/mail/create.php');
+        if ($COURSE->id != $SITE->id) {
+            $url->param('course', $COURSE->id);
+            $url->param('sesskey', sesskey());
+        }
     }
+
     $node->add(s($text), $url);
 
     // Inbox

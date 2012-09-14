@@ -8,6 +8,7 @@ $string['addto'] = 'Add To';
 $string['bcc'] = 'Bcc';
 $string['cc'] = 'Cc';
 $string['compose'] = 'Compose';
+$string['continue'] = 'Continue';
 $string['courses'] = 'Courses';
 $string['discard'] = 'Discard';
 $string['draft'] = 'Draft';

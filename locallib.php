@@ -10,7 +10,7 @@ function local_mail_view($type) {
 
     $itemid = optional_param('id', 0, PARAM_INT);
     $offset = optional_param('offset', 0, PARAM_INT);
-    
+
     // Set up page
 
     $courseid = ($type == 'course' ? $itemid : SITEID);

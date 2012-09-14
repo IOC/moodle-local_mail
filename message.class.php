@@ -67,13 +67,13 @@ class local_mail_message {
         return $result;
     }
 
-    static function create($userid, $courseid, $subject, $content, $format, $time=false) {
+    static function create($userid, $courseid, $time=false) {
         global $DB;
 
         $transaction = $DB->start_delegated_transaction();
 
         $course = self::fetch_course($courseid);
-        $record = self::create_record($course, $subject, $content, $format, 0, $time);
+        $record = self::create_record($course, '', '', -1, 0, $time);
 
         $user = self::fetch_user($userid);
         $user_record = self::create_user_record($record->id, 'from', $user);
@@ -364,16 +364,13 @@ class local_mail_message {
         return $message;
     }
 
-    function save($courseid, $subject, $content, $format, $time=false) {
+    function save($subject, $content, $format, $time=false) {
         global $DB;
 
         assert($this->draft);
 
-        $this->course = self::fetch_course($courseid);
-
         $record = new stdClass;
         $record->id = $this->id;
-        $record->courseid = $courseid;
         $record->subject = $this->subject = $subject;
         $record->content = $this->content = $content;
         $record->format = $this->format = $format;
@@ -384,9 +381,6 @@ class local_mail_message {
         $DB->set_field('local_mail_index', 'time', $this->time, array(
             'messageid' => $this->id,
         )); 
-        $DB->set_field('local_mail_index', 'item', $this->course->id, array(
-            'messageid' => $this->id, 'type' => 'course',
-        ));
         $transaction->allow_commit();
     }
 

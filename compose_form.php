@@ -7,7 +7,6 @@ class mail_compose_form extends moodleform {
     function definition() {
         $mform = $this->_form;
         $message = $this->_customdata['message'];
-        $courses = $this->_customdata['courses'];
 
         // Header
 
@@ -17,16 +16,8 @@ class mail_compose_form extends moodleform {
         // Course
 
         $label = get_string('course');
-        if (!$message or !$message->recipients()) {
-            $options = array(SITEID => '');
-            foreach ($courses as $course) {
-                $options[$course->id] = $course->fullname;
-            }
-            $mform->addElement('select', 'course', $label, $options);
-        } else {
-            $text = $message->course()->fullname;
-            $mform->addElement('static', 'coursefullname', $label, $text);
-        }
+        $text = $message->course()->fullname;
+        $mform->addElement('static', 'coursefullname', $label, $text);
 
         // Recipients
 
@@ -105,7 +96,7 @@ class mail_compose_form extends moodleform {
     }
 
     private function format_recipients($users) {
-        global $OUTPUT, $DB;
+        global $OUTPUT;
 
         $message = $this->_customdata['message'];
 
