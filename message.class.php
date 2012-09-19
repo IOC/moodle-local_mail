@@ -113,7 +113,7 @@ class local_mail_message {
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $item);
         $records = $DB->get_records('local_mail_index', $conditions, 'time DESC',
-                                    'id, messageid', $limitfrom, $limitfrom);
+                                    'id, messageid', $limitfrom, $limitnum);
         $ids = array_map(function($r) { return $r->messageid; }, $records);
 
         return self::fetch_many($ids);
