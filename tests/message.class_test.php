@@ -49,10 +49,10 @@ class local_mail_message_test extends local_mail_testcase {
             array('102', 'C2',        'Course 2'),
         );
         $user = array(
-            array('id', 'username', 'firstname', 'lastname', 'email',        'picture', 'imagealt'),
-            array( 201, 'user1',     'User1',    'Name',     'user1@ex.org',  1,        'User 1' ),
-            array( 202, 'user2',     'User2',    'Name',     'user2@ex.org',  1,        'User 2' ),
-            array( 203, 'user3',     'User3',    'Name',     'user3@ex.org',  1,        'User 3' ),
+            array('id', 'username', 'firstname', 'lastname', 'email',        'picture', 'imagealt', 'maildisplay',),
+            array( 201, 'user1',     'User1',    'Name',     'user1@ex.org',  1,        'User 1',    1 ),
+            array( 202, 'user2',     'User2',    'Name',     'user2@ex.org',  1,        'User 2',    1 ),
+            array( 203, 'user3',     'User3',    'Name',     'user3@ex.org',  1,        'User 3',    1 ),
         );
 
         $this->loadRecords('course', $course);
