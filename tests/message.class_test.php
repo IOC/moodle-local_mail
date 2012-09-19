@@ -148,9 +148,9 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals('', $result->subject());
         $this->assertEquals('', $result->content());
         $this->assertEquals(-1, $result->format());
-        $this->assertEquals(0, $result->reference());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
+        $this->assertEquals(array(), $result->references());
         $this->assertEquals($this->user1, $result->sender());
         $this->assertCount(0, $result->recipients());
         $this->assertCount(0, $result->labels());
@@ -164,39 +164,49 @@ class local_mail_message_test extends local_mail_testcase {
         $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
         $message1->add_label($label);
-        $message2 = local_mail_message::create(202, 101);
+        $message1->send();
+        $message2 = $message1->reply(202);
         $other = local_mail_message::create(201, 102);
+        $other->add_recipient('to', 202);
         $other->add_label($label);
+        $other->send();
+        $other->reply(202);
 
         local_mail_message::delete_course(101);
 
         $this->assertNotRecords('messages', array('courseid' => 101));
+        $this->assertNotRecords('message_refs', array('messageid' => $message2->id()));
         $this->assertNotRecords('message_users', array('messageid' => $message1->id()));
-        $this->assertNotRecords('message_users', array('messageid' => $message1->id()));
-        $this->assertNotRecords('message_labels', array('messageid' => $message2->id()));
+        $this->assertNotRecords('message_users', array('messageid' => $message2->id()));
+        $this->assertNotRecords('message_labels', array('messageid' => $message1->id()));
         $this->assertNotRecords('message_labels', array('messageid' => $message2->id()));
         $this->assertRecords('messages');
         $this->assertRecords('message_users');
+        $this->assertRecords('message_refs');
         $this->assertRecords('message_labels');
         $this->assertNotIndex(201, 'course', 101, $message1->id());
         $this->assertNotIndex(202, 'course', 101, $message2->id());
     }
 
     function test_discard() {
-        $label = local_mail_label::create(201, 'name');
-        $message = local_mail_message::create(201, 101);
-        $message->add_recipient('to', 202);
+        $label = local_mail_label::create(202, 'name');
+        $reference = local_mail_message::create(201, 101);
+        $reference->add_recipient('to', 202);
+        $reference->send();
+        $message = $reference->reply(202);
         $message->add_label($label);
-        $other = local_mail_message::create(201, 101);
+        $other = $reference->forward(202);
         $other->add_label($label);
 
         $message->discard();
 
         $this->assertNotRecords('messages', array('id' => $message->id()));
         $this->assertNotRecords('message_users', array('messageid' => $message->id()));
+        $this->assertNotRecords('message_refs', array('messageid' => $message->id()));
         $this->assertNotRecords('message_labels', array('messageid' => $message->id()));
         $this->assertRecords('messages');
         $this->assertRecords('message_users');
+        $this->assertRecords('message_refs');
         $this->assertRecords('message_labels');
         $this->assertNotIndex(201, 'drafts', 0, $message->id());
         $this->assertNotIndex(201, 'course', 101, $message->id());
@@ -222,9 +232,15 @@ class local_mail_message_test extends local_mail_testcase {
         $label2 = local_mail_label::create(201, 'label2');
         $label3 = local_mail_label::create(202, 'label3');
         $this->loadRecords('local_mail_messages', array(
-            array('id', 'courseid', 'subject',  'content', 'format', 'reference', 'draft', 'time'),
-            array( 501,  101,       'subject1', 'content1', 301,      503,         0,       1234567890 ),
-            array( 502,  101,       'subject2', 'content2', 301,      501,         1,       1234567891 ),
+            array('id', 'courseid', 'subject',  'content', 'format', 'draft', 'time'),
+            array( 501,  101,       'subject1', 'content1', 301,      0,       1234567890 ),
+            array( 502,  101,       'subject2', 'content2', 301,      1,       1234567891 ),
+        ));
+        $this->loadRecords('local_mail_message_refs', array(
+            array('messageid', 'reference'),
+            array( 501,         504 ),
+            array( 501,         503 ),
+            array( 502,         501 ),
         ));
         $this->loadRecords('local_mail_message_users', array(
              array('messageid', 'userid', 'role', 'unread', 'starred',  'deleted'),
@@ -248,9 +264,9 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals('subject1', $result->subject());
         $this->assertEquals('content1', $result->content());
         $this->assertEquals(301, $result->format());
-        $this->assertEquals(503, $result->reference());
         $this->assertFalse($result->draft());
         $this->assertEquals(1234567890, $result->time());
+        $this->assertEquals(array(504, 503), $result->references());
         $this->assertEquals($this->user1, $result->sender());
         $this->assertFalse($result->unread(201));
         $this->assertFalse($result->starred(201));
@@ -355,10 +371,10 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals($this->course1, $result->course());
         $this->assertEquals('FW: subject', $result->subject());
         $this->assertEquals('', $result->content());
-        $this->assertEquals(0, $result->format());
-        $this->assertEquals($message->id(), $result->reference());
+        $this->assertEquals(-1, $result->format());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
+        $this->assertEquals(array($message->id()), $result->references());
         $this->assertEquals($this->user2, $result->sender());
         $this->assertCount(0, $result->recipients());
         $this->assertCount(1, $result->labels());
@@ -432,10 +448,10 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals($this->course1, $result->course());
         $this->assertEquals('RE: subject', $result->subject());
         $this->assertEquals('', $result->content());
-        $this->assertEquals(0, $result->format());
-        $this->assertEquals($message->id(), $result->reference());
+        $this->assertEquals(-1, $result->format());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
+        $this->assertEquals(array($message->id()), $result->references());
         $this->assertEquals($this->user2, $result->sender());
         $this->assertCount(1, $result->recipients());
         $this->assertEquals($this->user1, $result->recipients('to')[201]);

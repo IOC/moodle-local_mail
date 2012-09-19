@@ -24,9 +24,8 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="subject"/>
         <FIELD NAME="subject" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" PREVIOUS="courseid" NEXT="content"/>
         <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false" PREVIOUS="subject" NEXT="format"/>
-        <FIELD NAME="format" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" PREVIOUS="content" NEXT="reference"/>
-        <FIELD NAME="reference" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="format" NEXT="draft"/>
-        <FIELD NAME="draft" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="reference" NEXT="time"/>
+        <FIELD NAME="format" TYPE="int" LENGTH="4" NOTNULL="true" SEQUENCE="false" PREVIOUS="content" NEXT="draft"/>
+        <FIELD NAME="draft" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" PREVIOUS="format" NEXT="time"/>
         <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="draft"/>
       </FIELDS>
       <KEYS>
@@ -36,7 +35,7 @@
         <INDEX NAME="courseid" UNIQUE="false" FIELDS="courseid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_mail_message_labels" COMMENT="-" PREVIOUS="local_mail_messages" NEXT="local_mail_message_users">
+    <TABLE NAME="local_mail_message_labels" COMMENT="-" PREVIOUS="local_mail_messages" NEXT="local_mail_message_refs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="messageid"/>
         <FIELD NAME="messageid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="labelid"/>
@@ -49,7 +48,20 @@
         <INDEX NAME="messageid" UNIQUE="false" FIELDS="messageid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="local_mail_message_users" COMMENT="-" PREVIOUS="local_mail_message_labels" NEXT="local_mail_index">
+    <TABLE NAME="local_mail_message_refs" COMMENT="-" PREVIOUS="local_mail_message_labels" NEXT="local_mail_message_users">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="messageid"/>
+        <FIELD NAME="messageid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="reference"/>
+        <FIELD NAME="reference" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="messageid"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="messageid" UNIQUE="false" FIELDS="messageid"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="local_mail_message_users" COMMENT="-" PREVIOUS="local_mail_message_refs" NEXT="local_mail_index">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="messageid"/>
         <FIELD NAME="messageid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="userid"/>

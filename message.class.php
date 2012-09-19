@@ -11,9 +11,9 @@ class local_mail_message {
     private $subject;
     private $content;
     private $format;
-    private $reference;
     private $draft;
     private $time;
+    private $refs = array();
     private $users = array();
     private $role = array();
     private $unread = array();
@@ -73,12 +73,12 @@ class local_mail_message {
         $transaction = $DB->start_delegated_transaction();
 
         $course = self::fetch_course($courseid);
-        $record = self::create_record($course, '', '', -1, 0, $time);
+        $record = self::create_record($course, '', '', -1, $time);
 
         $user = self::fetch_user($userid);
         $user_record = self::create_user_record($record->id, 'from', $user);
 
-        $message = new self($record, array($user_record));
+        $message = new self($record, array(), array($user_record));
         $message->create_index($userid, 'drafts');
         $message->create_index($userid, 'course', $courseid);
 
@@ -96,6 +96,7 @@ class local_mail_message {
         $DB->delete_records_select('local_mail_index', $select, $params);
         $DB->delete_records_select('local_mail_message_labels', $select, $params);
         $DB->delete_records_select('local_mail_message_users', $select, $params);
+        $DB->delete_records_select('local_mail_message_refs', $select, $params);
         $DB->delete_records('local_mail_messages', $params);
         $transaction->allow_commit();
     }
@@ -126,11 +127,17 @@ class local_mail_message {
         }
 
         $sql = 'SELECT m.id, m.courseid, m.subject, m.content, m.format,'
-            . ' m.reference, m.draft, m.time, c.shortname, c.fullname'
+            . ' m.draft, m.time, c.shortname, c.fullname'
             . ' FROM {local_mail_messages} m'
             . ' JOIN {course} c ON c.id = m.courseid'
             . ' WHERE m.id  IN (' . implode(',', $ids) . ')';
         $records = $DB->get_records_sql($sql);
+
+        $sql = 'SELECT mr.id AS recordid, mr.messageid, mr.reference'
+            . ' FROM {local_mail_message_refs} mr'
+            . ' WHERE mr.messageid IN (' . implode(',', $ids) . ')'
+            . ' ORDER BY mr.id ASC';
+        $ref_records = $DB->get_records_sql($sql);
 
         $sql = 'SELECT mu.id AS recordid, mu.messageid, mu.userid, mu.role,'
             . ' mu.unread, mu.starred, mu.deleted,'
@@ -148,7 +155,8 @@ class local_mail_message {
 
         foreach ($ids as $id) {
             if (isset($records[$id])) {
-                $messages[$id] = new self($records[$id], $user_records, $label_records);
+                $messages[$id] = new self($records[$id], $ref_records,
+                                          $user_records, $label_records);
             }
         }
 
@@ -211,6 +219,7 @@ class local_mail_message {
 
         $transaction = $DB->start_delegated_transaction();
         $DB->delete_records('local_mail_messages', array('id' => $this->id));
+        $DB->delete_records('local_mail_message_refs', array('messageid' => $this->id));
         $DB->delete_records('local_mail_message_users', array('messageid' => $this->id));
         $DB->delete_records('local_mail_message_labels', array('messageid' => $this->id));
         $DB->delete_records('local_mail_index', array('messageid' => $this->id));
@@ -239,10 +248,13 @@ class local_mail_message {
         $transaction = $DB->start_delegated_transaction();
 
         $subject = 'FW: ' . $this->subject;
-        $record = self::create_record($this->course, $subject, '', 0, $this->id, $time);
+        $record = self::create_record($this->course, $subject, '', -1, $time);
         $user_record = self::create_user_record($record->id, 'from', $this->users[$userid]);
 
-        $message = new self($record, array($user_record));
+        $references = array_merge(array($this->id), $this->references());
+        $ref_records = self::create_ref_records($record->id, $references);
+
+        $message = new self($record, $ref_records, array($user_record));
 
         $message->create_index($userid, 'drafts');
         $message->create_index($userid, 'course', $this->course->id);
@@ -288,8 +300,8 @@ class local_mail_message {
         });
     }
 
-    function reference() {
-        return $this->reference;
+    function references() {
+        return $this->refs;
     }
 
     function remove_label(local_mail_label $label) {
@@ -335,7 +347,10 @@ class local_mail_message {
         $transaction = $DB->start_delegated_transaction();
 
         $subject = 'RE: ' . $this->subject;
-        $record = self::create_record($this->course, $subject, '', 0, $this->id, $time);
+        $record = self::create_record($this->course, $subject, '', -1, $time);
+
+        $references = array_merge(array($this->id), $this->references());
+        $ref_records = self::create_ref_records($record->id, $references);
 
         $user_records = array(
             self::create_user_record($record->id, 'from', $this->users[$userid]),
@@ -350,7 +365,7 @@ class local_mail_message {
             }
         }
 
-        $message = new self($record, $user_records);
+        $message = new self($record, $ref_records, $user_records);
 
         $message->create_index($userid, 'drafts');
         $message->create_index($userid, 'course', $this->course->id);
@@ -412,10 +427,10 @@ class local_mail_message {
             $this->create_index($user->id, 'course', $this->course->id);
         }
 
-        if ($this->reference) {
-            $reference = self::fetch($this->reference);
+        if ($references = $this->references()) {
+            $message = self::fetch($references[0]);
             foreach ($this->recipients() as $users) {
-                foreach ($reference->labels($user->id) as $label) {
+                foreach ($message->labels($user->id) as $label) {
                     $this->add_label($label);
                 }
             }
@@ -536,7 +551,7 @@ class local_mail_message {
         return $this->has_user($userid) and (!$this->draft or $this->role[$userid] == 'from');
     }
 
-    private function __construct($record, $user_records, $label_records=array()) {
+    private function __construct($record, $ref_records, $user_records, $label_records=array()) {
         $this->id = (int) $record->id;
         $this->course = (object) array(
             'id' => $record->courseid,
@@ -546,9 +561,14 @@ class local_mail_message {
         $this->subject = $record->subject;
         $this->content = $record->content;
         $this->format = (int) $record->format;
-        $this->reference = (int) $record->reference;
         $this->draft = (bool) $record->draft;
         $this->time = (int) $record->time;
+
+        foreach ($ref_records as $r) {
+            if ($r->messageid == $record->id) {
+                $this->refs[] = $r->reference;
+            }
+        }
 
         foreach ($user_records as $r) {
             if ($r->messageid == $record->id) {
@@ -575,7 +595,7 @@ class local_mail_message {
         }
     }
 
-    private static function create_record($course, $subject, $content, $format, $reference, $time) {
+    private static function create_record($course, $subject, $content, $format, $time) {
         global $DB;
 
         $record = new stdClass;
@@ -583,7 +603,6 @@ class local_mail_message {
         $record->subject = $subject;
         $record->content = $content;
         $record->format = $format;
-        $record->reference = $reference;
         $record->draft = true;
         $record->time = $time ?: time();
 
@@ -593,6 +612,22 @@ class local_mail_message {
         $record->fullname = $course->fullname;
 
         return $record;
+    }
+
+    private static function create_ref_records($messageid, array $references) {
+        global $DB;
+
+        $records = array();
+
+        foreach ($references as $reference) {
+            $record = new stdClass;
+            $record->messageid = $messageid;
+            $record->reference = $reference;
+            $DB->insert_record('local_mail_message_refs', $record);
+            $records[] = $record;
+        }
+
+        return $records;
     }
 
     private static function create_user_record($messageid, $role, $user) {

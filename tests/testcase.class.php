@@ -49,6 +49,7 @@ abstract class local_mail_testcase extends advanced_testcase {
         $DB->delete_records_select('user', 'id > 200');
         $DB->delete_records('local_mail_labels');
         $DB->delete_records('local_mail_messages');
+        $DB->delete_records('local_mail_message_refs');
         $DB->delete_records('local_mail_message_users');
         $DB->delete_records('local_mail_message_labels');
         $DB->delete_records('local_mail_index');
