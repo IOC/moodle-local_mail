@@ -20,7 +20,7 @@ class local_mail_create_form extends moodleform {
         foreach ($courses as $course) {
             $options[$course->id] = $course->fullname;
         }
-        $mform->addElement('select', 'course', $label, $options);
+        $mform->addElement('select', 'c', $label, $options);
 
         // Button
 
@@ -33,7 +33,7 @@ class local_mail_create_form extends moodleform {
 
         $errors = array();
 
-        if ($data['course'] == $SITE->id) {
+        if ($data['c'] == $SITE->id) {
             $errors['course'] = get_string('erroremptycourse', 'local_mail');
         }
 

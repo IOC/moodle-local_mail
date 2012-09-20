@@ -4,7 +4,7 @@ require_once('../../config.php');
 require_once('locallib.php');
 require_once('create_form.php');
 
-$courseid = optional_param('course', $SITE->id, PARAM_INT);
+$courseid = optional_param('c', $SITE->id, PARAM_INT);
 
 // Setup page
 
@@ -19,7 +19,7 @@ local_mail_setup_page($course, $url);
 if ($course->id != $SITE->id) {
     confirm_sesskey();
     $message = local_mail_message::create($USER->id, $course->id);
-    $params = array('id' => $message->id());
+    $params = array('m' => $message->id());
     $url = new moodle_url('/local/mail/compose.php', $params);
     redirect($url);
 }
