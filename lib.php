@@ -33,11 +33,11 @@ function local_mail_extends_navigation($root) {
 
     if ($PAGE->url->compare($url, URL_MATCH_BASE) or
         $PAGE->url->compare($url_recipients, URL_MATCH_BASE)) {
-        $url->param('id', $PAGE->url->param('id'));
+        $url->param('m', $PAGE->url->param('m'));
     } else {
         $url = new moodle_url('/local/mail/create.php');
         if ($COURSE->id != $SITE->id) {
-            $url->param('course', $COURSE->id);
+            $url->param('c', $COURSE->id);
             $url->param('sesskey', sesskey());
         }
     }
@@ -83,7 +83,7 @@ function local_mail_extends_navigation($root) {
         if (!empty($count->courses[$course->id])) {
             $text .= ' (' . $count->courses[$course->id] . ')';
         }
-        $url = new moodle_url('/local/mail/view_course.php', array('id' => $course->id));
+        $url = new moodle_url('/local/mail/view_course.php', array('c' => $course->id));
         $nodecourses->add(s($text), $url);
     }
 
@@ -98,7 +98,7 @@ function local_mail_extends_navigation($root) {
             if (!empty($count->labels[$label->id()])) {
                 $text .= ' (' . $count->labels[$label->id()] . ')';
             }
-            $url = new moodle_url('/local/mail/view_label.php', array('id' => $label->id()));
+            $url = new moodle_url('/local/mail/view_label.php', array('l' => $label->id()));
             $nodelabels->add(s($text), $url);
         }
     }

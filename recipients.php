@@ -4,7 +4,7 @@ require_once('../../config.php');
 require_once('locallib.php');
 require_once('recipients_selector.php');
 
-$messageid = required_param('id', PARAM_INT);
+$messageid = required_param('m', PARAM_INT);
 
 // Fetch message
 
@@ -15,7 +15,7 @@ if (!$message or !$message->editable($USER->id)) {
 
 // Set up page
 
-$params = array('id' => $messageid);
+$params = array('m' => $messageid);
 $url = new moodle_url('/local/mail/recipients.php', $params);
 $activeurl = new moodle_url('/local/mail/compose.php', $params);
 local_mail_setup_page($message->course(), $url);
@@ -37,7 +37,7 @@ if ($data = data_submitted()) {
 
     // Cancel
     if (!empty($data->cancel)) {
-        $params = array('id' => $messageid);
+        $params = array('m' => $messageid);
         $url = new moodle_url('/local/mail/compose.php', $params);
         redirect($url);
     }
@@ -58,7 +58,7 @@ if ($data = data_submitted()) {
         }
     }
 
-    $params = array('id' => $messageid);
+    $params = array('m' => $messageid);
     $url = new moodle_url('/local/mail/compose.php', $params);
     redirect($url);
 }

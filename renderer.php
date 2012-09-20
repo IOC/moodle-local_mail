@@ -46,30 +46,15 @@ class local_mail_renderer extends plugin_renderer_base {
             $unreadclass = '';
             $attributes = array(
                     'type' => 'checkbox',
-                    'name' => 'msg[]',
+                    'name' => 'msgs[]',
                     'value' => $message->id(),
                     'class' => 'mail_checkbox');
             $checkbox = html_writer::empty_tag('input', $attributes);
-            /*
-            $flags = html_writer::start_tag('span', array('class' => 'mail_flags'));
-            $params = array(
-                    'starred' => $message->id(),
-                    'sesskey' => sesskey());
-            $url = new moodle_url($this->page->url, $params);
-            if ($message->starred($userid)) {
-                $linkparams = array('title' => get_string('starred', 'local_mail'));
-                $flags .= html_writer::link($url, html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('starred','local_mail'))), $linkparams);
-            } elseif ($type !== 'drafts') {
-                $linkparams = array('title' => get_string('nostarred', 'local_mail'));
-                $flags .= html_writer::link($url, html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('nostarred','local_mail'))), $linkparams);
-            }
-            $flags .= html_writer::end_tag('span');
-            */
             $flags = $this->starred($message, $userid, $type);
             $content = ($this->users($message, $userid, $type, $itemid) .
                         $this->summary($message, $userid, $type, $itemid) .
                         $this->date($message));
-            $params = array('message' => $message->id());
+            $params = array('m' => $message->id());
             if ($message->editable($userid)) {
                 $url = new moodle_url('/local/mail/compose.php', $params);
                 $url->param('type', $type);
@@ -101,33 +86,32 @@ class local_mail_renderer extends plugin_renderer_base {
         $prevoffset = max(0, $offset - $pagesize);
         $prevurl = new moodle_url($this->page->url, array('offset' => $prevoffset));
         $prevtitle = $this->output->larrow();
-        $prev = html_writer::empty_tag('input', array(
+        $params = array(
             'value' => $prevtitle,
             'type' => 'submit',
             'name' => 'offset[' . $prevoffset . ']',
             'tooltip' => get_string('previous'),
             'class' => 'singlebutton',
-            'disabled' => ($offset == 0)));
-/*        $prev = $this->output->single_button($prevurl, $prevtitle, 'get', array(
-            'tooltip' => get_string('previous'),
-            'disabled' => ($offset == 0),
-        ));*/
+        );
+        if ($offset === 0) {
+            $params = array_merge($params, array('disabled' => 'disabled'));
+        }
+        $prev = html_writer::empty_tag('input', $params);
 
         $nextoffset = min($totalcount - 1, $offset + $pagesize);
         $nexturl = new moodle_url($this->page->url, array('offset' => $nextoffset));
         $nexttitle = $this->output->rarrow();
-        $next = html_writer::empty_tag('input', array(
-                'value' => $nexttitle,
-                'type' => 'submit',
-                'name' => 'offset[' . $nextoffset . ']',
-                'tooltip' => get_string('next'),
-                'class' => 'singlebutton',
-                'disabled' => ($offset + $count == $totalcount)));
-/*        $next = $this->output->single_button($nexturl, $nexttitle, 'get', array(
+        $params = array(
+            'value' => $nexttitle,
+            'type' => 'submit',
+            'name' => 'offset[' . $nextoffset . ']',
             'tooltip' => get_string('next'),
-            'disabled' => ($offset + $count == $totalcount),
-        ));*/
-
+            'class' => 'singlebutton',
+        );
+        if (($offset + $count) == $totalcount) {
+            $params = array_merge($params, array('disabled' => 'disabled'));
+        }
+        $next = html_writer::empty_tag('input', $params);
         return $this->output->container($str . ' ' . $prev . $next, 'mail_paging');
     }
     
@@ -153,7 +137,7 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function delete($type) {
-        $label = ($type === 'trash'?get_string('undelete', 'local_mail'):get_string('delete'));
+        $label = ($type === 'trash'?get_string('restore', 'local_mail'):get_string('delete'));
         $attributes = array('type' => 'submit', 'name' => 'delete', 'value' => $label, 'class' => 'singlebutton');
         return html_writer::empty_tag('input', $attributes);
     }
@@ -173,14 +157,18 @@ class local_mail_renderer extends plugin_renderer_base {
         $url = new moodle_url($this->page->url, $params);
         $output = html_writer::start_tag('span', array('class' => 'mail_flags'));
         if ($view){
-            $url->param('message', $message->id());
+            $url->param('m', $message->id());
         }
         if ($message->starred($userid)) {
             $linkparams = array('title' => get_string('starred', 'local_mail'));
-            $output .= html_writer::link($url, html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('starred','local_mail'))), $linkparams);
-        } elseif ($type !== 'drafts') {
+            $output .= html_writer::link($url, html_writer::empty_tag('img',
+                                                                      array('src' => $OUTPUT->pix_url('starred','local_mail'))),
+                                                                      $linkparams);
+        } else {
             $linkparams = array('title' => get_string('nostarred', 'local_mail'));
-            $output .= html_writer::link($url, html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('nostarred','local_mail'))), $linkparams);
+            $output .= html_writer::link($url,
+                                         html_writer::empty_tag('img', array('src' => $OUTPUT->pix_url('nostarred','local_mail'))),
+                                         $linkparams);
         }
         $output .= html_writer::end_tag('span');
         return $output;
@@ -201,45 +189,88 @@ class local_mail_renderer extends plugin_renderer_base {
         return html_writer::empty_tag('input', $attributes);
     }
 
-    function mail($message) {
+    function settings($type) {
+        $url = new moodle_url('/local/mail/preferences.php');
+        $output = html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'class' => 'mail_toolbar'));
+        $label = get_string('settings', 'local_mail');
+        $attributes = array('type' => 'hidden', 'name' => 'type', 'value' => $type);
+        $output .= html_writer::empty_tag('input', $attributes);
+        if ($type == 'course' or $type == 'label') {
+            $course = optional_param('c',0,PARAM_INT);
+            $attributes = array('type' => 'hidden', 'name' => 'c', 'value' => $course);
+            $output .= html_writer::empty_tag('input', $attributes);
+        }
+        $attributes = array('type' => 'submit', 'name' => 'settings', 'value' => $label, 'class' => 'singlebutton');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('form');
+        return $output;
+    }
+
+    function read() {
+        $label = get_string('read', 'local_mail');
+        $attributes = array('type' => 'submit', 'name' => 'read', 'value' => $label, 'class' => 'singlebutton');
+        return html_writer::empty_tag('input', $attributes);
+    }
+
+    function unread() {
+        $label = get_string('unread', 'local_mail');
+        $attributes = array('type' => 'submit', 'name' => 'unread', 'value' => $label, 'class' => 'singlebutton');
+        return html_writer::empty_tag('input', $attributes);
+    }
+
+    function mail($message, $reply = false) {
         global $CFG, $OUTPUT, $USER;
 
         $totalusers = 0;
 
         $output = html_writer::empty_tag('input', array(
                 'type' => 'hidden',
-                'name' => 'msg',
+                'name' => 'm',
                 'value' => $message->id(),
         ));
-
         $output .= $OUTPUT->container_start('mail_header');
         $output .= $OUTPUT->container_start('left');
         $output .= $OUTPUT->user_picture($message->sender());
         $output .= $OUTPUT->container_end();
         $output .= $OUTPUT->container_start('mail_info');
-        $output .= html_writer::link($CFG->wwwroot.'/user/view.php?id='.$message->sender()->id.'&course='.$message->course()->id, fullname($message->sender()), array('class' => 'user_from'));
+        $output .= html_writer::link(new moodle_url('/user/view.php',
+                                            array(
+                                                'id' => $message->sender()->id,
+                                                'course' => $message->course()->id
+                                            )),
+                                    fullname($message->sender()),
+                                    array('class' => 'user_from'));
         $output .= $this->date($message);
-        $output .= $OUTPUT->container_start('mail_recipients');
-        foreach (array('to', 'cc', 'bcc') as $role) {
-            $recipients = $message->recipients($role);
-            if (!empty($recipients)) {
-                $output .= html_writer::start_tag('div');
-                $output .= html_writer::tag('span', get_string($role, 'local_mail'), array('class' => 'mail_role'));
-                $numusers = count($recipients);
-                $totalusers += $numusers;
-                $cont = 1;
-                foreach ($recipients as $user) {
-                    $output .= html_writer::link($CFG->wwwroot.'/user/view.php?id='.$user->id.'&course='.$message->course()->id, fullname($user));
-                    if ($cont < $numusers) {
-                        $output .= ', ';
+        if (!$reply) {
+            $output .= $OUTPUT->container_start('mail_recipients');
+            foreach (array('to', 'cc', 'bcc') as $role) {
+                $recipients = $message->recipients($role);
+                if (!empty($recipients)) {
+                    $output .= html_writer::start_tag('div');
+                    $output .= html_writer::tag('span', get_string($role, 'local_mail'), array('class' => 'mail_role'));
+                    $numusers = count($recipients);
+                    $totalusers += $numusers;
+                    $cont = 1;
+                    foreach ($recipients as $user) {
+                        $output .= html_writer::link(new moodle_url('/user/view.php',
+                                            array(
+                                                'id' => $user->id,
+                                                'course' => $message->course()->id
+                                            )),
+                                            fullname($user));
+                        if ($cont < $numusers) {
+                            $output .= ', ';
+                        }
+                        $cont += 1;
                     }
-                    $cont += 1;
+                    $output .= ' ';
+                    $output .= html_writer::end_tag('div');
                 }
-                $output .= ' ';
-                $output .= html_writer::end_tag('div');
             }
+            $output .= $OUTPUT->container_end();
+        } else {
+            $output .= html_writer::tag('div', '', array('class' => 'mail_recipients'));
         }
-        $output .= $OUTPUT->container_end();
         $output .= $OUTPUT->container_end();
         $output .= $OUTPUT->container_end();
 
@@ -247,13 +278,14 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= $OUTPUT->container_start('mail_content');
         $output .= format_text($message->content(), $message->format());
         $output .= $OUTPUT->container_end();
-        if ($message->sender()->id !== $USER->id) {
-            $output .= $this->toolbar('reply', ($totalusers > 1));
-        } else {
-            $output .= $this->toolbar('forward');
+        if (!$reply) {
+            if ($message->sender()->id !== $USER->id) {
+                $output .= $this->toolbar('reply', ($totalusers > 1));
+            } else {
+                $output .= $this->toolbar('forward');
+            }
         }
         $output .= $OUTPUT->container_end();
-
         return $output;
     }
 
@@ -267,12 +299,18 @@ class local_mail_renderer extends plugin_renderer_base {
             $output = $this->forward();
         } else {
             $delete = $this->delete($type);
+            $read = '';
+            $unread = $this->unread();
             $pagingbar = '';
             if ($type !== 'view') {
-                $pagingbar = $this->paging($paging['offset'], $paging['count'], $paging['totalcount'], $paging['pagesize']);
+                $read = $this->read();
+                $pagingbar = $this->paging($paging['offset'],
+                                        $paging['count'],
+                                        $paging['totalcount'],
+                                        $paging['pagesize']);
             }
             $clearer = $this->output->container('', 'clearer');
-            $output = $delete . $pagingbar . $clearer;
+            $output = $delete . $read . $unread . $pagingbar . $clearer;
         }
         return $this->output->container($output, 'mail_toolbar');
     }
@@ -292,6 +330,8 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function view($params) {
+        global $USER;
+
         $content = '';
 
         $type = $params['type'];
@@ -301,17 +341,47 @@ class local_mail_renderer extends plugin_renderer_base {
         $count = count($messages);
         $offset = $params['offset'];
         $totalcount = $params['totalcount'];
+        $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
 
         if ($messages) {
             $url = new moodle_url($this->page->url);
             $content .= html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
-            $content .= $this->toolbar($type, false, array('offset' => $offset, 'count' => $count, 'totalcount' => $totalcount, 'pagesize' => MAIL_PAGESIZE));
+            $paging = array(
+                'offset' => $offset,
+                'count' => $count,
+                'totalcount' => $totalcount,
+                'pagesize' => $mailpagesize,
+            );
+            $content .= $this->toolbar($type, false, $paging);
             $content .= $this->messagelist($messages, $userid, $type, $itemid);
             $content .= html_writer::empty_tag('input', array(
                     'type' => 'hidden',
                     'name' => 'sesskey',
                     'value' => sesskey(),
             ));
+            $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
+            $nums = array('5', '10', '20', '50', '100');
+            $cont = count($nums) - 1;
+            $perpage = '';
+            foreach ($nums as $num) {
+                $params = array(
+                        'perpage' => $num,
+                        'sesskey' => sesskey());
+                if ($mailpagesize == $num) {
+                    $perpage .= html_writer::start_tag('strong');
+                }
+                $url = new moodle_url($this->page->url, $params);
+                $perpage .= html_writer::link($url, $num);
+                if ($mailpagesize == $num) {
+                    $perpage .= html_writer::end_tag('strong');
+                }
+                if ($cont) {
+                    $perpage .= '|';
+                }
+                $cont -= 1;
+            }
+            $content .= get_string('perpage', 'local_mail', $perpage);
+            $content .= html_writer::end_tag('div');
             $content .= html_writer::end_tag('form');
         } else {
             $text = get_string('nomessages', 'local_mail');

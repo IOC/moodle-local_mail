@@ -4,7 +4,7 @@ require_once('../../config.php');
 require_once('locallib.php');
 require_once('compose_form.php');
 
-$messageid = required_param('id', PARAM_INT);
+$messageid = required_param('m', PARAM_INT);
 $remove = optional_param_array('remove', false, PARAM_INT);
 
 // Fetch message
@@ -14,10 +14,17 @@ if (!$message or !$message->editable($USER->id)) {
     print_error('local_mail', 'invalidmessage');
 }
 
+// Fetch references
+
+$refs = $message->references();
+if (!empty($refs)) {
+    $references = local_mail_message::fetch_many($refs);
+}
+
 // Set up page
 
 $url = new moodle_url('/local/mail/compose.php');
-$url->param('id', $message->id());
+$url->param('m', $message->id());
 local_mail_setup_page($message->course(), $url);
 
 // Remove recipients
@@ -52,7 +59,7 @@ if ($data = $mform->get_data()) {
     if (!empty($data->discard)) {
         $message->discard();
         $url = new moodle_url('/local/mail/view_course.php');
-        $url->param('id', $message->course()->id);
+        $url->param('c', $message->course()->id);
         redirect($url);
     }
 
@@ -60,7 +67,7 @@ if ($data = $mform->get_data()) {
 
     // Select recipients
     if (!empty($data->recipients)) {
-        $params = array('id' => $message->id());
+        $params = array('m' => $message->id());
         $url = new moodle_url('/local/mail/recipients.php', $params);
         redirect($url);
     }
@@ -76,7 +83,8 @@ if ($data = $mform->get_data()) {
     if (!empty($data->send)) {
         $message->send();
         $url = new moodle_url('/local/mail/view_course.php');
-        $url->param('id', $courseid);
+        $url->param('c', $message->course()->id);
+        local_mail_send_notifications($message);
         redirect($url);
     }
 }
@@ -85,4 +93,13 @@ if ($data = $mform->get_data()) {
 
 echo $OUTPUT->header();
 $mform->display();
+$mailoutput = $PAGE->get_renderer('local_mail');
+if (!empty($refs)) {
+    echo $OUTPUT->container_start('mail_reply');
+    echo html_writer::tag('h2', get_string('references', 'local_mail'));
+    foreach ($references as $ref) {
+        echo $mailoutput->mail($ref, true);
+    }
+    echo $OUTPUT->container_end();
+}
 echo $OUTPUT->footer();

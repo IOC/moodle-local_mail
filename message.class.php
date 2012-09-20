@@ -113,7 +113,7 @@ class local_mail_message {
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $item);
         $records = $DB->get_records('local_mail_index', $conditions, 'time DESC',
-                                    'id, messageid', $limitfrom, $limitfrom);
+                                    'id, messageid', $limitfrom, $limitnum);
         $ids = array_map(function($r) { return $r->messageid; }, $records);
 
         return self::fetch_many($ids);
@@ -141,7 +141,7 @@ class local_mail_message {
 
         $sql = 'SELECT mu.id AS recordid, mu.messageid, mu.userid, mu.role,'
             . ' mu.unread, mu.starred, mu.deleted,'
-            . ' u.username, u.firstname, u.lastname, u.email, u.picture, u.imagealt'
+            . ' u.username, u.firstname, u.lastname, u.email, u.picture, u.imagealt, u.maildisplay'
             . ' FROM {local_mail_message_users} mu'
             . ' JOIN {user} u ON u.id = mu.userid'
             . ' WHERE mu.messageid  IN (' . implode(',', $ids) . ')';
@@ -584,6 +584,7 @@ class local_mail_message {
                     'email' => $r->email,
                     'picture' => $r->picture,
                     'imagealt' => $r->imagealt,
+                    'maildisplay' => $r->maildisplay,
                 );
             }
         }
@@ -649,6 +650,7 @@ class local_mail_message {
         $record->email = $user->email;
         $record->picture = $user->picture;
         $record->imagealt = $user->imagealt;
+        $record->maildisplay = $user->maildisplay;
 
         return $record;
     }
@@ -663,7 +665,7 @@ class local_mail_message {
     private static function fetch_user($userid) {
         global $DB;
         $conditions = array('id' => $userid);
-        $fields = 'id, username, firstname, lastname, email, picture, imagealt';
+        $fields = 'id, username, firstname, lastname, email, picture, imagealt, maildisplay';
         return $DB->get_record('user', $conditions, $fields, MUST_EXIST);
     }
 
