@@ -552,7 +552,25 @@ class local_mail_message {
     }
 
     function viewable($userid) {
-        return $this->has_user($userid) and (!$this->draft or $this->role[$userid] == 'from');
+        global $DB;
+
+        if ($this->has_user($userid)) {
+            return !$this->draft or $this->role[$userid] == 'from';
+        } else {
+            $sql = 'SELECT m.id'
+                . ' FROM {local_mail_messages} m'
+                . ' JOIN {local_mail_message_users} mu ON mu.messageid = m.id'
+                . ' JOIN {local_mail_message_refs} mr ON mr.messageid = m.id'
+                . ' WHERE mr.reference = :messageid'
+                . ' AND mu.userid = :userid'
+                . ' AND (m.draft = 0 OR mu.role = :role)';
+            $params = array(
+                'role' => 'from',
+                'messageid' => $this->id,
+                'userid' => $userid,
+            );
+            return $DB->record_exists_sql($sql, $params);
+        }
     }
 
     private function __construct($record, $ref_records, $user_records, $label_records=array()) {
