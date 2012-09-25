@@ -285,6 +285,8 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertCount(2, $result->labels());
         $this->assertContains($label1, $result->labels());
         $this->assertContains($label2, $result->labels());
+
+        $this->assertFalse(local_mail_message::fetch(503));
     }
 
     function test_fetch_index() {
@@ -320,6 +322,7 @@ class local_mail_message_test extends local_mail_testcase {
         $message2->send();
         $message2->add_label($label1);
         $message2->add_label($label2);
+
         $result = local_mail_message::fetch_many(array($message1->id(), $message2->id()));
 
         $this->assertCount(2, $result);

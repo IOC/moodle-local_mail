@@ -122,8 +122,10 @@ class local_mail_message {
     static function fetch_many(array $ids) {
         global $DB;
 
+        $messages = array();
+
         if (!$ids) {
-            return array();
+            return $messages;
         }
 
         $sql = 'SELECT m.id, m.courseid, m.subject, m.content, m.format,'
