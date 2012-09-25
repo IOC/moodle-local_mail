@@ -431,9 +431,11 @@ class local_mail_message {
 
         if ($references = $this->references()) {
             $message = self::fetch($references[0]);
-            foreach ($this->recipients() as $users) {
-                foreach ($message->labels($user->id) as $label) {
-                    $this->add_label($label);
+            foreach ($this->recipients() as $user) {
+                if ($message->has_user($user->id)) {
+                    foreach ($message->labels($user->id) as $label) {
+                        $this->add_label($label);
+                    }
                 }
             }
         }

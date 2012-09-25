@@ -521,6 +521,7 @@ class local_mail_message_test extends local_mail_testcase {
         $reference->send();
         $reference->add_label($label);
         $message = $reference->reply(202);
+        $message->add_recipient('cc', 203);
 
         $message->send();
 
