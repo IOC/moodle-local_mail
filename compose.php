@@ -58,8 +58,8 @@ if ($data = $mform->get_data()) {
     // Discard message
     if (!empty($data->discard)) {
         $message->discard();
-        $url = new moodle_url('/local/mail/view_course.php');
-        $url->param('c', $message->course()->id);
+        $params = array('t' => 'course', 'c' => $message->course()->id);
+        $url = new moodle_url('/local/mail/view.php', $params);
         redirect($url);
     }
 
@@ -67,23 +67,21 @@ if ($data = $mform->get_data()) {
 
     // Select recipients
     if (!empty($data->recipients)) {
-        $params = array('m' => $message->id());
-        $url = new moodle_url('/local/mail/recipients.php', $params);
+        $url = new moodle_url('/local/mail/recipients.php', array('m' => $message->id()));
         redirect($url);
     }
 
     // Save message
     if (!empty($data->save)) {
-        $params = array('type' => 'drafts');
-        $url = new moodle_url('/local/mail/view_drafts.php');
+        $url = new moodle_url('/local/mail/view.php', array('t' => 'drafts'));
         redirect($url);
     }
 
     // Send message
     if (!empty($data->send)) {
         $message->send();
-        $url = new moodle_url('/local/mail/view_course.php');
-        $url->param('c', $message->course()->id);
+        $params = array('t' => 'course', 'c' => $message->course()->id);
+        $url = new moodle_url('/local/mail/view.php', $params);
         local_mail_send_notifications($message);
         redirect($url);
     }

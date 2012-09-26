@@ -37,8 +37,7 @@ if ($data = data_submitted()) {
 
     // Cancel
     if (!empty($data->cancel)) {
-        $params = array('m' => $messageid);
-        $url = new moodle_url('/local/mail/compose.php', $params);
+        $url = new moodle_url('/local/mail/compose.php', array('m' => $messageid));
         redirect($url);
     }
 
@@ -58,8 +57,7 @@ if ($data = data_submitted()) {
         }
     }
 
-    $params = array('m' => $messageid);
-    $url = new moodle_url('/local/mail/compose.php', $params);
+    $url = new moodle_url('/local/mail/compose.php', array('m' => $messageid));
     redirect($url);
 }
 

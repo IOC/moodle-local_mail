@@ -54,12 +54,14 @@ class local_mail_renderer extends plugin_renderer_base {
             $content = ($this->users($message, $userid, $type, $itemid) .
                         $this->summary($message, $userid, $type, $itemid) .
                         $this->date($message));
-            $params = array('m' => $message->id());
             if ($message->editable($userid)) {
-                $url = new moodle_url('/local/mail/compose.php', $params);
+                $url = new moodle_url('/local/mail/compose.php', array('m' => $message->id()));
                 $url->param('type', $type);
             } else {
-                $url = new moodle_url("/local/mail/view_$type.php", $params);
+                $params = array('t' => $type, 'm' => $message->id());
+                $type == 'course' and $params['c'] = $itemid;
+                $type == 'label' and $params['l'] = $itemid;
+                $url = new moodle_url("/local/mail/view.php", $params);
             }
             if ($message->unread($userid)) {
                 $unreadclass = 'mail_unread';

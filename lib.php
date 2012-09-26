@@ -50,13 +50,13 @@ function local_mail_extends_navigation($root) {
     if (!empty($count->inbox)) {
         $text .= ' (' . $count->inbox . ')';
     }
-    $url = new moodle_url('/local/mail/view_inbox.php');
+    $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox'));
     $node->add(s($text), $url);
 
     // Starred
 
     $text = get_string('starred', 'local_mail');
-    $url = new moodle_url('/local/mail/view_starred.php');
+    $url = new moodle_url('/local/mail/view.php', array('t' => 'starred'));
     $node->add(s($text), $url);
 
     // Drafts
@@ -65,13 +65,13 @@ function local_mail_extends_navigation($root) {
     if (!empty($count->drafts)) {
         $text .= ' (' . $count->drafts . ')';
     }
-    $url = new moodle_url('/local/mail/view_drafts.php');
+    $url = new moodle_url('/local/mail/view.php', array('t' => 'drafts'));
     $node->add(s($text), $url);
 
     // Sent
 
     $text = get_string('sent', 'local_mail');
-    $url = new moodle_url('/local/mail/view_sent.php');
+    $url = new moodle_url('/local/mail/view.php', array('t' => 'sent'));
     $node->add(s($text), $url);
 
     // Courses
@@ -83,7 +83,8 @@ function local_mail_extends_navigation($root) {
         if (!empty($count->courses[$course->id])) {
             $text .= ' (' . $count->courses[$course->id] . ')';
         }
-        $url = new moodle_url('/local/mail/view_course.php', array('c' => $course->id));
+        $params = array('t' => 'course', 'c' => $course->id);
+        $url = new moodle_url('/local/mail/view.php', $params);
         $nodecourses->add(s($text), $url);
     }
 
@@ -98,7 +99,8 @@ function local_mail_extends_navigation($root) {
             if (!empty($count->labels[$label->id()])) {
                 $text .= ' (' . $count->labels[$label->id()] . ')';
             }
-            $url = new moodle_url('/local/mail/view_label.php', array('l' => $label->id()));
+            $params = array('t' => 'label', 'l' => $label->id());
+            $url = new moodle_url('/local/mail/view.php', $params);
             $nodelabels->add(s($text), $url);
         }
     }
@@ -106,7 +108,7 @@ function local_mail_extends_navigation($root) {
     // Trash
 
     $text = get_string('trash', 'local_mail');
-    $url = new moodle_url('/local/mail/view_trash.php');
+    $url = new moodle_url('/local/mail/view.php', array('t' => 'trash'));
     $node->add(s($text), $url);
 }
 
