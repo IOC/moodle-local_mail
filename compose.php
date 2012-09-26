@@ -39,16 +39,23 @@ if ($remove) {
 $data = array();
 $customdata = array();
 $customdata['message'] = $message;
-$mform = new mail_compose_form($url, $customdata);
+$customdata['context'] = $PAGE->context;
 
 $mform = new mail_compose_form($url, $customdata);
 
+$draftareaid = file_get_submitted_draft_itemid('messae');
+$content = file_prepare_draft_area($draftareaid, $PAGE->context->id,
+                                   'local_mail','message', $message->id(),
+                                   mail_compose_form::file_options(),
+                                   $message->content());
 $format = $message->format() >= 0 ? $message->format() : editors_get_preferred_format();
 
 $data['course'] = $message->course()->id;
 $data['subject'] = $message->subject();
 $data['content']['format'] = $format;
-$data['content']['text'] = $message->content();
+$data['content']['text'] = $content;
+$data['content']['itemid'] = $draftareaid;
+$data['attachments'] = $draftareaid;
 $mform->set_data($data);
 
 // Process form
@@ -57,13 +64,20 @@ if ($data = $mform->get_data()) {
 
     // Discard message
     if (!empty($data->discard)) {
+        $fs = get_file_storage();
+        $fs->delete_area_files($PAGE->context->id, 'local_mail', 'message', $message->id());
         $message->discard();
         $params = array('t' => 'course', 'c' => $message->course()->id);
         $url = new moodle_url('/local/mail/view.php', $params);
         redirect($url);
     }
 
-    $message->save(trim($data->subject), $data->content['text'], $data->content['format']);
+    $content = file_save_draft_area_files($data->content['itemid'], $PAGE->context->id,
+                                          'local_mail', 'message', $message->id(),
+                                          mail_compose_form::file_options(),
+                                          $data->content['text']);
+
+    $message->save(trim($data->subject), $content, $data->content['format']);
 
     // Select recipients
     if (!empty($data->recipients)) {
@@ -100,4 +114,5 @@ if (!empty($refs)) {
     }
     echo $OUTPUT->container_end();
 }
+
 echo $OUTPUT->footer();

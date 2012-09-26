@@ -278,7 +278,7 @@ class local_mail_renderer extends plugin_renderer_base {
 
         $output .= $OUTPUT->container_start('mail_body');
         $output .= $OUTPUT->container_start('mail_content');
-        $output .= format_text($message->content(), $message->format());
+        $output .= local_mail_format_content($message);
         $output .= $OUTPUT->container_end();
         if (!$reply) {
             if ($message->sender()->id !== $USER->id) {

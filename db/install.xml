@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/mail/db" VERSION="20120917" COMMENT="-"
+<XMLDB PATH="blocks/mail/db" VERSION="20120926" COMMENT="-"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -58,7 +58,8 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="messageid" UNIQUE="false" FIELDS="messageid"/>
+        <INDEX NAME="messageid" UNIQUE="false" FIELDS="messageid" NEXT="reference"/>
+        <INDEX NAME="reference" UNIQUE="false" FIELDS="reference" PREVIOUS="messageid"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="local_mail_message_users" COMMENT="-" PREVIOUS="local_mail_message_refs" NEXT="local_mail_index">

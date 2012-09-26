@@ -1,9 +1,26 @@
 <?php
 
+require_once($CFG->libdir . '/filelib.php');
 require_once('label.class.php');
 require_once('message.class.php');
 
 define('MAIL_PAGESIZE', 10);
+define('LOCAL_MAIL_MAXFILES', 5);
+define('LOCAL_MAIL_MAXBYTES', 1048576);
+
+function local_mail_attachments($message) {
+    $context = context_course::instance($message->course()->id);
+    $fs = get_file_storage();
+    return $fs->get_area_files($context->id, 'local_mail', 'message',
+                               $message->id(), 'filename', false);
+}
+
+function local_mail_format_content($message) {
+    $context = context_course::instance($message->course()->id);
+    $content = file_rewrite_pluginfile_urls($message->content(), 'pluginfile.php', $context->id,
+                                            'local_mail', 'message', $message->id());
+    return format_text($content, $message->format());
+}
 
 function local_mail_setup_page($course, $url) {
     global $DB, $PAGE;

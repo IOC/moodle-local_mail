@@ -1,6 +1,7 @@
 <?php
 
 require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot . '/repository/lib.php');
 
 class mail_compose_form extends moodleform {
 
@@ -52,8 +53,13 @@ class mail_compose_form extends moodleform {
         // Content
 
         $label = get_string('message', 'local_mail');
-        $mform->addElement('editor', 'content', $label);
+        $mform->addElement('editor', 'content', $label, null, self::file_options());
         $mform->setType('content', PARAM_RAW);
+
+        // Attachments
+
+        $label = get_string('attachments', 'local_mail');
+        $mform->addElement('filemanager', 'attachments', $label, null, self::file_options());
 
         // Buttons
 
@@ -77,6 +83,11 @@ class mail_compose_form extends moodleform {
 
         $errors = array();
 
+        // Skip on discard
+        if (!empty($data['discard'])) {
+            return array();
+        }
+
         // Course selected
         if (isset($data['course']) and $data['course'] == SITEID) {
             $errors['course'] = get_string('erroremptycourse', 'local_mail');
@@ -92,7 +103,30 @@ class mail_compose_form extends moodleform {
             $errors['recipients'] = get_string('erroremptyrecipients', 'local_mail');
         }
 
+        // Maximum number of attachmnents
+
+        $options = self::file_options();
+        $info = file_get_draft_area_info($data['attachments']);
+        if ($info['filecount'] > $options['maxfiles']) {
+            $errors['attachments'] = get_string('maxfilesreached', 'moodle', $options['maxfiles']);
+        }
+
         return $errors;
+    }
+
+    public static function file_options() {
+        global $COURSE, $PAGE, $CFG;
+
+        $config_maxbytes = get_config('local_mail', 'maxbytes') ?: LOCAL_MAIL_MAXBYTES;
+        $config_maxfiles = get_config('local_mail', 'maxfiles');
+        $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes,
+                                                  $COURSE->maxbytes, $config_maxbytes);
+        $maxfiles = is_numeric($config_maxfiles) ? $config_maxfiles : LOCAL_MAIL_MAXFILES;
+        return array('accepted_types' => '*',
+                     'maxbytes' => $maxbytes,
+                     'maxfiles' => $maxfiles,
+                     'return_types' => FILE_INTERNAL | FILE_EXTERNAL,
+                     'subdirs' => false);
     }
 
     private function format_recipients($users) {

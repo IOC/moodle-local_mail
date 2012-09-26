@@ -3,6 +3,8 @@
 require_once($CFG->dirroot . '/local/mail/locallib.php');
 
 function local_mail_course_deleted($course) {
+    $context = context_course::instance($course->id);
+    $fs->delete_area_files($course->context->id, 'local_mail');
     local_mail_message::delete_course($course->id);
 }
 
@@ -112,3 +114,33 @@ function local_mail_extends_navigation($root) {
     $node->add(s($text), $url);
 }
 
+function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
+                               $forcedownload, array $options=array()) {
+    global $USER;
+
+    // Check course
+
+    require_login($course, true);
+    if ($context->contextlevel != CONTEXT_COURSE or $context->instanceid != $course->id) {
+        return false;
+    }
+
+    // Check message
+
+    $messageid = (int) array_shift($args);
+    $message = local_mail_message::fetch($messageid);
+    if ($filearea != 'message' or !$message or !$message->viewable($USER->id)) {
+        return false;
+    }
+
+    // Fetch file info
+
+    $fs = get_file_storage();
+    $relativepath = implode('/', $args);
+    $fullpath = "/$context->id/local_mail/$filearea/$messageid/$relativepath";
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, true, $options);
+}
