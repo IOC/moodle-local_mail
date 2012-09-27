@@ -551,12 +551,14 @@ class local_mail_message {
         return $this->unread[$userid];
     }
 
-    function viewable($userid) {
+    function viewable($userid, $include_refs=false) {
         global $DB;
 
         if ($this->has_user($userid)) {
             return !$this->draft or $this->role[$userid] == 'from';
-        } else {
+        }
+
+        if ($include_refs) {
             $sql = 'SELECT m.id'
                 . ' FROM {local_mail_messages} m'
                 . ' JOIN {local_mail_message_users} mu ON mu.messageid = m.id'
@@ -571,6 +573,8 @@ class local_mail_message {
             );
             return $DB->record_exists_sql($sql, $params);
         }
+
+        return false;
     }
 
     private function __construct($record, $ref_records, $user_records, $label_records=array()) {

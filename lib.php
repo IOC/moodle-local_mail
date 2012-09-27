@@ -129,7 +129,7 @@ function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
 
     $messageid = (int) array_shift($args);
     $message = local_mail_message::fetch($messageid);
-    if ($filearea != 'message' or !$message or !$message->viewable($USER->id)) {
+    if ($filearea != 'message' or !$message or !$message->viewable($USER->id, true)) {
         return false;
     }
 

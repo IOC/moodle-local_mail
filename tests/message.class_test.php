@@ -638,6 +638,7 @@ class local_mail_message_test extends local_mail_testcase {
         $forwarded->add_recipient('to', 203);
         $forwarded->send();
 
-        $this->assertTrue($message->viewable(203));
+        $this->assertFalse($message->viewable(203));
+        $this->assertTrue($message->viewable(203, true));
     }
 }
