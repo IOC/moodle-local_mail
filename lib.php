@@ -57,7 +57,7 @@ function local_mail_extends_navigation($root) {
 
     // Starred
 
-    $text = get_string('starred', 'local_mail');
+    $text = get_string('starredmail', 'local_mail');
     $url = new moodle_url('/local/mail/view.php', array('t' => 'starred'));
     $node->add(s($text), $url);
 
@@ -72,7 +72,7 @@ function local_mail_extends_navigation($root) {
 
     // Sent
 
-    $text = get_string('sent', 'local_mail');
+    $text = get_string('sentmail', 'local_mail');
     $url = new moodle_url('/local/mail/view.php', array('t' => 'sent'));
     $node->add(s($text), $url);
 

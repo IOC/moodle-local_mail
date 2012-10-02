@@ -61,7 +61,9 @@
 }
 
 .mail_list .mail_item {
+    padding: 0 0.5em;
     border-top: 1px solid #ddd;
+    white-space: nowrap;
 }
 
 
@@ -104,15 +106,8 @@
 }
 
 .mail_list .mail_summary {
-    width: 50%;
+    width: 45%;
     text-overflow: ellipsis;
-}
-
-.mail_list .mail_label {
-    background-color: #eee;
-    padding: 0.2em 0.4em;
-    margin: 0 0.2em;
-    border-radius: 0.2em;
 }
 
 .mail_list .mail_label.mail_draft {
@@ -121,8 +116,8 @@
 }
 
 .mail_list .mail_date {
-    width: 10%;
-    text-align: center;
+    width: 15%;
+    text-align: right;
 }
 
 .mail_list .mail_unread {
@@ -134,8 +129,8 @@
   white-space: nowrap;
   overflow: hidden;
   vertical-align: middle;
-  width:18px;
-  height:18px;
+  min-width: 2%;
+  height: 18px;
 }
 
 /* Toolbar */
@@ -225,6 +220,26 @@
     border-bottom: 2px solid #aaa;
 }
 
+.mail_attachments {
+    margin: 1em 0 0.5em;
+    border-top: 1px solid #aaa;
+    width: 50%;
+}
+
+.mail_attachment {
+    margin: 0.5em 0 0.5em 1em;
+    display: block;
+}
+
+.mail_attachment_size {
+    margin-left: 1em;
+}
+
+.mail_attachment_text {
+    margin-left: 0.5em;
+    font-weight: bold;
+}
+
 /* Mail reply */
 
 .mail_reply .mail_header {
@@ -234,4 +249,62 @@
 .mail_reply .mail_info .mail_date {
     float: none;
     display: block;
+}
+
+/* Mail references */
+
+.mail_references {
+    margin: 1em 0 0 43px;
+}
+
+.mail_references .mail_header {
+    margin-top: 1em;
+}
+
+.mail_references .mail_info .mail_date {
+    float: none;
+    display: block;
+}
+
+/* Label colors */
+
+.mail_label {
+    background-color: #eee;
+    padding: 0.2em 0.4em;
+    margin: 0 0.2em;
+    border-radius: 0.4em;
+}
+
+.mail_label_black, .mail_label_colors option[value="black"] {
+    background-color: #2e3436;
+    color: #fff;
+}
+
+.mail_label_red, .mail_label_colors option[value="red"] {
+    background-color: #a40000;
+    color: #fff;
+}
+
+.mail_label_orange, .mail_label_colors option[value="orange"] {
+    background-color: #f57900;
+    color: #fff;
+}
+
+.mail_label_yellow, .mail_label_colors option[value="yellow"] {
+    background-color: #fce94f;
+}
+
+.mail_label_green, .mail_label_colors option[value="green"] {
+    background-color: #4e9a06;
+    color: #fff;
+}
+
+.mail_label_blue, .mail_label_colors option[value="blue"]{
+    background-color: #204a87;
+    color: #fff;
+}
+
+.mail_label_purple, .mail_label_colors option[value="purple"] {
+    background-color: #5c3566;
+    color: #fff;
 }

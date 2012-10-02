@@ -107,12 +107,7 @@ echo $OUTPUT->header();
 $mform->display();
 $mailoutput = $PAGE->get_renderer('local_mail');
 if (!empty($refs)) {
-    echo $OUTPUT->container_start('mail_reply');
-    echo html_writer::tag('h2', get_string('references', 'local_mail'));
-    foreach ($references as $ref) {
-        echo $mailoutput->mail($ref, true);
-    }
-    echo $OUTPUT->container_end();
+    echo $mailoutput->references($references, true);
 }
 
 echo $OUTPUT->footer();

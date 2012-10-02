@@ -2,6 +2,7 @@
 
 require_once('../../config.php');
 require_once('locallib.php');
+require_once('labels_form.php');
 
 $type      = required_param('t', PARAM_ALPHA);
 $messageid = optional_param('m', 0, PARAM_INT);
@@ -10,6 +11,7 @@ $labelid   = optional_param('l', 0, PARAM_INT);
 $delete    = optional_param('delete', false, PARAM_ALPHA);
 $forward   = optional_param('forward', false, PARAM_BOOL);
 $offset    = optional_param_array('offset', array(), PARAM_INT);
+$myoffset  = optional_param('myoffset', 0, PARAM_INT);
 $reply     = optional_param('reply', false, PARAM_BOOL);
 $replyall  = optional_param('replyall', false, PARAM_BOOL);
 $starred   = optional_param('starred', false, PARAM_INT);
@@ -17,12 +19,139 @@ $msgs      = optional_param_array('msgs', array(), PARAM_INT);
 $read      = optional_param('read', false, PARAM_ALPHA);
 $unread    = optional_param('unread', false, PARAM_ALPHA);
 $perpage   = optional_param('perpage', false, PARAM_INT);
+$assignlbl = optional_param('assignlbl', false, PARAM_BOOL);
 
 $url = new moodle_url('/local/mail/view.php', array('t' => $type));
 $type == 'course' and $url->param('c', $courseid);
 $type == 'label' and $url->param('l', $labelid);
+empty($offset) and $url->param('myoffset', $myoffset);
 
-if ($messageid) {
+if ($assignlbl) {
+    $courseid = $courseid ?: $SITE->id;
+
+    if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+        print_error('invalidcourse', 'error');
+    }
+
+    local_mail_setup_page($course, $url);
+
+    // Set up form
+    $customdata = array();
+    $data = data_submitted();
+    $colors = local_mail_label::valid_colors();
+    if ( isset($data->submitbutton) or isset($data->cancel) ) {
+        if (isset($data->submitbutton)) {
+            $newlabel = false;
+            $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_ALPHANUMEXT));
+            if (!empty($data->newlabelname) and in_array($data->newlabelcolor, $colors)) {
+                $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);
+            }
+            if ($messageid) {
+                $message = local_mail_message::fetch($messageid);
+                if (!$message or !$message->viewable($USER->id)) {
+                    print_error('local_mail', 'nomessages');
+                }
+                if (isset($data->labelid)) {
+                    $data->labelid = clean_param_array($data->labelid, PARAM_INT);
+                    $labels = local_mail_label::fetch_user($USER->id);
+                    foreach ($labels as $label) {
+                        if ($data->labelid[$label->id()]) {
+                            $message->add_label($label);
+                        } else {
+                            $message->remove_label($label);
+                        }
+                    }
+                }
+                if ($newlabel) {
+                    $message->add_label($newlabel);
+                }
+            } else {
+                if ($msgs) {
+                    $messages = local_mail_message::fetch_many($msgs);
+                    if (isset($data->labelid)) {
+                        $data->labelid =  clean_param_array($data->labelid, PARAM_INT);
+                        $labels = local_mail_label::fetch_user($USER->id);
+                    }
+                    foreach ($messages as $message) {
+                        if (!$message->viewable($USER->id)) {
+                            print_error('local_mail', 'invalidmessage');
+                        }
+                        if (isset($data->labelid)) {
+                            foreach ($labels as $label) {
+                                if ($data->labelid[$label->id()]) {
+                                    $message->add_label($label);
+                                } else {
+                                    $message->remove_label($label);
+                                }
+                            }
+                        }
+                        if ($newlabel) {
+                            $message->add_label($newlabel);
+                        }
+                    }
+                }
+            }
+        }
+        if ($messageid) {
+            $url->param('m', $messageid);
+        }
+        redirect($url);
+    }
+    //Check whether there are messages to assign or not
+    if (!$messageid and empty($msgs)) {
+        print_error('noselectedmessages', 'local_mail', $url);
+    }
+    //Set up customdata
+    $customdata["assignlbl"] = $assignlbl;
+    $customdata["t"] = $type;
+    $customdata["myoffset"] = $myoffset;
+    $customdata["colors"] = array();
+    if ($messageid) {
+        $customdata["m"] = $messageid;
+    } else {
+        $customdata["msgs"] = $msgs;
+    }
+    foreach ($colors as $color) {
+        $customdata["colors"][$color] = $color;
+    }
+
+    $labels = local_mail_label::fetch_user($USER->id);
+    if ($messageid) {
+        $message = local_mail_message::fetch($messageid);
+    } else {
+        $messages = local_mail_message::fetch_many($msgs);
+    }
+    $customdata["labelids"] = array();
+    if ($labels) {
+        $ids = array_keys($labels);
+        foreach($labels as $label) {
+            $customdata['labelname'.$label->id()] = $label->name();
+            $customdata['color'.$label->id()] = $label->color();
+            if (!isset($messages)) {
+                $customdata['labelid['.$label->id().']'] = $message->has_label($label);
+            } else {
+                foreach($messages as $message) {
+                    if ($message->has_label($label)) {
+                        $customdata['labelid['.$label->id().']'] = 1;
+                    }
+                }
+            }
+        }
+        $customdata["labelids"] = $ids;
+    }
+
+    //Create form
+    $mform = new mail_labels_form($url, $customdata);
+
+    $mform->set_data($customdata);
+
+    // Display page
+
+    echo $OUTPUT->header();
+    $mform->display();
+    echo $OUTPUT->footer();
+
+} elseif ($messageid) {
     // Fetch message
 
     $message = local_mail_message::fetch($messageid);
@@ -56,7 +185,7 @@ if ($messageid) {
         if ($message->id() === $starred) {
             $message->set_starred($USER->id, !$message->starred($USER->id));
         }
-        $params = array('m' => $message->id());
+        $url->param('m', $message->id());
         redirect($url);
     }
 
@@ -85,7 +214,7 @@ if ($messageid) {
         redirect($url);
     }
 
-    $url->param('message', $message->id());
+    $url->param('m', $message->id());
     echo $OUTPUT->header();
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
     $mailoutput = $PAGE->get_renderer('local_mail');
@@ -109,6 +238,10 @@ if ($messageid) {
     ));
 
     echo html_writer::end_tag('form');
+    $refs = $message->references();
+    if (!empty($refs)) {
+        echo $mailoutput->references(local_mail_message::fetch_many($refs));
+    }
     echo $OUTPUT->footer();
 
 } else {
@@ -116,13 +249,18 @@ if ($messageid) {
     // Set up messages
 
     if (empty($offset)) {
-        $offset = 0;
+        $offset = $myoffset?:0;
     } else {
         $offset = key($offset);
     }
+
     $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
-    $totalcount = local_mail_message::count_index($USER->id, $type, $courseid);
-    $messages = local_mail_message::fetch_index($USER->id, $type, $courseid, $offset, $mailpagesize);
+
+    $itemid = ($labelid?:$courseid);
+
+    $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
+    $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
+
 
     // Display page
 
