@@ -223,6 +223,7 @@ if ($assignlbl) {
 
     echo $OUTPUT->container_start('mail_subject');
     $title = s($message->subject());
+    echo $mailoutput->label_message($message);
     echo $OUTPUT->heading($title, 3, '');
     echo $mailoutput->starred($message, $USER->id, $type, true);
     echo $OUTPUT->container_end();

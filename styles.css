@@ -271,7 +271,7 @@
 .mail_label {
     background-color: #eee;
     padding: 0.2em 0.4em;
-    margin: 0 0.2em;
+    margin: 0 0.1em;
     border-radius: 0.4em;
 }
 
@@ -307,4 +307,8 @@
 .mail_label_purple, .mail_label_colors option[value="purple"] {
     background-color: #5c3566;
     color: #fff;
+}
+
+.mail_group_labels {
+    margin-right: 0.5em;
 }

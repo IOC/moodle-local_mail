@@ -33,12 +33,13 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function label_message($message) {
-        $output = '';
+        $output = html_writer::start_tag('span', array('class' => 'mail_group_labels'));
         $labels = $message->labels();
         foreach ($labels as $label) {
             $output .= html_writer::tag('span', s($label->name()),
                 array('class' => 'mail_label mail_label_'. $label->color()));
         }
+        $output .= html_writer::end_tag('span');
         return $output;
     }
 
