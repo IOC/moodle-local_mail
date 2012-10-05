@@ -24,6 +24,9 @@ function local_mail_extends_navigation($root) {
     // My mail
 
     $text = get_string('mymail', 'local_mail');
+    if (!empty($count->inbox)) {
+        $text .= ' (' . $count->inbox . ')';
+    }
     $node = navigation_node::create($text, null, navigation_node::TYPE_ROOTNODE);
     $root->add_node($node, 'courses');
 
