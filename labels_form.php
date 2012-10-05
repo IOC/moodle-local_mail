@@ -11,11 +11,11 @@ class mail_labels_form extends moodleform {
         $colors = $this->_customdata['colors'];
         $labelids = $this->_customdata['labelids'];
         $type = $this->_customdata['t'];
-        $myoffset = $this->_customdata['myoffset'];
+        $offset = $this->_customdata['offset'];
 
         $mform->addElement('hidden', 't', $type);
 
-        $mform->addElement('hidden', 'myoffset', $myoffset);
+        $mform->addElement('hidden', 'offset', $offset);
 
         if ($this->_customdata['t'] == 'course') {
             $mform->addElement('hidden', 'c', $this->_customdata['c']);

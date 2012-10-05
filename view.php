@@ -10,8 +10,9 @@ $courseid  = optional_param('c', 0, PARAM_INT);
 $labelid   = optional_param('l', 0, PARAM_INT);
 $delete    = optional_param('delete', false, PARAM_ALPHA);
 $forward   = optional_param('forward', false, PARAM_BOOL);
-$offset    = optional_param_array('offset', array(), PARAM_INT);
-$myoffset  = optional_param('myoffset', 0, PARAM_INT);
+$offset    = optional_param('offset', 0, PARAM_INT);
+$nextpage  = optional_param('nextpage', false, PARAM_BOOL);
+$prevpage  = optional_param('prevpage', false, PARAM_BOOL);
 $reply     = optional_param('reply', false, PARAM_BOOL);
 $replyall  = optional_param('replyall', false, PARAM_BOOL);
 $starred   = optional_param('starred', false, PARAM_INT);
@@ -22,9 +23,10 @@ $perpage   = optional_param('perpage', false, PARAM_INT);
 $assignlbl = optional_param('assignlbl', false, PARAM_BOOL);
 
 $url = new moodle_url('/local/mail/view.php', array('t' => $type));
-$type == 'course' and $url->param('c', $courseid);
-$type == 'label' and $url->param('l', $labelid);
-empty($offset) and $url->param('myoffset', $myoffset);
+$offset = max(0, $offset);
+
+if ($type == 'course') $url->param('c', $courseid);
+if ($type == 'label') $url->param('l', $labelid);
 
 if ($assignlbl) {
     $courseid = $courseid ?: $SITE->id;
@@ -33,6 +35,7 @@ if ($assignlbl) {
         print_error('invalidcourse', 'error');
     }
 
+    $url->param('offset', $offset);
     local_mail_setup_page($course, $url);
 
     // Set up form
@@ -104,7 +107,7 @@ if ($assignlbl) {
     //Set up customdata
     $customdata["assignlbl"] = $assignlbl;
     $customdata["t"] = $type;
-    $customdata["myoffset"] = $myoffset;
+    $customdata["offset"] = $offset;
     $customdata["colors"] = array();
     if ($messageid) {
         $customdata["m"] = $messageid;
@@ -247,15 +250,19 @@ if ($assignlbl) {
 
 } else {
 
-    // Set up messages
+    $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
 
-    if (empty($offset)) {
-        $offset = $myoffset?:0;
-    } else {
-        $offset = key($offset);
+    if($prevpage or $nextpage) {
+        if($prevpage) {
+            $offset = max(0, $offset - $mailpagesize);
+         } elseif ($nextpage) {
+            $offset = $offset + $mailpagesize;
+         }
+         $url->param('offset', $offset);
+         redirect($url);
     }
 
-    $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
+    // Set up messages
 
     $itemid = ($labelid?:$courseid);
 
@@ -272,6 +279,7 @@ if ($assignlbl) {
     }
 
     local_mail_setup_page($course, $url);
+    $url->param('offset', $offset);
 
     // Remove
     if ($delete) {

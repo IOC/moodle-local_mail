@@ -87,7 +87,7 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    function paging($offset, $count, $totalcount, $pagesize) {
+    function paging($offset, $count, $totalcount) {
         if ($count == 1) {
             $a = array('index' => $offset + 1, 'total' => $totalcount);
             $str = get_string('pagingsingle', 'local_mail', $a);
@@ -95,13 +95,11 @@ class local_mail_renderer extends plugin_renderer_base {
             $a = array('first' => $offset + 1, 'last' => $offset + $count, 'total' => $totalcount);
             $str = get_string('pagingmultiple', 'local_mail', $a);
         }
-        $prevoffset = max(0, $offset - $pagesize);
-        $prevurl = new moodle_url($this->page->url, array('offset' => $prevoffset));
         $prevtitle = $this->output->larrow();
         $params = array(
             'value' => $prevtitle,
             'type' => 'submit',
-            'name' => 'offset[' . $prevoffset . ']',
+            'name' => 'prevpage',
             'tooltip' => get_string('previous'),
             'class' => 'singlebutton',
         );
@@ -110,13 +108,11 @@ class local_mail_renderer extends plugin_renderer_base {
         }
         $prev = html_writer::empty_tag('input', $params);
 
-        $nextoffset = min($totalcount - 1, $offset + $pagesize);
-        $nexturl = new moodle_url($this->page->url, array('offset' => $nextoffset));
         $nexttitle = $this->output->rarrow();
         $params = array(
             'value' => $nexttitle,
             'type' => 'submit',
-            'name' => 'offset[' . $nextoffset . ']',
+            'name' => 'nextpage',
             'tooltip' => get_string('next'),
             'class' => 'singlebutton',
         );
@@ -392,8 +388,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 }
                 $pagingbar = $this->paging($paging['offset'],
                                         $paging['count'],
-                                        $paging['totalcount'],
-                                        $paging['pagesize']);
+                                        $paging['totalcount']);
             }
             $clearer = $this->output->container('', 'clearer');
             $output = $delete . $read . $unread . $labels . $pagingbar . $clearer;
@@ -457,6 +452,7 @@ class local_mail_renderer extends plugin_renderer_base {
             foreach ($nums as $num) {
                 $params = array(
                         'perpage' => $num,
+                        'offset' => $offset,
                         'sesskey' => sesskey()
                 );
                 if ($mailpagesize == $num) {
