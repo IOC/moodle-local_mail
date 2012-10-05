@@ -57,7 +57,8 @@ class local_mail_renderer extends plugin_renderer_base {
                     'type' => 'checkbox',
                     'name' => 'msgs[]',
                     'value' => $message->id(),
-                    'class' => 'mail_checkbox');
+                    'class' => 'mail_checkbox'
+            );
             $checkbox = html_writer::empty_tag('input', $attributes);
             $flags = $this->starred($message, $userid, $type);
             $content = ($this->users($message, $userid, $type, $itemid) .
@@ -151,20 +152,31 @@ class local_mail_renderer extends plugin_renderer_base {
 
     function delete($type) {
         $label = ($type === 'trash'?get_string('restore', 'local_mail'):get_string('delete'));
-        $attributes = array('type' => 'submit', 'name' => 'delete', 'value' => $label, 'class' => 'singlebutton');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'delete',
+            'value' => $label,
+            'class' => 'singlebutton'
+        );
         return html_writer::empty_tag('input', $attributes);
     }
 
     function reply() {
         $label = get_string('reply', 'local_mail');
-        $attributes = array('type' => 'submit', 'name' => 'reply', 'value' => $label, 'class' => 'singlebutton');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'reply',
+            'value' => $label,
+            'class' => 'singlebutton'
+        );
         return html_writer::empty_tag('input', $attributes);
     }
 
     function starred($message, $userid, $type, $view = false) {
         $params = array(
                 'starred' => $message->id(),
-                'sesskey' => sesskey());
+                'sesskey' => sesskey()
+        );
         $url = new moodle_url($this->page->url, $params);
         $output = html_writer::start_tag('span', array('class' => 'mail_flags'));
         if ($view){
@@ -187,13 +199,23 @@ class local_mail_renderer extends plugin_renderer_base {
 
     function forward() {
         $label = get_string('forward', 'local_mail');
-        $attributes = array('type' => 'submit', 'name' => 'forward', 'value' => $label, 'class' => 'singlebutton');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'forward',
+            'value' => $label,
+            'class' => 'singlebutton'
+        );
         return html_writer::empty_tag('input', $attributes);
     }
 
     function replyall($enabled = false) {
         $label = get_string('replyall', 'local_mail');
-        $attributes = array('type' => 'submit', 'name' => 'replyall', 'value' => $label, 'class' => 'singlebutton');
+        $attributes = array('
+            type' => 'submit', '
+            name' => 'replyall', '
+            value' => $label, '
+            class' => 'singlebutton'
+        );
         if (!$enabled){
             $attributes = array_merge($attributes, array('disabled' => 'disabled'));
         }
@@ -204,20 +226,35 @@ class local_mail_renderer extends plugin_renderer_base {
         $label = get_string('setlabels', 'local_mail');
         $attributes = array('type' => 'hidden', 'name' => 'type', 'value' => $type);
         $output = html_writer::empty_tag('input', $attributes);
-        $attributes = array('type' => 'submit', 'name' => 'assignlbl', 'value' => $label, 'class' => 'singlebutton');
+        $attributes = array('
+            type' => 'submit', '
+            name' => 'assignlbl',
+            'value' => $label,
+            'class' => 'singlebutton'
+        );
         $output .= html_writer::empty_tag('input', $attributes);
         return $output;
     }
 
     function read() {
         $label = get_string('read', 'local_mail');
-        $attributes = array('type' => 'submit', 'name' => 'read', 'value' => $label, 'class' => 'singlebutton');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'read', '
+            value' => $label, '
+            class' => 'singlebutton'
+        );
         return html_writer::empty_tag('input', $attributes);
     }
 
     function unread() {
         $label = get_string('unread', 'local_mail');
-        $attributes = array('type' => 'submit', 'name' => 'unread', 'value' => $label, 'class' => 'singlebutton');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'unread',
+            'value' => $label, '
+            class' => 'singlebutton'
+        );
         return html_writer::empty_tag('input', $attributes);
     }
 
@@ -420,7 +457,8 @@ class local_mail_renderer extends plugin_renderer_base {
             foreach ($nums as $num) {
                 $params = array(
                         'perpage' => $num,
-                        'sesskey' => sesskey());
+                        'sesskey' => sesskey()
+                );
                 if ($mailpagesize == $num) {
                     $perpage .= html_writer::start_tag('strong');
                 }

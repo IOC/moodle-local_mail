@@ -48,8 +48,6 @@ function local_mail_setup_page($course, $url) {
 }
 
 function local_mail_send_notifications($message) {
-    global $CFG;
-
     // Send the mail now!
     foreach ($message->recipients() as $userto) {
 
