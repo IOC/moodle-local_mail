@@ -102,7 +102,13 @@ if ($assignlbl) {
     }
     //Check whether there are messages to assign or not
     if (!$messageid and empty($msgs)) {
-        print_error('noselectedmessages', 'local_mail', $url);
+        echo $OUTPUT->header();
+        echo html_writer::tag('p', get_string('noselectedmessages', 'local_mail'), array('class' => 'box errorbox'));
+        $continuebutton = new single_button($url, get_string('continue'));
+        $continuebutton->class = 'continuebutton';
+        echo $OUTPUT->render($continuebutton);
+        echo $OUTPUT->footer();
+        die;
     }
     //Set up customdata
     $customdata["assignlbl"] = $assignlbl;
