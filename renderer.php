@@ -60,7 +60,10 @@ class local_mail_renderer extends plugin_renderer_base {
                     'class' => 'mail_checkbox'
             );
             $checkbox = html_writer::empty_tag('input', $attributes);
-            $flags = $this->starred($message, $userid, $type, $offset);
+            $flags = '';
+            if ($type !== 'trash') {
+                $flags = $this->starred($message, $userid, $type, $offset);
+            }
             $content = ($this->users($message, $userid, $type, $itemid) .
                         $this->summary($message, $userid, $type, $itemid) .
                         $this->date($message));
@@ -370,7 +373,7 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    function toolbar($type, $replyall = false, $paging = null) {
+    function toolbar($type, $replyall = false, $paging = null, $trash = false) {
         if ($type === 'reply') {
             $output = $this->reply();
             //all recipients
@@ -380,7 +383,10 @@ class local_mail_renderer extends plugin_renderer_base {
             $output = $this->forward();
         } else {
             $delete = $this->delete($type);
-            $labels = $this->labels($type);
+            $labels = '';
+            if (!$trash and $type !== 'trash' and $type !== 'drafts') {
+                $labels = $this->labels($type);
+            }
             $read = $unread = '';
             if ($type !== 'drafts') {
                 $unread = $this->unread();

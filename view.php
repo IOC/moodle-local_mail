@@ -51,7 +51,8 @@ if ($assignlbl) {
             }
             if ($messageid) {
                 $message = local_mail_message::fetch($messageid);
-                if (!$message or !$message->viewable($USER->id)) {
+                $invalid = $message->deleted($USER->id) or $message->draft();
+                if (!$message or !$message->viewable($USER->id) or $invalid) {
                     print_error('local_mail', 'nomessages');
                 }
                 if (isset($data->labelid)) {
@@ -76,7 +77,8 @@ if ($assignlbl) {
                         $labels = local_mail_label::fetch_user($USER->id);
                     }
                     foreach ($messages as $message) {
-                        if (!$message->viewable($USER->id)) {
+                        $invalid = $message->deleted($USER->id) or $message->draft();
+                        if (!$message->viewable($USER->id) or $invalid) {
                             print_error('local_mail', 'invalidmessage');
                         }
                         if (isset($data->labelid)) {
@@ -127,8 +129,16 @@ if ($assignlbl) {
     $labels = local_mail_label::fetch_user($USER->id);
     if ($messageid) {
         $message = local_mail_message::fetch($messageid);
+        if ($message->deleted($USER->id) or $message->draft()) {
+            print_error('local_mail', 'invalidmessage');
+        }
     } else {
         $messages = local_mail_message::fetch_many($msgs);
+        foreach ($messages as $message) {
+            if ($message->deleted($USER->id) or $message->draft()) {
+                print_error('local_mail', 'invalidmessage');
+            }
+        }
     }
     $customdata["labelids"] = array();
     if ($labels) {
@@ -191,7 +201,7 @@ if ($assignlbl) {
 
     if ($starred) {
         require_sesskey();
-        if ($message->id() === $starred) {
+        if (!$message->deleted($USER->id) and $message->id() === $starred) {
             $message->set_starred($USER->id, !$message->starred($USER->id));
         }
         $url->param('m', $message->id());
@@ -227,14 +237,16 @@ if ($assignlbl) {
     echo $OUTPUT->header();
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
     $mailoutput = $PAGE->get_renderer('local_mail');
-    echo $mailoutput->toolbar('view');
+    echo $mailoutput->toolbar('view', false, null, true);
     echo $OUTPUT->container_start('mail_view');
 
     echo $OUTPUT->container_start('mail_subject');
     $title = s($message->subject());
     echo $mailoutput->label_message($message);
     echo $OUTPUT->heading($title, 3, '');
-    echo $mailoutput->starred($message, $USER->id, $type, 0, true);
+    if ($type !== 'trash') {
+        echo $mailoutput->starred($message, $USER->id, $type, 0, true);
+    }
     echo $OUTPUT->container_end();
 
     echo $mailoutput->mail($message);
@@ -312,7 +324,7 @@ if ($assignlbl) {
     if ($starred) {
         require_sesskey();
         $message = local_mail_message::fetch($starred);
-        if (!$message or !$message->viewable($USER->id)) {
+        if (!$message or !$message->viewable($USER->id) or $message->deleted($USER->id)) {
             print_error('local_mail', 'invalidmessage');
         }
         $message->set_starred($USER->id, !$message->starred($USER->id));
