@@ -48,7 +48,7 @@ class local_mail_renderer extends plugin_renderer_base {
         return html_writer::tag('span', s($name), array('class' => 'mail_label mail_draft'));
     }
 
-    function messagelist($messages, $userid, $type, $itemid) {
+    function messagelist($messages, $userid, $type, $itemid, $offset) {
         $output = $this->output->container_start('mail_list');
 
         foreach ($messages as $message) {
@@ -60,7 +60,7 @@ class local_mail_renderer extends plugin_renderer_base {
                     'class' => 'mail_checkbox'
             );
             $checkbox = html_writer::empty_tag('input', $attributes);
-            $flags = $this->starred($message, $userid, $type);
+            $flags = $this->starred($message, $userid, $type, $offset);
             $content = ($this->users($message, $userid, $type, $itemid) .
                         $this->summary($message, $userid, $type, $itemid) .
                         $this->date($message));
@@ -88,7 +88,9 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function paging($offset, $count, $totalcount) {
-        if ($count == 1) {
+        if ($offset === false){
+            $str = get_string('pagingempty', 'local_mail', $totalcount);
+        } elseif ($count == 1) {
             $a = array('index' => $offset + 1, 'total' => $totalcount);
             $str = get_string('pagingsingle', 'local_mail', $a);
         } else {
@@ -103,7 +105,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'tooltip' => get_string('previous'),
             'class' => 'singlebutton',
         );
-        if ($offset === 0) {
+        if (!$offset) {
             $params = array_merge($params, array('disabled' => 'disabled'));
         }
         $prev = html_writer::empty_tag('input', $params);
@@ -116,7 +118,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'tooltip' => get_string('next'),
             'class' => 'singlebutton',
         );
-        if (($offset + $count) == $totalcount) {
+        if ($offset === false or ($offset + $count) == $totalcount) {
             $params = array_merge($params, array('disabled' => 'disabled'));
         }
         $next = html_writer::empty_tag('input', $params);
@@ -168,15 +170,17 @@ class local_mail_renderer extends plugin_renderer_base {
         return html_writer::empty_tag('input', $attributes);
     }
 
-    function starred($message, $userid, $type, $view = false) {
+    function starred($message, $userid, $type, $offset = 0, $view = false) {
         $params = array(
                 'starred' => $message->id(),
                 'sesskey' => sesskey()
         );
         $url = new moodle_url($this->page->url, $params);
+        $url->param('offset', $offset);
         $output = html_writer::start_tag('span', array('class' => 'mail_flags'));
         if ($view){
             $url->param('m', $message->id());
+            $url->remove_params(array('offset'));
         }
         if ($message->starred($userid)) {
             $linkparams = array('title' => get_string('starred', 'local_mail'));
@@ -424,57 +428,65 @@ class local_mail_renderer extends plugin_renderer_base {
         $totalcount = $params['totalcount'];
         $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
 
-        if ($messages) {
-            $url = new moodle_url($this->page->url);
-            $content .= html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
-            $paging = array(
-                'offset' => $offset,
-                'count' => $count,
-                'totalcount' => $totalcount,
-                'pagesize' => $mailpagesize,
-            );
-            $content .= $this->toolbar($type, false, $paging);
-            $content .= $this->messagelist($messages, $userid, $type, $itemid);
-            $content .= html_writer::empty_tag('input', array(
-                    'type' => 'hidden',
-                    'name' => 'sesskey',
-                    'value' => sesskey(),
-            ));
-            $content .= html_writer::empty_tag('input', array(
-                    'type' => 'hidden',
-                    'name' => 'myoffset',
-                    'value' => $offset,
-            ));
-            $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
-            $nums = array('5', '10', '20', '50', '100');
-            $cont = count($nums) - 1;
-            $perpage = '';
-            foreach ($nums as $num) {
-                $params = array(
-                        'perpage' => $num,
-                        'offset' => $offset,
-                        'sesskey' => sesskey()
-                );
-                if ($mailpagesize == $num) {
-                    $perpage .= html_writer::start_tag('strong');
-                }
-                $url = new moodle_url($this->page->url, $params);
-                $perpage .= html_writer::link($url, $num);
-                if ($mailpagesize == $num) {
-                    $perpage .= html_writer::end_tag('strong');
-                }
-                if ($cont) {
-                    $perpage .= '|';
-                }
-                $cont -= 1;
-            }
-            $content .= get_string('perpage', 'local_mail', $perpage);
-            $content .= html_writer::end_tag('div');
-            $content .= html_writer::end_tag('form');
-        } else {
-            $text = get_string('nomessages', 'local_mail');
-            $content = html_writer::tag('p', s($text));
+        $url = new moodle_url($this->page->url);
+        $content .= html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
+        $paging = array(
+            'offset' => $offset,
+            'count' => $count,
+            'totalcount' => $totalcount,
+            'pagesize' => $mailpagesize,
+        );
+        if (!$messages) {
+            $paging['offset'] = false;
         }
+        $content .= $this->toolbar($type, false, $paging);
+        if ($messages) {
+            $content .= $this->messagelist($messages, $userid, $type, $itemid, $offset);
+        } else {
+            $content .= $this->output->container_start('mail_list');
+            $string = get_string('nomessagestoview', 'local_mail');
+            $initurl = new moodle_url('/local/mail/view.php');
+            $initurl->param('t' , $type);
+            $link = html_writer::link($initurl, get_string('showrecentmessages', 'local_mail'));
+            $content .= html_writer::tag('div', $string.' '.$link, array('class' => 'mail_item'));
+            $content .= $this->output->container_end();
+        }
+        $content .= html_writer::empty_tag('input', array(
+                'type' => 'hidden',
+                'name' => 'sesskey',
+                'value' => sesskey(),
+        ));
+        $content .= html_writer::empty_tag('input', array(
+                'type' => 'hidden',
+                'name' => 'myoffset',
+                'value' => $offset,
+        ));
+        $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
+        $nums = array('5', '10', '20', '50', '100');
+        $cont = count($nums) - 1;
+        $perpage = '';
+        foreach ($nums as $num) {
+            $params = array(
+                    'perpage' => $num,
+                    'offset' => $offset,
+                    'sesskey' => sesskey()
+            );
+            if ($mailpagesize == $num) {
+                $perpage .= html_writer::start_tag('strong');
+            }
+            $url = new moodle_url($this->page->url, $params);
+            $perpage .= html_writer::link($url, $num);
+            if ($mailpagesize == $num) {
+                $perpage .= html_writer::end_tag('strong');
+            }
+            if ($cont) {
+                $perpage .= '|';
+            }
+            $cont -= 1;
+        }
+        $content .= get_string('perpage', 'local_mail', $perpage);
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::end_tag('form');
 
         return $this->output->container($content);
     }
