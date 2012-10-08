@@ -69,7 +69,6 @@ class local_mail_renderer extends plugin_renderer_base {
                         $this->date($message));
             if ($message->editable($userid)) {
                 $url = new moodle_url('/local/mail/compose.php', array('m' => $message->id()));
-                $url->param('type', $type);
             } else {
                 $params = array('t' => $type, 'm' => $message->id());
                 $type == 'course' and $params['c'] = $itemid;
@@ -464,7 +463,7 @@ class local_mail_renderer extends plugin_renderer_base {
         ));
         $content .= html_writer::empty_tag('input', array(
                 'type' => 'hidden',
-                'name' => 'myoffset',
+                'name' => 'offset',
                 'value' => $offset,
         ));
         $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
