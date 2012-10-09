@@ -383,7 +383,7 @@ class local_mail_renderer extends plugin_renderer_base {
         } else {
             $delete = $this->delete($type);
             $labels = '';
-            if (!$trash and $type !== 'trash' and $type !== 'drafts') {
+            if (!$trash and $type !== 'trash') {
                 $labels = $this->labels($type);
             }
             $read = $unread = '';
@@ -400,7 +400,7 @@ class local_mail_renderer extends plugin_renderer_base {
                                         $paging['totalcount']);
             }
             $clearer = $this->output->container('', 'clearer');
-            $output = $delete . $read . $unread . $labels . $pagingbar . $clearer;
+            $output = $labels . $read . $unread . $pagingbar . $delete . $clearer;
         }
         return $this->output->container($output, 'mail_toolbar');
     }

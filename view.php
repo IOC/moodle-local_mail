@@ -51,8 +51,7 @@ if ($assignlbl) {
             }
             if ($messageid) {
                 $message = local_mail_message::fetch($messageid);
-                $invalid = $message->deleted($USER->id) or $message->draft();
-                if (!$message or !$message->viewable($USER->id) or $invalid) {
+                if (!$message or !$message->viewable($USER->id) or $message->deleted($USER->id)) {
                     print_error('local_mail', 'nomessages');
                 }
                 if (isset($data->labelid)) {
@@ -77,8 +76,7 @@ if ($assignlbl) {
                         $labels = local_mail_label::fetch_user($USER->id);
                     }
                     foreach ($messages as $message) {
-                        $invalid = $message->deleted($USER->id) or $message->draft();
-                        if (!$message->viewable($USER->id) or $invalid) {
+                        if (!$message->viewable($USER->id) or $message->deleted($USER->id)) {
                             print_error('local_mail', 'invalidmessage');
                         }
                         if (isset($data->labelid)) {
@@ -129,13 +127,13 @@ if ($assignlbl) {
     $labels = local_mail_label::fetch_user($USER->id);
     if ($messageid) {
         $message = local_mail_message::fetch($messageid);
-        if ($message->deleted($USER->id) or $message->draft()) {
+        if ($message->deleted($USER->id)) {
             print_error('local_mail', 'invalidmessage');
         }
     } else {
         $messages = local_mail_message::fetch_many($msgs);
         foreach ($messages as $message) {
-            if ($message->deleted($USER->id) or $message->draft()) {
+            if ($message->deleted($USER->id)) {
                 print_error('local_mail', 'invalidmessage');
             }
         }
@@ -237,7 +235,7 @@ if ($assignlbl) {
     echo $OUTPUT->header();
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
     $mailoutput = $PAGE->get_renderer('local_mail');
-    echo $mailoutput->toolbar('view', false, null, true);
+    echo $mailoutput->toolbar('view', false, null, ($type === 'trash'));
     echo $OUTPUT->container_start('mail_view');
 
     echo $OUTPUT->container_start('mail_subject');
