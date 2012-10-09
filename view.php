@@ -113,6 +113,7 @@ if ($assignlbl) {
     //Set up customdata
     $customdata["assignlbl"] = $assignlbl;
     $customdata["t"] = $type;
+    $customdata["c"] = $courseid;
     $customdata["offset"] = $offset;
     $customdata["colors"] = array();
     if ($messageid) {
