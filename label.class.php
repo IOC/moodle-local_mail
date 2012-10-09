@@ -94,14 +94,6 @@ class local_mail_label {
         $DB->update_record('local_mail_labels', $record);
     }
 
-    function set_color($color) {
-        $this->color = $color;
-    }
-
-    function set_name($name) {
-        $this->name = $name;
-    }
-
     function userid() {
         return $this->userid;
     }
