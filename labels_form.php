@@ -39,7 +39,6 @@ class mail_labels_form extends moodleform {
         // List labels
 
         $mform->addElement('header', 'listlabels', get_string('labels', 'local_mail'));
-        $cont = 0;
         if ($labelids) {
             foreach($labelids as $id) {
                 $html = html_writer::tag('span', $this->_customdata['labelname'.$id], array('class' => 'mail_label '.'mail_label_'.$this->_customdata['color'.$id]));

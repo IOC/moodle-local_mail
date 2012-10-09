@@ -212,11 +212,11 @@ class local_mail_renderer extends plugin_renderer_base {
 
     function replyall($enabled = false) {
         $label = get_string('replyall', 'local_mail');
-        $attributes = array('
-            type' => 'submit', '
-            name' => 'replyall', '
-            value' => $label, '
-            class' => 'singlebutton'
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'replyall',
+            'value' => $label,
+            'class' => 'singlebutton'
         );
         if (!$enabled){
             $attributes = array_merge($attributes, array('disabled' => 'disabled'));
@@ -228,9 +228,9 @@ class local_mail_renderer extends plugin_renderer_base {
         $label = get_string('setlabels', 'local_mail');
         $attributes = array('type' => 'hidden', 'name' => 'type', 'value' => $type);
         $output = html_writer::empty_tag('input', $attributes);
-        $attributes = array('
-            type' => 'submit', '
-            name' => 'assignlbl',
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'assignlbl',
             'value' => $label,
             'class' => 'singlebutton'
         );
@@ -242,9 +242,9 @@ class local_mail_renderer extends plugin_renderer_base {
         $label = get_string('read', 'local_mail');
         $attributes = array(
             'type' => 'submit',
-            'name' => 'read', '
-            value' => $label, '
-            class' => 'singlebutton'
+            'name' => 'read',
+            'value' => $label,
+            'class' => 'singlebutton'
         );
         return html_writer::empty_tag('input', $attributes);
     }
@@ -254,10 +254,31 @@ class local_mail_renderer extends plugin_renderer_base {
         $attributes = array(
             'type' => 'submit',
             'name' => 'unread',
-            'value' => $label, '
-            class' => 'singlebutton'
+            'value' => $label,
+            'class' => 'singlebutton'
         );
         return html_writer::empty_tag('input', $attributes);
+    }
+
+    function optlabels() {
+        $label = get_string('editlabel', 'local_mail');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'editlbl',
+            'value' => $label,
+            'class' => 'singlebutton'
+        );
+        $content = html_writer::tag('span', '', array('class' => 'mail_toolbar_sep'));
+        $content .= html_writer::empty_tag('input', $attributes);
+        $label = get_string('removelabel', 'local_mail');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'removelbl',
+            'value' => $label,
+            'class' => 'singlebutton'
+        );
+        $content .= html_writer::empty_tag('input', $attributes);
+        return $content;
     }
 
     function references($references, $reply = false) {
@@ -382,7 +403,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $output = $this->forward();
         } else {
             $delete = $this->delete($type);
-            $labels = '';
+            $labels = $extended = '';
             if (!$trash and $type !== 'trash') {
                 $labels = $this->labels($type);
             }
@@ -399,8 +420,11 @@ class local_mail_renderer extends plugin_renderer_base {
                                         $paging['count'],
                                         $paging['totalcount']);
             }
+            if ($type === 'label') {
+                $extended = $this->optlabels();
+            }
             $clearer = $this->output->container('', 'clearer');
-            $output = $labels . $read . $unread . $pagingbar . $delete . $clearer;
+            $output = $labels . $read . $unread . $pagingbar . $delete . $extended . $clearer;
         }
         return $this->output->container($output, 'mail_toolbar');
     }

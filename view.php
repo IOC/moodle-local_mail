@@ -3,24 +3,28 @@
 require_once('../../config.php');
 require_once('locallib.php');
 require_once('labels_form.php');
+require_once('label_form.php');
 
-$type      = required_param('t', PARAM_ALPHA);
-$messageid = optional_param('m', 0, PARAM_INT);
-$courseid  = optional_param('c', 0, PARAM_INT);
-$labelid   = optional_param('l', 0, PARAM_INT);
-$delete    = optional_param('delete', false, PARAM_ALPHA);
-$forward   = optional_param('forward', false, PARAM_BOOL);
-$offset    = optional_param('offset', 0, PARAM_INT);
-$nextpage  = optional_param('nextpage', false, PARAM_BOOL);
-$prevpage  = optional_param('prevpage', false, PARAM_BOOL);
-$reply     = optional_param('reply', false, PARAM_BOOL);
-$replyall  = optional_param('replyall', false, PARAM_BOOL);
-$starred   = optional_param('starred', false, PARAM_INT);
-$msgs      = optional_param_array('msgs', array(), PARAM_INT);
-$read      = optional_param('read', false, PARAM_ALPHA);
-$unread    = optional_param('unread', false, PARAM_ALPHA);
-$perpage   = optional_param('perpage', false, PARAM_INT);
-$assignlbl = optional_param('assignlbl', false, PARAM_BOOL);
+$type       = required_param('t', PARAM_ALPHA);
+$messageid  = optional_param('m', 0, PARAM_INT);
+$courseid   = optional_param('c', 0, PARAM_INT);
+$labelid    = optional_param('l', 0, PARAM_INT);
+$delete     = optional_param('delete', false, PARAM_ALPHA);
+$forward    = optional_param('forward', false, PARAM_BOOL);
+$offset     = optional_param('offset', 0, PARAM_INT);
+$nextpage   = optional_param('nextpage', false, PARAM_BOOL);
+$prevpage   = optional_param('prevpage', false, PARAM_BOOL);
+$reply      = optional_param('reply', false, PARAM_BOOL);
+$replyall   = optional_param('replyall', false, PARAM_BOOL);
+$starred    = optional_param('starred', false, PARAM_INT);
+$msgs       = optional_param_array('msgs', array(), PARAM_INT);
+$read       = optional_param('read', false, PARAM_ALPHA);
+$unread     = optional_param('unread', false, PARAM_ALPHA);
+$perpage    = optional_param('perpage', false, PARAM_INT);
+$assignlbl  = optional_param('assignlbl', false, PARAM_BOOL);
+$editlbl    = optional_param('editlbl', false, PARAM_BOOL);
+$removelbl  = optional_param('removelbl', false, PARAM_BOOL);
+$confirmlbl = optional_param('confirmlbl', false, PARAM_BOOL);
 
 $url = new moodle_url('/local/mail/view.php', array('t' => $type));
 $offset = max(0, $offset);
@@ -28,7 +32,88 @@ $offset = max(0, $offset);
 if ($type == 'course') $url->param('c', $courseid);
 if ($type == 'label') $url->param('l', $labelid);
 
-if ($assignlbl) {
+if ($removelbl) {
+    $label = local_mail_label::fetch($labelid);
+    if ($label->userid() != $USER->id) {
+        print_error('invalidlabel', 'local_mail');
+    }
+
+    $courseid = $courseid ?: $SITE->id;
+
+    if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+        print_error('invalidcourse', 'error');
+    }
+
+    local_mail_setup_page($course, $url);
+
+    if ($confirmlbl) {
+        if ($label->userid() != $USER->id) {
+            print_error('invalidlabel', 'local_mail');
+        }
+        $label->delete();
+        $url->param('t', 'inbox');
+        $url->remove_params(array('l'));
+        redirect($url);
+    } else {
+        echo $OUTPUT->header();
+        $cancel = clone $url;
+        $url->param('confirmlbl', '1');
+        $url->param('removelbl', '1');
+
+        echo $OUTPUT->confirm(get_string('labeldeleteconfirm', 'local_mail', $label->name()), $url, $cancel);
+        echo $OUTPUT->footer();
+    }
+} elseif ($editlbl) {
+    $label = local_mail_label::fetch($labelid);
+    if ($label->userid() != $USER->id) {
+        print_error('invalidlabel', 'local_mail');
+    }
+
+    $courseid = $courseid ?: $SITE->id;
+
+    if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+        print_error('invalidcourse', 'error');
+    }
+
+    $url->param('offset', $offset);
+    local_mail_setup_page($course, $url);
+
+    // Set up form
+    $customdata = array();
+    $data = data_submitted();
+    $colors = local_mail_label::valid_colors();
+    if (isset($data->submitbutton) or isset($data->cancel)) {
+        if (isset($data->submitbutton)) {
+            $data->labelname = trim(clean_param($data->labelname, PARAM_ALPHANUMEXT));
+            if (!empty($data->labelname) and in_array($data->labelcolor, $colors)) {
+                $label->save($data->labelname, $data->labelcolor);
+            }
+        }
+        redirect($url);
+    }
+    //Set up customdata
+    $customdata["editlbl"] = $editlbl;
+    $customdata["offset"] = $offset;
+    $customdata["colors"] = array();
+    foreach ($colors as $color) {
+        $customdata["colors"][$color] = $color;
+    }
+    $customdata['l'] = $label->id();
+    $customdata['labelname'] = $label->name();
+    $customdata['labelcolor'] = $label->color();
+
+    //Create form
+    $mform = new mail_label_form($url, $customdata);
+
+    $mform->set_data($customdata);
+
+    // Display page
+
+    echo $OUTPUT->header();
+    $mform->display();
+    echo $OUTPUT->footer();
+
+} elseif ($assignlbl) {
     $courseid = $courseid ?: $SITE->id;
 
     if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -52,7 +137,7 @@ if ($assignlbl) {
             if ($messageid) {
                 $message = local_mail_message::fetch($messageid);
                 if (!$message or !$message->viewable($USER->id) or $message->deleted($USER->id)) {
-                    print_error('local_mail', 'nomessages');
+                    print_error('nomessages', 'local_mail');
                 }
                 if (isset($data->labelid)) {
                     $data->labelid = clean_param_array($data->labelid, PARAM_INT);
@@ -77,7 +162,7 @@ if ($assignlbl) {
                     }
                     foreach ($messages as $message) {
                         if (!$message->viewable($USER->id) or $message->deleted($USER->id)) {
-                            print_error('local_mail', 'invalidmessage');
+                            print_error('invalidmessage', 'local_mail');
                         }
                         if (isset($data->labelid)) {
                             foreach ($labels as $label) {
@@ -129,13 +214,13 @@ if ($assignlbl) {
     if ($messageid) {
         $message = local_mail_message::fetch($messageid);
         if ($message->deleted($USER->id)) {
-            print_error('local_mail', 'invalidmessage');
+            print_error('invalidmessage', 'local_mail');
         }
     } else {
         $messages = local_mail_message::fetch_many($msgs);
         foreach ($messages as $message) {
             if ($message->deleted($USER->id)) {
-                print_error('local_mail', 'invalidmessage');
+                print_error('invalidmessage', 'local_mail');
             }
         }
     }
@@ -174,7 +259,7 @@ if ($assignlbl) {
 
     $message = local_mail_message::fetch($messageid);
     if (!$message or !$message->viewable($USER->id)) {
-        print_error('local_mail', 'invalidmessage');
+        print_error('invalidmessage', 'local_mail');
     }
 
     if (!$course = $DB->get_record('course', array('id' => $message->course()->id))) {
@@ -324,7 +409,7 @@ if ($assignlbl) {
         require_sesskey();
         $message = local_mail_message::fetch($starred);
         if (!$message or !$message->viewable($USER->id) or $message->deleted($USER->id)) {
-            print_error('local_mail', 'invalidmessage');
+            print_error('invalidmessage', 'local_mail');
         }
         $message->set_starred($USER->id, !$message->starred($USER->id));
         redirect($url);

@@ -121,16 +121,16 @@
 }
 
 .mail_list .mail_unread {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .mail_list .mail_flags {
-  display: inline-block;
-  white-space: nowrap;
-  overflow: hidden;
-  vertical-align: middle;
-  min-width: 2%;
-  height: 18px;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
+    min-width: 2%;
+    height: 18px;
 }
 
 /* Toolbar */
@@ -144,14 +144,18 @@
 }
 
 .mail_toolbar .singlebutton {
-  display: inline-block;
-  margin-right: 0.5em;
-  padding: 0.1em 0.2em;
-  min-width: 4em;
+    display: inline-block;
+    margin-right: 0.5em;
+    padding: 0.1em 0.2em;
+    min-width: 4em;
+}
+
+.mail_toolbar_sep {
+    margin-left: 3em;
 }
 
 .mail_paging .singlebutton {
-  min-width: 1em;
+    min-width: 1em;
 }
 
 .mail_perpage {
