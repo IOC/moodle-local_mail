@@ -68,8 +68,15 @@ class local_mail_label {
     function delete() {
         global $DB;
 
+        $transaction = $DB->start_delegated_transaction();
+
         $DB->delete_records('local_mail_labels', array('id' => $this->id));
         $DB->delete_records('local_mail_message_labels', array('labelid' => $this->id));
+
+        $conditions = array('userid' => $this->userid, 'type' => 'label', 'item' => $this->id);
+        $DB->delete_records('local_mail_index', $conditions);
+
+        $transaction->allow_commit();
     }
 
     function id() {
@@ -92,14 +99,6 @@ class local_mail_label {
         $record->color = $this->color = $color;
 
         $DB->update_record('local_mail_labels', $record);
-    }
-
-    function set_color($color) {
-        $this->color = $color;
-    }
-
-    function set_name($name) {
-        $this->name = $name;
     }
 
     function userid() {
