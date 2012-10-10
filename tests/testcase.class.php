@@ -11,9 +11,29 @@ abstract class local_mail_testcase extends advanced_testcase {
         parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
     }
 
+    static function assertIndex($userid, $type, $item, $time, $messageid, $unread) {
+        self::assertRecords('index', array(
+            'userid' => $userid,
+            'type' => $type,
+            'item' => $item,
+            'time' => $time,
+            'messageid' => $messageid,
+            'unread' => $unread,
+        ));
+    }
+
     static function assertNotContains($needle, $haystack, $message = '',
                                       $ignoreCase = false, $checkForObjectIdentity = false) {
         parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+    }
+
+    static function assertNotIndex($userid, $type, $item, $message) {
+        self::assertNotRecords('index', array(
+            'userid' => $userid,
+            'type' => $type,
+            'item' => $item,
+            'messageid' => $message,
+        ));
     }
 
     static function assertNotRecords($table, array $conditions = array()) {

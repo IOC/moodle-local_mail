@@ -16,28 +16,8 @@ class local_mail_message_test extends local_mail_testcase {
 
     private $course1, $course2, $user1, $user2, $user3;
 
-    static function assertIndex($userid, $type, $item, $time, $messageid, $unread) {
-        self::assertRecords('index', array(
-            'userid' => $userid,
-            'type' => $type,
-            'item' => $item,
-            'time' => $time,
-            'messageid' => $messageid,
-            'unread' => $unread,
-        ));
-    }
-
     static function assertMessage(local_mail_message $message) {
         self::assertEquals($message, local_mail_message::fetch($message->id()));
-    }
-
-    static function assertNotIndex($userid, $type, $item, $message) {
-        self::assertNotRecords('index', array(
-            'userid' => $userid,
-            'type' => $type,
-            'item' => $item,
-            'messageid' => $message,
-        ));
     }
 
     function setUp() {

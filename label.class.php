@@ -68,8 +68,15 @@ class local_mail_label {
     function delete() {
         global $DB;
 
+        $transaction = $DB->start_delegated_transaction();
+
         $DB->delete_records('local_mail_labels', array('id' => $this->id));
         $DB->delete_records('local_mail_message_labels', array('labelid' => $this->id));
+
+        $conditions = array('userid' => $this->userid, 'type' => 'label', 'item' => $this->id);
+        $DB->delete_records('local_mail_index', $conditions);
+
+        $transaction->allow_commit();
     }
 
     function id() {

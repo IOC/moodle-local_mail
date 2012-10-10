@@ -27,17 +27,26 @@ class local_mail_label_test extends local_mail_testcase {
         $other = local_mail_label::create(201, 'other', 'green');
         $this->loadRecords('local_mail_message_labels', array(
             array('messageid', 'labelid'),
-            array( 501,       $label->id()),
-            array( 502,       $label->id()),
-            array( 501,       $other->id()),
+            array( 501,         $label->id()),
+            array( 502,         $label->id()),
+            array( 501,         $other->id()),
         ));
-        
+        $this->loadRecords('local_mail_index', array(
+            array('userid', 'type',  'item',        'time', 'messageid', 'unread'),
+            array( 201,     'label',  $label->id(),  1,      501,         0 ),
+            array( 201,     'label',  $label->id(),  2,      501,         0 ),
+            array( 201,     'label',  $other->id(),  3,      501,         0 ),
+        ));
+
         $label->delete();
 
         $this->assertNotRecords('labels', array('id' => $label->id()));
         $this->assertNotRecords('message_labels', array('labelid' => $label->id()));
         $this->assertRecords('labels');
         $this->assertRecords('message_labels');
+        $this->assertNotIndex(201, 'label', $label->id(), 501);
+        $this->assertNotIndex(201, 'label', $label->id(), 501);
+        $this->assertIndex(201, 'label', $other->id(), 3, 501, 0);
     }
 
     function test_fetch() {
