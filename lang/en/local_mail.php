@@ -18,6 +18,7 @@ $string['drafts'] = 'Drafts';
 $string['from'] = 'From';
 $string['editlabel'] = 'Edit label';
 $string['erroremptycourse'] = 'Please specifiy a course.';
+$string['erroremptylabelname'] = 'Please specify a label name.';
 $string['erroremptyrecipients'] = 'Please specifiy at least one recipient.';
 $string['erroremptysubject'] = 'Please specify a subject.';
 $string['inbox'] = 'Inbox';

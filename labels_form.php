@@ -56,7 +56,18 @@ class mail_labels_form extends moodleform {
         $mform->addElement('select', 'newlabelcolor', get_string('labelcolor', 'local_mail'), $colors, array('class' => 'mail_label_colors'));
 
         // Buttons
+
+        $buttonarray = array();
+
+        $label = get_string('savechanges');
+        $buttonarray[] = $mform->createElement('submit', 'submitbutton', $label);
+
+        $label = get_string('cancel');
+        $buttonarray[] = $mform->createElement('submit', 'cancel', $label);
+
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
         
-        $this->add_action_buttons();
+        //$this->add_action_buttons();
     }
 }

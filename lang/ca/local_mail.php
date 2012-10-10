@@ -17,6 +17,7 @@ $string['draft'] = 'Esborrany';
 $string['drafts'] = 'Esborranys';
 $string['editlabel'] = 'Edita l\'etiqueta';
 $string['erroremptycourse'] = 'Si us plau indiqueu un curs.';
+$string['erroremptylabelname'] = 'Si us plau indiqueu un nom d\'etiqueta.';
 $string['erroremptyrecipients'] = 'Indiqueu un destinatari com a mínim.';
 $string['erroremptysubject'] = 'Indiqueu l\'assumpte.';
 $string['inbox'] = 'Safata d\'entrada';

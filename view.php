@@ -80,18 +80,7 @@ if ($removelbl) {
 
     // Set up form
     $customdata = array();
-    $data = data_submitted();
     $colors = local_mail_label::valid_colors();
-    if (isset($data->submitbutton) or isset($data->cancel)) {
-        if (isset($data->submitbutton)) {
-            $data->labelname = trim(clean_param($data->labelname, PARAM_ALPHANUMEXT));
-            if (!empty($data->labelname) and in_array($data->labelcolor, $colors)) {
-                $label->save($data->labelname, $data->labelcolor);
-            }
-        }
-        redirect($url);
-    }
-    //Set up customdata
     $customdata["editlbl"] = $editlbl;
     $customdata["offset"] = $offset;
     $customdata["colors"] = array();
@@ -104,8 +93,17 @@ if ($removelbl) {
 
     //Create form
     $mform = new mail_label_form($url, $customdata);
-
     $mform->set_data($customdata);
+
+    if ($data = $mform->get_data()) {
+        if (isset($data->submitbutton)) {
+            $data->labelname = trim(clean_param($data->labelname, PARAM_ALPHANUMEXT));
+            if ($data->labelname and in_array($data->labelcolor, $colors)) {
+                $label->save($data->labelname, $data->labelcolor);
+            }
+        }
+        redirect($url);
+    }
 
     // Display page
 
@@ -123,68 +121,6 @@ if ($removelbl) {
     $url->param('offset', $offset);
     local_mail_setup_page($course, $url);
 
-    // Set up form
-    $customdata = array();
-    $data = data_submitted();
-    $colors = local_mail_label::valid_colors();
-    if ( isset($data->submitbutton) or isset($data->cancel) ) {
-        if (isset($data->submitbutton)) {
-            $newlabel = false;
-            $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_ALPHANUMEXT));
-            if (!empty($data->newlabelname) and in_array($data->newlabelcolor, $colors)) {
-                $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);
-            }
-            if ($messageid) {
-                $message = local_mail_message::fetch($messageid);
-                if (!$message or !$message->viewable($USER->id) or $message->deleted($USER->id)) {
-                    print_error('nomessages', 'local_mail');
-                }
-                if (isset($data->labelid)) {
-                    $data->labelid = clean_param_array($data->labelid, PARAM_INT);
-                    $labels = local_mail_label::fetch_user($USER->id);
-                    foreach ($labels as $label) {
-                        if ($data->labelid[$label->id()]) {
-                            $message->add_label($label);
-                        } else {
-                            $message->remove_label($label);
-                        }
-                    }
-                }
-                if ($newlabel) {
-                    $message->add_label($newlabel);
-                }
-            } else {
-                if ($msgs) {
-                    $messages = local_mail_message::fetch_many($msgs);
-                    if (isset($data->labelid)) {
-                        $data->labelid =  clean_param_array($data->labelid, PARAM_INT);
-                        $labels = local_mail_label::fetch_user($USER->id);
-                    }
-                    foreach ($messages as $message) {
-                        if (!$message->viewable($USER->id) or $message->deleted($USER->id)) {
-                            print_error('invalidmessage', 'local_mail');
-                        }
-                        if (isset($data->labelid)) {
-                            foreach ($labels as $label) {
-                                if ($data->labelid[$label->id()]) {
-                                    $message->add_label($label);
-                                } else {
-                                    $message->remove_label($label);
-                                }
-                            }
-                        }
-                        if ($newlabel) {
-                            $message->add_label($newlabel);
-                        }
-                    }
-                }
-            }
-        }
-        if ($messageid) {
-            $url->param('m', $messageid);
-        }
-        redirect($url);
-    }
     //Check whether there are messages to assign or not
     if (!$messageid and empty($msgs)) {
         echo $OUTPUT->header();
@@ -195,12 +131,15 @@ if ($removelbl) {
         echo $OUTPUT->footer();
         die;
     }
-    //Set up customdata
+
+    // Set up form
+    $customdata = array();
     $customdata["assignlbl"] = $assignlbl;
     $customdata["t"] = $type;
     $customdata["c"] = $courseid;
     $customdata["offset"] = $offset;
     $customdata["colors"] = array();
+    $colors = local_mail_label::valid_colors();
     if ($messageid) {
         $customdata["m"] = $messageid;
     } else {
@@ -247,6 +186,63 @@ if ($removelbl) {
     $mform = new mail_labels_form($url, $customdata);
 
     $mform->set_data($customdata);
+
+    if ($data = $mform->get_data()) {
+        if (isset($data->submitbutton)) {
+            $newlabel = false;
+            $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_ALPHANUMEXT));
+            if (!empty($data->newlabelname) and in_array($data->newlabelcolor, $colors)) {
+                $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);
+                if (!isset($data->labelid)){
+                    $data->labelid = array();
+                }
+                $data->labelid[$newlabel->id()] = 1;
+            }
+            if ($messageid) {
+                $message = local_mail_message::fetch($messageid);
+                if (!$message or !$message->viewable($USER->id) or $message->deleted($USER->id)) {
+                    print_error('nomessages', 'local_mail');
+                }
+                if (isset($data->labelid)) {
+                    $data->labelid = clean_param_array($data->labelid, PARAM_INT);
+                    $labels = local_mail_label::fetch_user($USER->id);
+                    foreach ($labels as $label) {
+                        if ($data->labelid[$label->id()]) {
+                            $message->add_label($label);
+                        } else {
+                            $message->remove_label($label);
+                        }
+                    }
+                }
+            } else {
+                if ($msgs) {
+                    $messages = local_mail_message::fetch_many($msgs);
+                    if (isset($data->labelid)) {
+                        $data->labelid = clean_param_array($data->labelid, PARAM_INT);
+                        $labels = local_mail_label::fetch_user($USER->id);
+                    }
+                    foreach ($messages as $message) {
+                        if (!$message->viewable($USER->id) or $message->deleted($USER->id)) {
+                            print_error('invalidmessage', 'local_mail');
+                        }
+                        if (isset($data->labelid)) {
+                            foreach ($labels as $label) {
+                                if ($data->labelid[$label->id()]) {
+                                    $message->add_label($label);
+                                } else {
+                                    $message->remove_label($label);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if ($messageid) {
+            $url->param('m', $messageid);
+        }
+        redirect($url);
+    }
 
     // Display page
 

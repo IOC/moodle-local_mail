@@ -26,6 +26,23 @@ class mail_label_form extends moodleform {
 
         // Buttons
         
-        $this->add_action_buttons();
+        $buttonarray = array();
+
+        $label = get_string('savechanges');
+        $buttonarray[] = $mform->createElement('submit', 'submitbutton', $label);
+
+        $label = get_string('cancel');
+        $buttonarray[] = $mform->createElement('submit', 'cancel', $label);
+
+        $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
+        $mform->closeHeaderBefore('buttonar');
+    }
+
+    function validation($data, $files) {
+        $errors = parent::validation($data, $files);
+        if (empty($data['cancel']) and !trim($data['labelname'])) {
+            $errors['labelname'] = get_string('erroremptylabelname', 'local_mail');
+        }
+        return $errors;
     }
 }
