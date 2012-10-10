@@ -179,6 +179,10 @@
     margin-top: 0.5em;
 }
 
+.mail_perpage span{
+    margin: 0 0.5em;
+}
+
 /* View mail */
 
 

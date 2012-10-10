@@ -493,7 +493,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
         $nums = array('5', '10', '20', '50', '100');
         $cont = count($nums) - 1;
-        $perpage = '';
+        $perpage = html_writer::start_tag('span');
         foreach ($nums as $num) {
             $params = array(
                     'perpage' => $num,
@@ -509,10 +509,11 @@ class local_mail_renderer extends plugin_renderer_base {
                 $perpage .= html_writer::end_tag('strong');
             }
             if ($cont) {
-                $perpage .= '|';
+                $perpage .= ' | ';
             }
             $cont -= 1;
         }
+        $perpage .= html_writer::end_tag('span');
         $content .= get_string('perpage', 'local_mail', $perpage);
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('form');
