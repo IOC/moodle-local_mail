@@ -133,6 +133,22 @@
     height: 18px;
 }
 
+/* Mail starred */
+
+.mail_starred {
+    display:inline-block;
+    width: 18px;
+    height: 18px;
+    background: transparent url('pix/starred.png') no-repeat right top;
+}
+
+.mail_nostarred {
+    display:inline-block;
+    width: 18px;
+    height: 18px;
+    background: transparent url('pix/nostarred.png') no-repeat right top;
+}
+
 /* Toolbar */
 
 .mail_toolbar .singlebutton{
