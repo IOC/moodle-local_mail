@@ -436,6 +436,7 @@ if ($removelbl) {
     echo $OUTPUT->header();
     echo $mailoutput->view(array(
         'type' => $type,
+        'labelid' => $labelid,
         'itemid' => $courseid,
         'userid' => $USER->id,
         'messages' => $messages,

@@ -447,6 +447,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $type = $params['type'];
         $itemid = !empty($params['itemid']) ? $params['itemid'] : 0;
         $userid = $params['userid'];
+        $labelid = $params['labelid'];
         $messages = $params['messages'];
         $count = count($messages);
         $offset = $params['offset'];
@@ -472,6 +473,9 @@ class local_mail_renderer extends plugin_renderer_base {
             $string = get_string('nomessagestoview', 'local_mail');
             $initurl = new moodle_url('/local/mail/view.php');
             $initurl->param('t' , $type);
+            if ($type === 'label') {
+                $initurl->param('l' , $labelid);
+            }
             $link = html_writer::link($initurl, get_string('showrecentmessages', 'local_mail'));
             $content .= html_writer::tag('div', $string.' '.$link, array('class' => 'mail_item'));
             $content .= $this->output->container_end();
