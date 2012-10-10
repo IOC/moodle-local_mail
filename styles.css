@@ -332,3 +332,9 @@
 .mail_group_labels {
     margin-right: 0.5em;
 }
+
+/* Form custom styles */
+
+.mform .fsubmit {
+    text-align: left;
+}
