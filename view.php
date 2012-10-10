@@ -34,7 +34,7 @@ if ($type == 'label') $url->param('l', $labelid);
 
 if ($removelbl) {
     $label = local_mail_label::fetch($labelid);
-    if ($label->userid() != $USER->id) {
+    if (!$label or $label->userid() != $USER->id) {
         print_error('invalidlabel', 'local_mail');
     }
 
@@ -65,7 +65,7 @@ if ($removelbl) {
     }
 } elseif ($editlbl) {
     $label = local_mail_label::fetch($labelid);
-    if ($label->userid() != $USER->id) {
+    if (!$label or $label->userid() != $USER->id) {
         print_error('invalidlabel', 'local_mail');
     }
 
