@@ -32,10 +32,14 @@ class local_mail_renderer extends plugin_renderer_base {
                                 array('class' => 'mail_label mail_course'));
     }
 
-    function label_message($message) {
+    function label_message($message, $type, $labelid) {
+        global $USER;
         $output = html_writer::start_tag('span', array('class' => 'mail_group_labels'));
-        $labels = $message->labels();
+        $labels = $message->labels($USER->id);
         foreach ($labels as $label) {
+            if ($type === 'label' and $label->id() === $labelid) {
+                continue;
+            }
             $output .= html_writer::tag('span', s($label->name()),
                 array('class' => 'mail_label mail_label_'. $label->color()));
         }
@@ -48,7 +52,7 @@ class local_mail_renderer extends plugin_renderer_base {
         return html_writer::tag('span', s($name), array('class' => 'mail_label mail_draft'));
     }
 
-    function messagelist($messages, $userid, $type, $itemid, $offset) {
+    function messagelist($messages, $userid, $type, $itemid, $offset, $labelid) {
         $output = $this->output->container_start('mail_list');
 
         foreach ($messages as $message) {
@@ -65,7 +69,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 $flags = $this->starred($message, $userid, $type, $offset);
             }
             $content = ($this->users($message, $userid, $type, $itemid) .
-                        $this->summary($message, $userid, $type, $itemid) .
+                        $this->summary($message, $userid, $type, $itemid, $labelid) .
                         $this->date($message));
             if ($message->editable($userid)) {
                 $url = new moodle_url('/local/mail/compose.php', array('m' => $message->id()));
@@ -127,7 +131,7 @@ class local_mail_renderer extends plugin_renderer_base {
         return $this->output->container($str . ' ' . $prev . $next, 'mail_paging');
     }
     
-    function summary($message, $userid, $type, $itemid) {
+    function summary($message, $userid, $type, $itemid, $labelid) {
         global $DB;
 
         $content = '';
@@ -140,7 +144,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $content .= $this->label_course($message->course());
         }
 
-        $content .= $this->label_message($message);
+        $content .= $this->label_message($message, $type, $labelid);
 
         if ($message->subject()) {
             $content .= s($message->subject());
@@ -254,6 +258,30 @@ class local_mail_renderer extends plugin_renderer_base {
             'class' => 'singlebutton'
         );
         return html_writer::empty_tag('input', $attributes);
+    }
+
+    function selectall() {
+        $output = html_writer::start_tag('span', array('class' => 'mail_hidden mail_checkbox_all'));
+        $output .= html_writer::checkbox('selectall', '', false);
+        $url = $this->output->pix_url('t/expanded', 'moodle');
+        $output .= html_writer::empty_tag('img', array('src' => $url));
+        $output .= html_writer::end_tag('span');
+        //Menu options
+        $output .= html_writer::start_tag('span', array('class' => 'mail_hidden mail_optselect'));
+        $items = array(
+            'all' => 'Tot',
+            'none' => 'Res',
+            'read' => 'Llegit',
+            'unread' => 'No llegit',
+            'starred' => 'Destacat',
+            'nostarred' => 'No destacat'
+            );
+        foreach ($items as $key => $item) {
+            $items[$key] = html_writer::link('#', $item, array('class' => 'mail_menu_option_' . $key));
+        }
+        $output .= html_writer::alist($items, array('class' => 'mail_menu_options'));
+        $output .= html_writer::end_tag('span');
+        return $output;
     }
 
     function optlabels() {
@@ -398,6 +426,7 @@ class local_mail_renderer extends plugin_renderer_base {
         } elseif ($type === 'forward') {
             $output = $this->forward();
         } else {
+            $selectall = $this->selectall();
             $delete = $this->delete($type);
             $labels = $extended = '';
             if (!$trash and $type !== 'trash') {
@@ -420,7 +449,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 $extended = $this->optlabels();
             }
             $clearer = $this->output->container('', 'clearer');
-            $output = $labels . $read . $unread . $pagingbar . $delete . $extended . $clearer;
+            $output = $selectall . $labels . $read . $unread . $pagingbar . $delete . $extended . $clearer;
         }
         return $this->output->container($output, 'mail_toolbar');
     }
@@ -467,7 +496,7 @@ class local_mail_renderer extends plugin_renderer_base {
         }
         $content .= $this->toolbar($type, false, $paging);
         if ($messages) {
-            $content .= $this->messagelist($messages, $userid, $type, $itemid, $offset);
+            $content .= $this->messagelist($messages, $userid, $type, $itemid, $offset, $labelid);
         } else {
             $content .= $this->output->container_start('mail_list');
             $string = get_string('nomessagestoview', 'local_mail');

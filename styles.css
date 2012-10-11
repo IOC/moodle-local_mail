@@ -133,6 +133,10 @@
     height: 18px;
 }
 
+.mail_list .mail_selected {
+    background-color: #ffc;
+}
+
 /* Mail starred */
 
 .mail_starred {
@@ -164,6 +168,41 @@
     margin-right: 0.5em;
     padding: 0.1em 0.2em;
     min-width: 4em;
+}
+
+.mail_toolbar .mail_checkbox_all {
+    display: inline-block;
+    width: 40px;
+    background-color: #f1f1f1;
+    margin-right: 0.5em;
+    padding: 2px 6px;
+    border: 1px solid #999;
+    border-radius: 0.1em;
+}
+
+.mail_toolbar .mail_checkbox_all input{
+    margin: 0 10%;
+    vertical-align: middle;
+}
+
+.mail_toolbar .mail_checkbox_all img{
+    float: right;
+    margin-bottom: auto;
+    margin-top: 4px;
+    opacity: 0.7;
+}
+
+.mail_toolbar .mail_optselect {
+    width: 10em;
+    background-color: #fff;
+    position: absolute;
+    top: 40px;
+    left: 225px;
+    border: 1px solid #bbb;
+}
+
+.mail_toolbar .mail_menu_options {
+    list-style: none;
 }
 
 .mail_toolbar_sep {
@@ -341,4 +380,10 @@
 
 .mform .fsubmit {
     text-align: left;
+}
+
+/* hidden */
+
+.mail_hidden {
+    display: none;
 }

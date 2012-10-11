@@ -434,6 +434,7 @@ if ($removelbl) {
     }
 
     // Display page
+    $PAGE->requires->js('/local/mail/mail.js');
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $OUTPUT->header();
     echo $mailoutput->view(array(
