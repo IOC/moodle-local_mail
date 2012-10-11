@@ -58,7 +58,7 @@ class local_mail_label {
     }
 
     static function valid_colors() {
-        return array('black', 'red', 'orange', 'yellow', 'green', 'blue', 'purple');
+        return array('red', 'orange', 'yellow', 'green', 'blue', 'purple', 'black');
     }
 
     function color() {

@@ -68,6 +68,5 @@ class mail_labels_form extends moodleform {
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
         
-        //$this->add_action_buttons();
     }
 }
