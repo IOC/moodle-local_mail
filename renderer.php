@@ -192,7 +192,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $linkparams = array('title' => get_string('starred', 'local_mail'));
             $output .= html_writer::link($url, html_writer::tag('span', '', array('class' => 'mail_starred')), $linkparams);
         } else {
-            $linkparams = array('title' => get_string('nostarred', 'local_mail'));
+            $linkparams = array('title' => get_string('unstarred', 'local_mail'));
             $output .= html_writer::link($url, html_writer::tag('span', '', array('class' => 'mail_nostarred')), $linkparams);
         }
         $output .= html_writer::end_tag('span');
@@ -239,7 +239,7 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function read() {
-        $label = get_string('read', 'local_mail');
+        $label = get_string('markasread', 'local_mail');
         $attributes = array(
             'type' => 'submit',
             'name' => 'read',
@@ -250,7 +250,7 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function unread() {
-        $label = get_string('unread', 'local_mail');
+        $label = get_string('markasunread', 'local_mail');
         $attributes = array(
             'type' => 'submit',
             'name' => 'unread',
@@ -269,12 +269,12 @@ class local_mail_renderer extends plugin_renderer_base {
         //Menu options
         $output .= html_writer::start_tag('span', array('class' => 'mail_hidden mail_optselect'));
         $items = array(
-            'all' => 'Tot',
-            'none' => 'Res',
-            'read' => 'Llegit',
-            'unread' => 'No llegit',
-            'starred' => 'Destacat',
-            'nostarred' => 'No destacat'
+            'all' => get_string('all', 'local_mail'),
+            'none' => get_string('none', 'local_mail'),
+            'read' => get_string('read', 'local_mail'),
+            'unread' => get_string('unread', 'local_mail'),
+            'starred' => get_string('starred', 'local_mail'),
+            'unstarred' => get_string('unstarred', 'local_mail')
             );
         foreach ($items as $key => $item) {
             $items[$key] = html_writer::link('#', $item, array('class' => 'mail_menu_option_' . $key));

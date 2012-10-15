@@ -168,5 +168,5 @@ YUI(M.yui.loader).use('node', function(Y) {
     	e.preventDefault();
     	mail_toggle_menu();
    		mail_select_nostarred();
-    }, '.mail_menu_option_nostarred');
+    }, '.mail_menu_option_unstarred');
 });
