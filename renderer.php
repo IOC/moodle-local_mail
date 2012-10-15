@@ -109,7 +109,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'prevpage',
             'tooltip' => get_string('previous'),
-            'class' => 'singlebutton',
+            'class' => 'mail_button singlebutton',
         );
         if (!$offset) {
             $params = array_merge($params, array('disabled' => 'disabled'));
@@ -122,7 +122,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'nextpage',
             'tooltip' => get_string('next'),
-            'class' => 'singlebutton',
+            'class' => 'mail_button singlebutton',
         );
         if ($offset === false or ($offset + $count) == $totalcount) {
             $params = array_merge($params, array('disabled' => 'disabled'));
@@ -160,7 +160,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'delete',
             'value' => $label,
-            'class' => 'singlebutton'
+            'class' => 'mail_button singlebutton'
         );
         return html_writer::empty_tag('input', $attributes);
     }
@@ -232,7 +232,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'assignlbl',
             'value' => $label,
-            'class' => 'singlebutton'
+            'class' => 'mail_button singlebutton'
         );
         $output .= html_writer::empty_tag('input', $attributes);
         return $output;
@@ -244,7 +244,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'read',
             'value' => $label,
-            'class' => 'singlebutton'
+            'class' => 'mail_button singlebutton'
         );
         return html_writer::empty_tag('input', $attributes);
     }
@@ -255,13 +255,13 @@ class local_mail_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'unread',
             'value' => $label,
-            'class' => 'singlebutton'
+            'class' => 'mail_button singlebutton'
         );
         return html_writer::empty_tag('input', $attributes);
     }
 
     function selectall() {
-        $output = html_writer::start_tag('span', array('class' => 'mail_hidden mail_checkbox_all'));
+        $output = html_writer::start_tag('span', array('class' => 'mail_hidden mail_button  mail_checkbox_all'));
         $output .= html_writer::checkbox('selectall', '', false);
         $url = $this->output->pix_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url));

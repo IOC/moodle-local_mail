@@ -1,8 +1,29 @@
 YUI(M.yui.loader).use('node', function(Y) {
 
+    var mail_buttons = ['assignlbl', 'read', 'unread', 'delete'];
+
 	var mail_toggle_menu = (function(){
 		Y.one('.mail_optselect').toggleClass('mail_hidden');
 	});
+
+    var mail_check_selected = (function(){
+        mail_enable_all_buttons(Y.all('.mail_selected').size());
+    });
+
+    var mail_enable_button = (function(name, bool) {
+        bool = (typeof bool !== 'undefined' ? bool : false);
+        if (bool) {
+            Y.one('.mail_toolbar input[name='+name+']').set('disabled','');
+        } else {
+            Y.one('.mail_toolbar input[name='+name+']').set('disabled','disabled');
+        }
+    });
+
+    var mail_enable_all_buttons = (function(bool) {
+        Y.each(mail_buttons, (function(value){
+            mail_enable_button(value, bool);
+        }));
+    });
 
     var mail_main_checkbox = (function(bool){
         if (bool){
@@ -12,6 +33,7 @@ YUI(M.yui.loader).use('node', function(Y) {
                 Y.one('.mail_checkbox_all > input').set('checked', '');
             }
         }
+        mail_check_selected();
     });
 
 	var mail_select_all = (function(){
@@ -109,9 +131,6 @@ YUI(M.yui.loader).use('node', function(Y) {
         mail_main_checkbox(node.hasClass('mail_selected'));
     }, 'input.mail_checkbox');
 
-    //Show all hidden elements
-    Y.one('span.mail_checkbox_all').removeClass('mail_hidden');
-
     //Select all/none
     Y.on('click', function(e) {
     	e.stopPropagation();
@@ -121,6 +140,7 @@ YUI(M.yui.loader).use('node', function(Y) {
     	} else {
     		mail_select_none();
     	}
+        mail_check_selected();
     }, '.mail_checkbox_all > input');
 
     //Toggle menu select all/none
@@ -169,4 +189,13 @@ YUI(M.yui.loader).use('node', function(Y) {
     	mail_toggle_menu();
    		mail_select_nostarred();
     }, '.mail_menu_option_unstarred');
+
+    Y.on('click', function(e) {
+        mail_check_selected();
+    }, '.mail_optselect');
+
+
+    //Show all hidden elements
+    Y.one('span.mail_checkbox_all').removeClass('mail_hidden');
+    mail_enable_all_buttons(false);
 });
