@@ -385,5 +385,5 @@
 /* hidden */
 
 .mail_hidden {
-    display: none;
+    display: none !important;
 }
