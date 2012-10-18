@@ -25,10 +25,12 @@ $assignlbl  = optional_param('assignlbl', false, PARAM_BOOL);
 $editlbl    = optional_param('editlbl', false, PARAM_BOOL);
 $removelbl  = optional_param('removelbl', false, PARAM_BOOL);
 $confirmlbl = optional_param('confirmlbl', false, PARAM_BOOL);
+$goback     = optional_param('goback', false, PARAM_BOOL);
 
 $url = new moodle_url('/local/mail/view.php', array('t' => $type));
 $offset = max(0, $offset);
 
+if ($goback) $messageid = 0;
 if ($type == 'course') $url->param('c', $courseid);
 if ($type == 'label') $url->param('l', $labelid);
 
@@ -324,14 +326,14 @@ if ($removelbl) {
 
     echo $OUTPUT->container_start('mail_subject');
     $title = s($message->subject());
-    echo $mailoutput->label_message($message);
+    echo $mailoutput->label_message($message, $type, $labelid);
     echo $OUTPUT->heading($title, 3, '');
     if ($type !== 'trash') {
         echo $mailoutput->starred($message, $USER->id, $type, 0, true);
     }
     echo $OUTPUT->container_end();
 
-    echo $mailoutput->mail($message);
+    echo $mailoutput->mail($message, false, $offset);
 
     echo $OUTPUT->container_end();
 
@@ -435,12 +437,15 @@ if ($removelbl) {
 
     // Display page
     $PAGE->requires->js('/local/mail/mail.js');
+    $PAGE->requires->string_for_js('starred', 'local_mail');
+    $PAGE->requires->string_for_js('unstarred', 'local_mail');
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $OUTPUT->header();
     echo $mailoutput->view(array(
         'type' => $type,
         'labelid' => $labelid,
-        'itemid' => $courseid,
+        'itemid' => $itemid,
+        'courseid' => $courseid,
         'userid' => $USER->id,
         'messages' => $messages,
         'totalcount' => $totalcount,

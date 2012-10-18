@@ -15,7 +15,7 @@
     vertical-align: middle;
 }
 
-.mail_recipient span  {
+.mail_recipient span {
     margin: 0 1em;
     white-space: nowrap;
     vertical-align: middle;
@@ -87,7 +87,10 @@
     background-color: #eee;
 }
 
-.mail_list .mail_users, .mail_list .mail_summary, .mail_list .mail_date,.mail_list .mail_checkbox{
+.mail_list .mail_users,
+.mail_list .mail_summary,
+.mail_list .mail_date,
+.mail_list .mail_checkbox{
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -155,8 +158,10 @@
 
 /* Toolbar */
 
-.mail_toolbar .singlebutton{
-  margin-top:0.4em;
+.mail_toolbar {
+    font-size: 1em;
+    vertical-align: middle;
+    margin-bottom: 1em;
 }
 
 .mail_toolbar .mail_paging {
@@ -165,56 +170,119 @@
 
 .mail_toolbar .singlebutton {
     display: inline-block;
+    margin-top:0.4em;
     margin-right: 0.5em;
-    padding: 0.1em 0.2em;
     min-width: 4em;
 }
 
 .mail_toolbar .mail_checkbox_all {
     display: inline-block;
+    text-align: middle;
     width: 40px;
 }
 
-.mail_toolbar .mail_checkbox_all input{
-    margin: 0 10%;
+.mail_toolbar .mail_more_actions,
+.mail_toolbar .mail_checkbox_all,
+.mail_toolbar .singlebutton,
+.mail_toolbar .mail_button.mail_button_disabled:hover {
+    opacity: 0.8;
+}
+
+.mail_toolbar .mail_checkbox_all img,
+.mail_toolbar .mail_more_actions img,
+.mail_toolbar .mail_checkbox_all input {
     vertical-align: middle;
 }
 
-.mail_toolbar .mail_checkbox_all img{
-    float: right;
-    margin-bottom: auto;
-    margin-top: 8px;
-    opacity: 0.7;
+.mail_toolbar .mail_checkbox_all:hover,
+.mail_toolbar .mail_more_actions:hover {
+    opacity: 0.9;
 }
 
 .mail_toolbar .mail_optselect {
-    width: 10em;
+    width: 12em;
     background-color: #fff;
     position: absolute;
-    top: 48px;
+    top: 51px;
     left: 225px;
     border: 1px solid #bbb;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.09) 0px 1px 1px 0px;
-    box-shadow: rgba(0, 0, 0, 0.09) 0px 1px 1px 0px;
+    line-height: 2em;
+    box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
 }
 
-.mail_toolbar .mail_menu_options {
+.mail_toolbar .mail_actselect {
+    background-color: #fff;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid #bbb;
+    line-height: 2em;
+    width: 15em;
+    box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
+}
+
+.mail_toolbar .mail_menu_options,
+.mail_toolbar .mail_menu_actions {
     list-style: none;
 }
 
+
+.mail_toolbar .mail_button span {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.mail_toolbar .mail_button span:before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.mail_toolbar .mail_button:before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+}
+
 .mail_toolbar .mail_button {
+    display: inline-block;
     background-color: #f1f1f1;
     margin: 0.4em 0.5em 1em 0;
-    padding: 0.1em 1em;
+    padding: 0.4em 1em;
     border: 1px solid #ccc;
     border-radius: 0.2em;
-    line-height: 2em;
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+    font-size: 1em;
+    height: 2.5em;
+    width: auto;
+    vertical-align: middle;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.mail_toolbar .mail_button_disabled {
+    color: grey;
 }
 
 .mail_toolbar .mail_button:hover {
-    border: 1px solid #bbb;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.30) 0px 1px 1px 0px;
-    box-shadow: rgba(0, 0, 0, 0.09) 0px 1px 1px 0px;
+    border: 1px solid #aaa;
+    box-shadow: rgba(0, 0, 0, 0.10) 0px 1px 1px 0px;
+}
+
+.mail_toolbar input.mail_button[disabled]:hover,
+.mail_toolbar .mail_button.mail_button_disabled:hover {
+    border: 1px solid #ccc;
+    box-shadow: 0px 0px 0px #000;
 }
 
 .mail_toolbar_sep {
@@ -241,12 +309,12 @@
     margin-bottom: 1em;
 }
 
-.mail_subject .mail_flags{
+.mail_subject .mail_flags {
     margin-left: 0.5em;
     vertical-align:middle;
 }
 
-.mail_subject h3{
+.mail_subject h3 {
     display:inline;
 }
 
@@ -266,7 +334,8 @@
     margin-botton: 1em;
 }
 
-.mail_header .left, .mail_subject .left{
+.mail_header .left,
+.mail_subject .left {
     float: left;
 }
 
