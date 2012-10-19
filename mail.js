@@ -5,28 +5,32 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         Y.one('span.mail_more_actions').removeClass('mail_hidden');
         mail_hide_noscript_buttons();
         mail_enable_all_buttons(false);
+        if (Y.one("input[name=type]").get('value') == 'trash') {
+           mail_hide_action('.mail_menu_action_markasstarred');
+           mail_hide_action('.mail_menu_action_markasunstarred');
+        }
     };
 
-    var mail_toggle_menu = (function(){
+    var mail_toggle_menu = function(){
         var button = Y.one('.mail_checkbox_all');
         if (!button.hasClass('mail_button_disabled')) {
 		  Y.one('.mail_optselect').toggleClass('mail_hidden');
         }
-	});
+	};
 
-    var mail_hide_menu_options = (function(){
+    var mail_hide_menu_options = function(){
         Y.one('.mail_optselect').addClass('mail_hidden');
-    });
+    };
 
-    var mail_hide_menu_actions = (function(){
+    var mail_hide_menu_actions = function(){
         Y.one('.mail_actselect').addClass('mail_hidden');
-    });
+    };
 
-    var mail_hide_noscript_buttons = (function(){
+    var mail_hide_noscript_buttons = function(){
         Y.all('.mail_toolbar .mail_noscript_button').addClass('mail_hidden');
-    });
+    };
 
-    var mail_toggle_menu_actions = (function(){
+    var mail_toggle_menu_actions = function(){
         var button = Y.one('.mail_more_actions');
         var menu = Y.one('.mail_actselect');
         var position = button.getXY();
@@ -35,22 +39,26 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             menu.toggleClass('mail_hidden');
             menu.setXY(position);
         }
-    });
+    };
 
-    var mail_check_selected = (function(){
+    var mail_hide_action = function(action) {
+        Y.one(action).ancestor('li').remove();
+    };
+
+    var mail_check_selected = function(){
         mail_enable_all_buttons(Y.all('.mail_selected').size());
-    });
+    };
 
-    var mail_enable_button = (function(name, bool) {
+    var mail_enable_button = function(name, bool) {
         bool = (typeof bool !== 'undefined' ? bool : false);
         if (bool) {
             Y.one('.mail_toolbar input[name='+name+']').set('disabled','');
         } else {
             Y.one('.mail_toolbar input[name='+name+']').set('disabled','disabled');
         }
-    });
+    };
 
-    var mail_enable_all_buttons = (function(bool) {
+    var mail_enable_all_buttons = function(bool) {
         var mail_buttons = Y.all('.mail_toolbar > input').get('name');
         Y.each(mail_buttons, (function(value){
             mail_enable_button(value, bool);
@@ -66,9 +74,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             Y.one('.mail_checkbox_all').addClass('mail_button_disabled');
             Y.one('.mail_checkbox_all input[name=selectall]').set('disabled','disabled').set('checked','');
         }
-    });
+    };
 
-    var mail_main_checkbox = (function(bool){
+    var mail_main_checkbox = function(bool){
         if (bool){
             Y.one('.mail_checkbox_all > input').set('checked', 'checked');
         } else {
@@ -77,9 +85,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             }
         }
         mail_check_selected();
-    });
+    };
 
-	var mail_select_all = (function(){
+	var mail_select_all = function(){
 		var checkbox = Y.one('.mail_checkbox_all > input');
 		checkbox.set('checked', 'checked');
     	var nodes = Y.all('.mail_checkbox');
@@ -87,9 +95,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
    			node.set('checked', 'checked');
     		node.ancestor('.mail_item').addClass('mail_selected');
     	});
-	});
+	};
 
-	var mail_select_none = (function(){
+	var mail_select_none = function(){
 		var checkbox = Y.one('.mail_checkbox_all > input');
 		checkbox.set('checked', '');
     	var nodes = Y.all('.mail_checkbox');
@@ -97,9 +105,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
    			node.set('checked', '');
     		node.ancestor('.mail_item').removeClass('mail_selected');
     	});
-	});
+	};
 
-	var mail_select_read = (function(){
+	var mail_select_read = function(){
     	var nodes = Y.all('.mail_item > input');
     	var ancestor;
     	if (nodes) {
@@ -114,9 +122,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 	    		}
 	    	});
 	    }
-	});
+	};
 
-	var mail_select_unread = (function(){
+	var mail_select_unread = function(){
     	var nodes = Y.all('.mail_item > input');
     	var ancestor;
     	if (nodes) {
@@ -131,9 +139,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 	    		}
 	    	});
 	    }
-	});
+	};
 
-	var mail_select_starred = (function(){
+	var mail_select_starred = function(){
     	var nodes = Y.all('.mail_item > input');
     	var ancestor;
     	if (nodes) {
@@ -148,9 +156,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 	    		}
 	    	});
 	    }
-	});
+	};
 
-	var mail_select_nostarred = (function(){
+	var mail_select_nostarred = function(){
     	var nodes = Y.all('.mail_item > input');
     	var ancestor;
     	if (nodes) {
@@ -165,7 +173,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 	    		}
 	    	});
 	    }
-	});
+	};
 
     //Success call
     var handleSuccess = function (transactionid, response, arguments) {
