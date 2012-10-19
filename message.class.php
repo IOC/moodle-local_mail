@@ -296,10 +296,14 @@ class local_mail_message {
 
     function recipients() {
         $roles = func_get_args();
-        return array_filter($this->users, function ($user) use ($roles) {
+        $result = array();
+        foreach ($this->users as $user) {
             $role = $this->role[$user->id];
-            return $role != 'from' and (!$roles or in_array($role, $roles));
-        });
+            if ($role != 'from' and (!$roles or in_array($role, $roles))) {
+                $result[$user->id] = $user;
+            }
+        }
+        return $result;
     }
 
     function references() {
