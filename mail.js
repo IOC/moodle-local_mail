@@ -141,7 +141,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 	    }
 	};
 
-	var mail_select_starred = function(){
+	var mail_select_starred = function() {
     	var nodes = Y.all('.mail_item > input');
     	var ancestor;
     	if (nodes) {
@@ -158,7 +158,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 	    }
 	};
 
-	var mail_select_nostarred = function(){
+	var mail_select_nostarred = function() {
     	var nodes = Y.all('.mail_item > input');
     	var ancestor;
     	if (nodes) {
@@ -177,10 +177,33 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 
     //Success call
     var handleSuccess = function (transactionid, response, arguments) {
-        var data = Y.JSON.parse(response.responseText);
-        if (data && data !== 'error') {
-            Y.one('div.region-content form').setContent(data);
-            init();
+        var obj = Y.JSON.parse(response.responseText);
+
+        if (obj.msgerror) {
+            alert(obj.msgerror);
+        } else {
+            if (obj.html) {
+                Y.one('div.region-content form').setContent(obj.html);
+                init();
+            }
+            if (obj.info) {
+                if (obj.info.inbox) {
+                    Y.one('#mail_inbox').setContent(obj.info.inbox);
+                }
+                if (obj.info.drafts) {
+                    Y.one('#mail_drafts').setContent(obj.info.drafts);
+                }
+                if (obj.info.courses) {
+                    Y.each(obj.info.courses, (function(value, index) {
+                        Y.one('#mail_course_'+index).setContent(value);
+                    }));
+                }
+                if (obj.info.labels) {
+                    Y.each(obj.info.labels, (function(value, index) {
+                        Y.one('#mail_label_'+index).setContent(value);
+                    }));
+                }
+            }
         }
         //console.log(response);
     };
@@ -201,8 +224,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 
         if (action == 'togglestarred') {
             obj = node.ancestor('.mail_item').one('input.mail_checkbox');
-            nodes.empty();
-            nodes.push(obj);
+            nodes = Y.all(obj);
             if (node.one('span').hasClass('mail_starred')) {
                 action = 'nostarred'
             } else {
@@ -212,10 +234,11 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         } else if(action == 'perpage'){
             nodes.empty();
             action = 'perpage';
-        }else {
+        } else {
             ids = Y.all('input[name="msgs[]"]:checked').get('value').join();
         }
         if (nodes.size()) {
+            //console.log(nodes);
             nodes.each(function (node) {
                 ancestor = node.ancestor('.mail_item');
                 if (action == 'starred') {
