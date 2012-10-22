@@ -18,7 +18,7 @@ require_login($courseid);
 
 $valid_actions = array(
     'starred',
-    'nostarred',
+    'unstarred',
     'delete',
     'markasread',
     'markasunread',
@@ -48,7 +48,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'setstarred';
         array_push($params, $messages);
         array_push($params, true);
-    } elseif ($action === 'nostarred') {
+    } elseif ($action === 'unstarred') {
         $func = 'setstarred';
         array_push($params, $messages);
         array_push($params, false);
@@ -218,13 +218,29 @@ function get_info() {
 	$count = local_mail_message::count_menu($USER->id);
 
     $text = get_string('inbox', 'local_mail');
-    if (!empty($count->inbox)) {
-        $count->inbox = $text .' (' . $count->inbox . ')';
+    if (empty($count->inbox)) {
+        $count->inbox = $text;
+    } else {
+        $count->inbox = $text . ' (' . $count->inbox . ')';
     }
 
     $text = get_string('drafts', 'local_mail');
-    if (!empty($count->drafts)) {
+    if(empty($count->drafts)) {
+        $count->drafts = $text;
+    }else{
         $count->drafts = $text . ' (' . $count->drafts . ')';
+    }
+
+    $labels = local_mail_label::fetch_user($USER->id);
+    if ($labels) {
+        foreach ($labels as $label) {
+            $text = $label->name();
+            if (empty($count->labels[$label->id()])) {
+                $count->labels[$label->id()] = $text;
+            }else{
+                $count->labels[$label->id()] = $text . ' (' . $count->labels[$label->id()] . ')';
+            }
+        }
     }
 
     if (!$courses = enrol_get_my_courses()) {
@@ -232,19 +248,11 @@ function get_info() {
     }
 
     foreach ($courses as $course) {
-        if (!empty($count->courses[$course->id])) {
-            $count->courses[$course->id] = $course->shortname . ' ('. $count->courses[$course->id].')';
-        }
-    }
-
-    $labels = local_mail_label::fetch_user($USER->id);
-    if ($labels) {
-        $text = get_string('labels', 'local_mail');
-        foreach ($labels as $label) {
-            $text = $label->name();
-            if (!empty($count->labels[$label->id()])) {
-                $count->labels[$label->id()] = $text . ' (' . $count->labels[$label->id()] . ')';
-            }
+        $text = $course->shortname;
+        if (empty($count->courses[$course->id])) {
+            $count->courses[$course->id] = $text;
+        } else {
+            $count->courses[$course->id] = $text . ' ('. $count->courses[$course->id].')';
         }
     }
 

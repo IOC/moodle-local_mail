@@ -53,8 +53,9 @@ function local_mail_extends_navigation($root) {
         $text .= ' (' . $count->inbox . ')';
     }
     $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox'));
-    $alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_inbox')));
-    $node->add('', $alink);
+    //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_inbox')));
+    $child = $node->add(s($text), $url);
+    $child->add_class('mail_inbox');
 
     // Starred
 
@@ -69,8 +70,9 @@ function local_mail_extends_navigation($root) {
         $text .= ' (' . $count->drafts . ')';
     }
     $url = new moodle_url('/local/mail/view.php', array('t' => 'drafts'));
-    $alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_drafts')));
-    $node->add('', $alink);
+    //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_drafts')));
+    $child = $node->add(s($text), $url);
+    $child->add_class('mail_drafts');
 
     // Sent
 
@@ -89,8 +91,9 @@ function local_mail_extends_navigation($root) {
         }
         $params = array('t' => 'course', 'c' => $course->id);
         $url = new moodle_url('/local/mail/view.php', $params);
-        $alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_course_'.$course->id)));
-        $nodecourses->add('', $alink);
+        //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_course_'.$course->id)));
+        $child = $nodecourses->add(s($text), $url);
+        $child->add_class('mail_course_'.$course->id);
     }
 
     // Labels
@@ -106,8 +109,9 @@ function local_mail_extends_navigation($root) {
             }
             $params = array('t' => 'label', 'l' => $label->id());
             $url = new moodle_url('/local/mail/view.php', $params);
-            $alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_label_'.$label->id())));
-            $nodelabels->add('', $alink);
+            //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_label_'.$label->id())));
+            $child = $nodelabels->add(s($text), $url);
+            $child->add_class('mail_label_'.$label->id());
         }
     }
 

@@ -195,7 +195,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $output .= html_writer::link($url, html_writer::tag('span', '', array('class' => 'mail_starred')), $linkparams);
         } else {
             $linkparams = array('title' => get_string('unstarred', 'local_mail'));
-            $output .= html_writer::link($url, html_writer::tag('span', '', array('class' => 'mail_nostarred')), $linkparams);
+            $output .= html_writer::link($url, html_writer::tag('span', '', array('class' => 'mail_unstarred')), $linkparams);
         }
         $output .= html_writer::end_tag('span');
         return $output;

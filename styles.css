@@ -149,11 +149,11 @@
     background: transparent url('pix/starred.png') no-repeat right top;
 }
 
-.mail_nostarred {
+.mail_unstarred {
     display:inline-block;
     width: 18px;
     height: 18px;
-    background: transparent url('pix/nostarred.png') no-repeat right top;
+    background: transparent url('pix/unstarred.png') no-repeat right top;
 }
 
 /* Toolbar */
