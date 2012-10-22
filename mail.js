@@ -271,7 +271,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 }
                 if (obj.info.drafts) {
                     img = Y.one('.mail_drafts a img').get('outerHTML');
-                    Y.one('.mail_drafts a').setContent(img+obj.info.inbox);
+                    Y.one('.mail_drafts a').setContent(img+obj.info.drafts);
                 }
                 if (obj.info.courses) {
                     Y.each(obj.info.courses, (function(value, index) {
