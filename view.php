@@ -318,6 +318,10 @@ if ($removelbl) {
     }
 
     $url->param('m', $message->id());
+    $PAGE->requires->js('/local/mail/mail.js');
+    $PAGE->requires->string_for_js('starred', 'local_mail');
+    $PAGE->requires->string_for_js('unstarred', 'local_mail');
+
     echo $OUTPUT->header();
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
     $mailoutput = $PAGE->get_renderer('local_mail');
@@ -343,11 +347,31 @@ if ($removelbl) {
         'value' => sesskey(),
     ));
 
-    echo html_writer::end_tag('form');
+    echo html_writer::empty_tag('input', array(
+        'type' => 'hidden',
+        'name' => 'type',
+        'value' => $type,
+    ));
+
+    if ($type == 'course') {
+        echo html_writer::empty_tag('input', array(
+            'type' => 'hidden',
+            'name' => 'itemid',
+            'value' => $message->course()->id,
+        ));
+    } elseif ($type == 'label') {
+        echo html_writer::empty_tag('input', array(
+            'type' => 'hidden',
+            'name' => 'itemid',
+            'value' => $labelid,
+        ));
+    }
+
     $refs = $message->references();
     if (!empty($refs)) {
         echo $mailoutput->references(local_mail_message::fetch_many($refs));
     }
+    echo html_writer::end_tag('form');
     echo $OUTPUT->footer();
 
 } else {

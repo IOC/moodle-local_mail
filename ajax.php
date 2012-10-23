@@ -7,13 +7,12 @@ $action   = optional_param('action', false, PARAM_ALPHA);
 $type     = optional_param('type', false, PARAM_ALPHA);
 $msgs     = optional_param('msgs', '', PARAM_SEQUENCE);
 $itemid   = optional_param('itemid', 0, PARAM_INT);
-$courseid = optional_param('courseid', $SITE->id, PARAM_INT);
 $offset   = optional_param('offset', 0, PARAM_INT);
-$labelid  = optional_param('labelid', 0, PARAM_INT);
 $perpage  = optional_param('perpage', 0, PARAM_INT);
 $sesskey  = optional_param('sesskey', null, PARAM_RAW);
 
 
+$courseid = ($type == 'course'?$itemid:$SITE->id);
 require_login($courseid);
 
 $valid_actions = array(
@@ -24,7 +23,9 @@ $valid_actions = array(
     'markasunread',
     'prevpage',
     'nextpage',
-    'perpage'
+    'perpage',
+    'viewmail',
+    'goback'
 );
 
 if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
@@ -33,16 +34,22 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         echo json_encode(array('msgerror' => get_string('invalidsesskey', 'error')));
         die;
     }
-    $params = array();
-
     if (empty($msgs) and ($action != 'prevpage' and $action != 'nextpage'and $action != 'perpage')){
         echo json_encode(array('msgerror' => 'No messages found!'));
         die;
     }
-    if ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage') {
-        $msgsids = explode(',', $msgs);
-        $messages = local_mail_message::fetch_many($msgsids);
+    if ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'goback') {
+        if ($action == 'viewmail') {
+            $message = local_mail_message::fetch($msgs);
+            if (!$message or !$message->viewable($USER->id)) {
+                echo json_encode(array('msgerror' => get_string('invalidmessage', 'local_mail')));
+            }
+        } else {
+            $msgsids = explode(',', $msgs);
+            $messages = local_mail_message::fetch_many($msgsids);
+        }
     }
+    $params = array();
     $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
     if ($action === 'starred') {
         $func = 'setstarred';
@@ -60,43 +67,63 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'setread';
         array_push($params, $messages);
         array_push($params, false);
+        if ($itemid) {
+            if ($type != 'course' and $type != 'label') {
+                $itemid = 0;
+            }
+            array_push($params, array(
+                                    'itemid' => $itemid,
+                                    'type' => $type,
+                                    'offset' => $offset,
+                                    'mailpagesize' => $mailpagesize
+                                )
+            );
+        }
     }elseif ($action === 'delete') {
         $func = 'setdelete';
         array_push($params, $messages);
         array_push($params, ($type != 'trash'));
+        if ($type != 'course' and $type != 'label') {
+            $itemid = 0;
+        }
         array_push($params, $itemid);
-        array_push($params, $courseid);
-        array_push($params, $labelid);
         array_push($params, $type);
         array_push($params, $offset);
         array_push($params, $mailpagesize);
     } elseif ($action === 'prevpage') {
         $func = 'setprevpage';
         array_push($params, $itemid);
-        array_push($params, $courseid);
-        array_push($params, $labelid);
         array_push($params, $type);
         array_push($params, $offset);
         array_push($params, $mailpagesize);
     } elseif ($action === 'nextpage') {
         $func = 'setnextpage';
         array_push($params, $itemid);
-        array_push($params, $courseid);
-        array_push($params, $labelid);
         array_push($params, $type);
         array_push($params, $offset);
         array_push($params, $mailpagesize);
     }  elseif ($action === 'perpage') {
         $func = 'setperpage';
         array_push($params, $itemid);
-        array_push($params, $courseid);
-        array_push($params, $labelid);
         array_push($params, $type);
         array_push($params, $offset);
         array_push($params, $perpage);
-    } else {
-        echo json_encode(array('msgerror' => 'Invalid action'));
-        die;
+    } elseif ($action === 'viewmail') {
+        $func = 'getmail';
+        array_push($params, $message);
+        array_push($params, $type);
+        array_push($params, false); //reply
+        array_push($params, $offset);
+        array_push($params, $itemid);
+    } elseif ($action === 'goback') {
+        $func = 'setgoback';
+        if ($type != 'course' and $type != 'label') {
+            $itemid = 0;
+        }
+        array_push($params, $itemid);
+        array_push($params, $type);
+        array_push($params, $offset);
+        array_push($params, $mailpagesize);
     }
     echo json_encode(call_user_func_array($func, $params));
 } else {
@@ -112,26 +139,33 @@ function setstarred ($messages, $bool) {
         }
     }
     return array(
-        'info' => get_info(),
+        'info' => '',
         'html' => ''
     );
 }
 
-function setread ($messages, $bool) {
+function setread ($messages, $bool, $mailview = false) {
     global $USER;
+
+    $html = '';
 
     foreach ($messages as $message) {
         if ($message->viewable($USER->id)) {
             $message->set_unread($USER->id, !$bool);
         }
     }
+
+    if ($mailview) {
+        $totalcount = local_mail_message::count_index($USER->id, $mailview['type'], $mailview['itemid']);
+        $html = print_messages($mailview['itemid'], $mailview['type'], $mailview['offset'], $mailview['mailpagesize'], $totalcount);
+    }
     return array(
         'info' => get_info(),
-        'html' => ''
+        'html' => $html
     );
 }
 
-function setdelete ($messages, $bool, $itemid, $courseid, $labelid, $type, $offset, $mailpagesize) {
+function setdelete ($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
     global $PAGE, $USER;
 
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
@@ -148,33 +182,43 @@ function setdelete ($messages, $bool, $itemid, $courseid, $labelid, $type, $offs
     }
     return array(
         'info' => get_info(),
-        'html' => print_messages($itemid, $courseid, $labelid, $type, $offset, $mailpagesize, $totalcount)
+        'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
     );
 }
 
-function setprevpage($itemid, $courseid, $labelid, $type, $offset, $mailpagesize){
+function setprevpage($itemid, $type, $offset, $mailpagesize){
     global $USER;
 
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
     $offset = max(0, $offset - $mailpagesize);
     return array(
         'info' => '',
-        'html' => print_messages($itemid, $courseid, $labelid, $type, $offset, $mailpagesize, $totalcount)
+        'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
     );
 }
 
-function setnextpage($itemid, $courseid, $labelid, $type, $offset, $mailpagesize){
+function setnextpage($itemid, $type, $offset, $mailpagesize){
     global $USER;
 
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
     $offset = $offset + $mailpagesize;
     return array(
         'info' => '',
-        'html' => print_messages($itemid, $courseid, $labelid, $type, $offset, $mailpagesize, $totalcount)
+        'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
     );
 }
 
-function setperpage($itemid, $courseid, $labelid, $type, $offset, $mailpagesize){
+function setgoback($itemid, $type, $offset, $mailpagesize){
+    global $USER;
+
+    $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
+    return array(
+        'info' => '',
+        'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
+    );
+}
+
+function setperpage($itemid, $type, $offset, $mailpagesize){
     global $USER;
 
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
@@ -182,7 +226,7 @@ function setperpage($itemid, $courseid, $labelid, $type, $offset, $mailpagesize)
         set_user_preference('local_mail_mailsperpage', $mailpagesize);
         return array(
             'info' => '',
-            'html' => print_messages($itemid, $courseid, $labelid, $type, $offset, $mailpagesize, $totalcount)
+            'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
         );
     }
     return array(
@@ -191,7 +235,7 @@ function setperpage($itemid, $courseid, $labelid, $type, $offset, $mailpagesize)
     );
 }
 
-function print_messages($itemid, $courseid, $labelid, $type, $offset, $mailpagesize, $totalcount) {
+function print_messages($itemid, $type, $offset, $mailpagesize, $totalcount) {
     global $PAGE, $USER;
 
     $url = new moodle_url('/local/mail/view.php', array('t' => $type));
@@ -200,9 +244,7 @@ function print_messages($itemid, $courseid, $labelid, $type, $offset, $mailpages
     $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
     $content = $mailoutput->view(array(
         'type' => $type,
-        'labelid' => $labelid,
         'itemid' => $itemid,
-        'courseid' => $courseid,
         'userid' => $USER->id,
         'messages' => $messages,
         'totalcount' => $totalcount,
@@ -210,6 +252,69 @@ function print_messages($itemid, $courseid, $labelid, $type, $offset, $mailpages
         'ajax' => true
     ));
     return preg_replace('/^<div>|<\/div>$/', '', $content);
+}
+
+function getmail($message, $type, $reply, $offset, $labelid) {
+    global $PAGE, $OUTPUT, $USER;
+
+    $url = new moodle_url('/local/mail/view.php', array('t' => $type));
+    $url->param('m', $message->id());
+    $PAGE->set_url($url);
+
+    $message->set_unread($USER->id, false);
+    $mailoutput = $PAGE->get_renderer('local_mail');
+    $content = $mailoutput->toolbar('view', false, null, ($type === 'trash'));
+    $content .= $OUTPUT->container_start('mail_view');
+
+    $content .= $OUTPUT->container_start('mail_subject');
+    $title = s($message->subject());
+    $content .= $mailoutput->label_message($message, $type, $labelid);
+    $content .= $OUTPUT->heading($title, 3, '');
+    if ($type !== 'trash') {
+        $content .= $mailoutput->starred($message, $USER->id, $type, 0, true);
+    }
+    $content .= $OUTPUT->container_end();
+
+    $content .= $mailoutput->mail($message, $reply, $offset);
+
+    $content .= $OUTPUT->container_end();
+
+    $content .= html_writer::empty_tag('input', array(
+        'type' => 'hidden',
+        'name' => 'sesskey',
+        'value' => sesskey(),
+    ));
+
+    $content .= html_writer::empty_tag('input', array(
+        'type' => 'hidden',
+        'name' => 'type',
+        'value' => $type,
+    ));
+
+    if ($type == 'course') {
+        $content .= html_writer::empty_tag('input', array(
+            'type' => 'hidden',
+            'name' => 'itemid',
+            'value' => $message->course()->id,
+        ));
+    } elseif ($type == 'label') {
+        $content .= html_writer::empty_tag('input', array(
+            'type' => 'hidden',
+            'name' => 'itemid',
+            'value' => $labelid,
+        ));
+    }
+
+    $content .= html_writer::end_tag('form');
+    $refs = $message->references();
+    if (!empty($refs)) {
+        $content .= $mailoutput->references(local_mail_message::fetch_many($refs));
+    }
+    $content = preg_replace('/^<div>|<\/div>$/', '', $content);
+    return array(
+        'info' => '',
+        'html' => $content
+    );
 }
 
 function get_info() {
