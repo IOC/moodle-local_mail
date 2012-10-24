@@ -24,8 +24,12 @@ function local_mail_extends_navigation($root) {
     // My mail
 
     $text = get_string('mymail', 'local_mail');
+    if (!empty($count->inbox)) {
+        $text .= ' (' . $count->inbox . ')';
+    }
     $node = navigation_node::create($text, null, navigation_node::TYPE_ROOTNODE);
-    $root->add_node($node, 'courses');
+    $child = $root->add_node($node, 'courses');
+    $child->add_class('mail_root');
 
     // Compose
 
@@ -53,7 +57,6 @@ function local_mail_extends_navigation($root) {
         $text .= ' (' . $count->inbox . ')';
     }
     $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox'));
-    //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_inbox')));
     $child = $node->add(s($text), $url);
     $child->add_class('mail_inbox');
 
@@ -70,7 +73,6 @@ function local_mail_extends_navigation($root) {
         $text .= ' (' . $count->drafts . ')';
     }
     $url = new moodle_url('/local/mail/view.php', array('t' => 'drafts'));
-    //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_drafts')));
     $child = $node->add(s($text), $url);
     $child->add_class('mail_drafts');
 
@@ -91,7 +93,6 @@ function local_mail_extends_navigation($root) {
         }
         $params = array('t' => 'course', 'c' => $course->id);
         $url = new moodle_url('/local/mail/view.php', $params);
-        //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_course_'.$course->id)));
         $child = $nodecourses->add(s($text), $url);
         $child->add_class('mail_course_'.$course->id);
     }
@@ -109,7 +110,6 @@ function local_mail_extends_navigation($root) {
             }
             $params = array('t' => 'label', 'l' => $label->id());
             $url = new moodle_url('/local/mail/view.php', $params);
-            //$alink = new action_link($url, html_writer::tag('span', s($text), array('id' => 'mail_label_'.$label->id())));
             $child = $nodelabels->add(s($text), $url);
             $child->add_class('mail_label_'.$label->id());
         }

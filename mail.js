@@ -290,6 +290,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 mail_update_url();
             }
             if (obj.info) {
+                if (obj.info.root) {
+                    Y.one('.mail_root span').setContent(obj.info.root);
+                }
                 if (obj.info.inbox) {
                     img = Y.one('.mail_inbox a img').get('outerHTML');
                     Y.one('.mail_inbox a').setContent(img+obj.info.inbox);
@@ -328,6 +331,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         var ancestor;
         var ids;
         var request;
+        var mail_view;
 
         if(mail_message_view) {
             if(action == 'togglestarred') {
@@ -356,6 +360,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             } else if(action == 'goback') {
                 mail_message_view = false;
             }
+            mail_view = true;
             ids = Y.one('input[name="m"]').get('value');
         } else {//List messages view
             if(action == 'viewmail') {
@@ -398,6 +403,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                     }
                 });
             }
+            mail_view = false;
         }
         //Ajax call
         var cfg =  {
@@ -407,7 +413,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 sesskey: Y.one('input[name="sesskey"]').get('value'),
                 type: Y.one('input[name="type"]').get('value'),
                 offset: Y.one('input[name="offset"]').get('value'),
-                action: action
+                action: action,
+                mailview: mail_view
             },
             on: {
                 success:handleSuccess,

@@ -10,6 +10,7 @@ $itemid   = optional_param('itemid', 0, PARAM_INT);
 $offset   = optional_param('offset', 0, PARAM_INT);
 $perpage  = optional_param('perpage', 0, PARAM_INT);
 $sesskey  = optional_param('sesskey', null, PARAM_RAW);
+$mailview = optional_param('mailview', false, PARAM_BOOL);
 
 
 $courseid = ($type == 'course'?$itemid:$SITE->id);
@@ -35,7 +36,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         die;
     }
     if (empty($msgs) and ($action != 'prevpage' and $action != 'nextpage'and $action != 'perpage')){
-        echo json_encode(array('msgerror' => 'No messages found!'));
+        echo json_encode(array('msgerror' => get_string('nomessageserror', 'local_mail')));
         die;
     }
     if ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'goback') {
@@ -67,7 +68,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'setread';
         array_push($params, $messages);
         array_push($params, false);
-        if ($itemid) {
+        if ($mailview) {
             if ($type != 'course' and $type != 'label') {
                 $itemid = 0;
             }
@@ -321,6 +322,14 @@ function get_info() {
     global $USER;
 
 	$count = local_mail_message::count_menu($USER->id);
+
+
+    $text = get_string('mymail', 'local_mail');
+    if (empty($count->inbox)) {
+        $count->root = $text;
+    } else {
+        $count->root = $text . ' (' . $count->inbox . ')';
+    }
 
     $text = get_string('inbox', 'local_mail');
     if (empty($count->inbox)) {

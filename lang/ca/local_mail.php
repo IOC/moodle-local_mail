@@ -41,6 +41,7 @@ $string['mymail'] = 'El meu correu';
 $string['newlabel'] = 'Crea una nova etiqueta';
 $string['nolabels'] = 'No hi ha cap etiqueta.';
 $string['nomessages'] = 'No hi ha cap missatge.';
+$string['nomessageserror'] = 'Per realitzar aquesta acció cal seleccionar algun missatge';
 $string['nomessagestoview'] = 'No hi ha missatges per mostrar.';
 $string['none'] = 'Cap';
 $string['norecipient'] = '(sense destinataris)';

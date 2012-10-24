@@ -42,6 +42,7 @@ $string['mymail'] = 'My mail';
 $string['newlabel'] = 'Create a new label';
 $string['nolabels'] = 'No labels available.';
 $string['nomessages'] = 'No messages.';
+$string['nomessageserror'] = 'Action required needs at least one message selected';
 $string['nomessagestoview'] = 'No messages to view.';
 $string['none'] = 'None';
 $string['norecipient'] = '(no recipient)';
