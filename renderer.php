@@ -316,7 +316,10 @@ class local_mail_renderer extends plugin_renderer_base {
             'markasread' => get_string('markasread', 'local_mail'),
             'markasunread' => get_string('markasunread', 'local_mail'),
             'markasstarred' => get_string('markasstarred', 'local_mail'),
-            'markasunstarred' => get_string('markasunstarred', 'local_mail')
+            'markasunstarred' => get_string('markasunstarred', 'local_mail'),
+            'separator' => '',
+            'editlabel' => get_string('editlabel', 'local_mail'),
+            'removelabel' => get_string('removelabel', 'local_mail')
             );
         foreach ($items as $key => $item) {
             $items[$key] = html_writer::link('#', $item, array('class' => 'mail_menu_action_' . $key));

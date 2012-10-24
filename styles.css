@@ -221,9 +221,16 @@
     box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
 }
 
+.mail_toolbar .mail_menu_action_separator {
+    display: block;
+    border-top: 1px solid #bbb;
+    margin: 0.4em 0;
+}
+
 .mail_toolbar .mail_menu_options,
 .mail_toolbar .mail_menu_actions {
     list-style: none;
+    margin: 1em 1em;
 }
 
 

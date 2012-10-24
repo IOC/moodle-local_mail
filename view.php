@@ -35,6 +35,7 @@ if ($type == 'course') $url->param('c', $courseid);
 if ($type == 'label') $url->param('l', $labelid);
 
 if ($removelbl) {
+    require_sesskey();
     $label = local_mail_label::fetch($labelid);
     if (!$label or $label->userid() != $USER->id) {
         print_error('invalidlabel', 'local_mail');
@@ -66,6 +67,7 @@ if ($removelbl) {
         echo $OUTPUT->footer();
     }
 } elseif ($editlbl) {
+    require_sesskey();
     $label = local_mail_label::fetch($labelid);
     if (!$label or $label->userid() != $USER->id) {
         print_error('invalidlabel', 'local_mail');
