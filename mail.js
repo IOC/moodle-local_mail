@@ -128,15 +128,15 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 }
                 //Starred or unstarred
                 if (!trash && node.one('.mail_flags a span').hasClass('mail_starred')) {
-                    var nodes = node.siblings(function(obj){
-                        return obj.hasClass('.mail_selected') && obj.one('.mail_flags a span.mail_starred');
+                    var nodes = node.siblings(function(obj) {
+                        return obj.hasClass('mail_selected') && obj.one('.mail_flags a span.mail_starred');
                     });
                     if (!nodes.size()) {
                         menu.one('a.mail_menu_action_markasunstarred').ancestor('li').hide();
                     }
                 } else {
-                    var nodes = node.siblings(function(obj){
-                        return obj.hasClass('.mail_selected') &&  obj.one('.mail_flags a span.mail_unstarred');
+                    var nodes = node.siblings(function(obj) {
+                        return obj.hasClass('mail_selected') &&  obj.one('.mail_flags a span.mail_unstarred');
                     });
                     if (!trash && !nodes.size()) {
                         menu.one('a.mail_menu_action_markasstarred').ancestor('li').hide();
