@@ -105,7 +105,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         var menu = Y.one('.mail_actselect');
         var position = button.getXY();
         if (!button.hasClass('mail_button_disabled')) {
-            position[1] += button.get('clientHeight') + 3;
+            position[1] += button.get('clientHeight') + 2;
             menu.toggleClass('mail_hidden');
             menu.setXY(position);
         }

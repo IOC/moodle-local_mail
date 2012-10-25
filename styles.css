@@ -203,7 +203,7 @@
     width: 12em;
     background-color: #fff;
     position: absolute;
-    top: 51px;
+    top: 49px;
     left: 225px;
     border: 1px solid #bbb;
     line-height: 2em;
@@ -232,7 +232,6 @@
     list-style: none;
     margin: 1em 1em;
 }
-
 
 .mail_toolbar .mail_button span {
     display: inline-block;
