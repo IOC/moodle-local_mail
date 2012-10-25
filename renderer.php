@@ -32,16 +32,23 @@ class local_mail_renderer extends plugin_renderer_base {
                                 array('class' => 'mail_label mail_course'));
     }
 
-    function label_message($message, $type, $labelid) {
+    function label_message($message, $type, $labelid, $mailview = false) {
         global $USER;
+
         $output = html_writer::start_tag('span', array('class' => 'mail_group_labels'));
         $labels = $message->labels($USER->id);
         foreach ($labels as $label) {
             if ($type === 'label' and $label->id() === $labelid) {
                 continue;
             }
-            $output .= html_writer::tag('span', s($label->name()),
+            $text = html_writer::tag('span', s($label->name()),
                 array('class' => 'mail_label mail_label_'. $label->color()));
+            if ($mailview) {
+                $linkparams = array('title' => get_string('showlabelmessages', 'local_mail', s($label->name())));
+                $output .= html_writer::link(new moodle_url('/local/mail/view.php', array('t' => 'label', 'l' => $label->id())), $text, $linkparams);
+            } else {
+                $output .= $text;
+            }
         }
         $output .= html_writer::end_tag('span');
         return $output;

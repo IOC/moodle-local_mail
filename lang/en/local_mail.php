@@ -59,6 +59,7 @@ $string['removelabel'] = 'Remove label';
 $string['reply'] = 'Reply';
 $string['replyall'] = 'Reply all';
 $string['restore'] = 'Restore';
+$string['showlabelmessages'] = 'Show "{$a}" label messages';
 $string['showrecentmessages'] = 'Show recent messages';
 $string['smallmessage'] = '{$a->user} has sent you an email';
 $string['forward'] = 'Forward';

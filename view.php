@@ -332,7 +332,7 @@ if ($removelbl) {
 
     echo $OUTPUT->container_start('mail_subject');
     $title = s($message->subject());
-    echo $mailoutput->label_message($message, $type, $labelid);
+    echo $mailoutput->label_message($message, $type, $labelid, true);
     echo $OUTPUT->heading($title, 3, '');
     if ($type !== 'trash') {
         echo $mailoutput->starred($message, $USER->id, $type, 0, true);

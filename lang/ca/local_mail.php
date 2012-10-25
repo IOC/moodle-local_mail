@@ -58,6 +58,7 @@ $string['removelabel'] = 'Elimina l\'etiqueta';
 $string['reply'] = 'Respon';
 $string['replyall'] = 'Respon a tots';
 $string['restore'] = 'Restaura';
+$string['showlabelmessages'] = 'Mostra els missatges amb l\'etiqueta "{$a}"';
 $string['showrecentmessages'] = 'Mostra els missatges més nous';
 $string['smallmessage'] = '{$a->user} us ha enviat un missatge de correu';
 $string['forward'] = 'Reenvia';
