@@ -80,3 +80,21 @@ function local_mail_send_notifications($message) {
         }
     }
 }
+
+function local_mail_js_labels() {
+    global $USER;
+
+    $labels = local_mail_label::fetch_user($USER->id);
+    $js = 'M.local_mail = {mail_labels: {';
+    $cont = 0;
+    $total = count($labels);
+    foreach ($labels as $label) {
+        $js .= '"'.$label->id().'":{"id": "' . $label->id() . '", "name": "' . s($label->name()) . '", "color": "' . $label->color() . '"}';
+        $cont++;
+        if ($cont < $total) {
+            $js .= ',';
+        }
+    }
+    $js .=  '}};';
+    return $js;
+}

@@ -199,38 +199,49 @@
     opacity: 0.9;
 }
 
-.mail_toolbar .mail_optselect {
-    width: 12em;
-    background-color: #fff;
-    position: absolute;
-    top: 49px;
-    left: 225px;
-    border: 1px solid #bbb;
-    line-height: 2em;
-    box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
-}
-
-.mail_toolbar .mail_actselect {
+.mail_toolbar .mail_optselect,
+.mail_toolbar .mail_actselect,
+.mail_toolbar .mail_labelselect {
     background-color: #fff;
     position: absolute;
     top: 0;
     left: 0;
     border: 1px solid #bbb;
     line-height: 2em;
-    width: 15em;
     box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-.mail_toolbar .mail_menu_action_separator {
+.mail_toolbar .mail_optselect {
+    top: 49px;
+    left: 225px;
+}
+
+.mail_toolbar .mail_labelselect label{
+    cursor: pointer;
+}
+
+.mail_toolbar .mail_menu_action_separator,
+ .mail_toolbar .mail_menu_label_separator {
     display: block;
     border-top: 1px solid #bbb;
     margin: 0.4em 0;
 }
 
 .mail_toolbar .mail_menu_options,
-.mail_toolbar .mail_menu_actions {
+.mail_toolbar .mail_menu_actions,
+.mail_toolbar .mail_menu_labels {
     list-style: none;
-    margin: 1em 1em;
+    margin: 1em 2em;
+}
+
+.mail_toolbar .mail_menu_options li,
+.mail_toolbar .mail_menu_actions li,
+.mail_toolbar .mail_menu_labels li {
+    width: 100%;
 }
 
 .mail_toolbar .mail_button span {
@@ -293,6 +304,15 @@
 
 .mail_toolbar_sep {
     margin-left: 3em;
+}
+
+.mail_toolbar a {
+    color: #000;
+    padding: 0.4em 0.4em;
+}
+
+.mail_toolbar a:hover {
+    background-color: #f1f1f1;
 }
 
 .mail_paging .singlebutton {
@@ -473,4 +493,10 @@
 
 .mail_hidden {
     display: none !important;
+}
+
+.mail_down_arrow {
+    background-repeat: no-repeat;
+    background-position: 93% 50%;
+    padding-right: 1.5em !important;
 }

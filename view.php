@@ -461,10 +461,12 @@ if ($removelbl) {
         redirect($url);
     }
 
+    $jslabels = local_mail_js_labels();
     // Display page
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->string_for_js('starred', 'local_mail');
     $PAGE->requires->string_for_js('unstarred', 'local_mail');
+    $PAGE->requires->js_init_code($jslabels);
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $OUTPUT->header();
     echo $mailoutput->view(array(

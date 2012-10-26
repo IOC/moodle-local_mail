@@ -6,6 +6,7 @@ require_once($CFG->dirroot . '/local/mail/lib.php');
 $action   = optional_param('action', false, PARAM_ALPHA);
 $type     = optional_param('type', false, PARAM_ALPHA);
 $msgs     = optional_param('msgs', '', PARAM_SEQUENCE);
+$labelids = optional_param('labelids', '', PARAM_SEQUENCE);
 $itemid   = optional_param('itemid', 0, PARAM_INT);
 $offset   = optional_param('offset', 0, PARAM_INT);
 $perpage  = optional_param('perpage', 0, PARAM_INT);
@@ -26,7 +27,8 @@ $valid_actions = array(
     'nextpage',
     'perpage',
     'viewmail',
-    'goback'
+    'goback',
+    'setlabels'
 );
 
 if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
@@ -125,6 +127,10 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         array_push($params, $type);
         array_push($params, $offset);
         array_push($params, $mailpagesize);
+    } elseif ($action === 'setlabels') {
+        $func = 'setlabels';
+        array_push($params, $messages);
+        array_push($params, explode(',', $labelids));
     }
     echo json_encode(call_user_func_array($func, $params));
 } else {
@@ -216,6 +222,28 @@ function setgoback($itemid, $type, $offset, $mailpagesize){
     return array(
         'info' => '',
         'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
+    );
+}
+
+function setlabels($messages, $labelids)
+{
+    global $USER;
+
+    $labels = local_mail_label::fetch_user($USER->id);
+    foreach ($messages as $message) {
+        if ($message->viewable($USER->id) and !$message->deleted($USER->id)) {
+            foreach ($labels as $label) {
+                if (in_array($label->id(), $labelids)) {
+                    $message->add_label($label);
+                } else {
+                    $message->remove_label($label);
+                }
+            }
+        }
+    }
+    return array(
+        'info' => '',
+        'html' => ''//print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
     );
 }
 

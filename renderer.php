@@ -42,7 +42,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 continue;
             }
             $text = html_writer::tag('span', s($label->name()),
-                array('class' => 'mail_label mail_label_'. $label->color()));
+                array('class' => 'mail_label mail_label_'. $label->color() . ' mail_label_' . $label->id()));
             if ($mailview) {
                 $linkparams = array('title' => get_string('showlabelmessages', 'local_mail', s($label->name())));
                 $output .= html_writer::link(new moodle_url('/local/mail/view.php', array('t' => 'label', 'l' => $label->id())), $text, $linkparams);
@@ -234,9 +234,10 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function labels($type) {
+        global $USER;
+
+        $items = array();
         $label = get_string('setlabels', 'local_mail');
-        //$attributes = array('type' => 'hidden', 'name' => 'type', 'value' => $type);
-        //$output = html_writer::empty_tag('input', $attributes);
         $attributes = array(
             'type' => 'submit',
             'name' => 'assignlbl',
@@ -244,6 +245,17 @@ class local_mail_renderer extends plugin_renderer_base {
             'class' => 'mail_button singlebutton'
         );
         $output = html_writer::empty_tag('input', $attributes);
+        //List labels and options
+        $labels = local_mail_label::fetch_user($USER->id);
+        $output .= html_writer::start_tag('span', array('class' => 'mail_hidden mail_labelselect'));
+        foreach ($labels as $key => $label) {
+            $items[$key] =  html_writer::checkbox('mail_menu_label_' . $key, $label->id(), false, $label->name(), array('class' => 'mail_label mail_label_'. $label->color()));
+        }
+        $items[] = html_writer::tag('span','', array('class' => 'mail_menu_label_separator'));
+        $items[] = html_writer::link('#', get_string('newlabel', 'local_mail'), array('class' => 'mail_menu_label_newlabel'));
+        $items[] = html_writer::link('#', get_string('applychanges', 'local_mail'), array('class' => 'mail_menu_label_apply'));
+        $output .= html_writer::alist($items, array('class' => 'mail_menu_labels'));
+        $output .= html_writer::end_tag('span');
         return $output;
     }
 
