@@ -319,10 +319,13 @@ if ($removelbl) {
         redirect($url);
     }
 
+    $jslabels = local_mail_js_labels();
     $url->param('m', $message->id());
+    // Display page
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->string_for_js('starred', 'local_mail');
     $PAGE->requires->string_for_js('unstarred', 'local_mail');
+    $PAGE->requires->js_init_code($jslabels);
 
     echo $OUTPUT->header();
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
