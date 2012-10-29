@@ -2,9 +2,10 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
 
     var mail_message_view = false;
     var mail_checkbox_labels_default = {};
+    var mail_view_type = '';
 
     var init = function(){
-        var type = Y.one("input[name=type]").get('value');
+        mail_view_type = Y.one('input[name="type"]').get('value');
         if (Y.one('input[name="m"]')) {
             mail_message_view = true;
         }
@@ -12,12 +13,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         Y.one('span.mail_more_actions').removeClass('mail_hidden');
         mail_hide_noscript_buttons();
         mail_enable_all_buttons(mail_message_view);
-        if (type == 'trash') {
+        if (mail_view_type == 'trash') {
             mail_remove_action('.mail_menu_action_markasstarred');
             mail_remove_action('.mail_menu_action_markasunstarred');
         } else {
             mail_add_arrow_menu_labels();
-            if (type == 'label' && !mail_message_view) {
+            if (mail_view_type == 'label' && !mail_message_view) {
                 Y.one('input[name="editlbl"]').remove();
                 Y.one('input[name="removelbl"]').remove();
                 Y.one('.mail_toolbar_sep').remove();
@@ -34,8 +35,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     };
 
     var mail_show_label_actions = function(separator) {
-        var type = Y.one("input[name=type]").get('value');
-        if (type == 'label' && !mail_message_view) {
+        if (mail_view_type == 'label' && !mail_message_view) {
             if (separator) {
                 Y.one('.mail_menu_action_separator').ancestor('li').show();
             }
@@ -48,8 +48,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         var separator = false;
         mail_hide_actions();
         if (mail_message_view) {
-            var type = Y.one("input[name=type]").get('value');
-            if (type == 'trash') {
+            if (mail_view_type == 'trash') {
                 Y.one('.mail_menu_action_markasunread').ancestor('li').show();
             } else {
                 Y.one('.mail_menu_action_markasunread').ancestor('li').show();
@@ -96,7 +95,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     };
 
     var mail_hide_menu_labels = function() {
-        if (Y.one('input[name="type"]').get('value') != 'trash') {
+        if (mail_view_type != 'trash') {
             Y.one('.mail_labelselect').addClass('mail_hidden');
         }
     };
@@ -145,7 +144,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     var mail_customize_menu_actions = function(node) {
         var menu = Y.one('.mail_menu_actions');
         var checkbox = node.one('input[type=checkbox]');
-        var type = Y.one("input[name=type]").get('value');
         var separator = false;
 
         if (checkbox.get('checked')) {
@@ -158,11 +156,11 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 separator = true;
             }
             //Starred or unstarred
-            if (type != 'trash' && node.one('.mail_flags span').hasClass('mail_starred')) {
+            if (mail_view_type != 'trash' && node.one('.mail_flags span').hasClass('mail_starred')) {
                 menu.one('a.mail_menu_action_markasunstarred').ancestor('li').show();
                 separator = true;
             } else {
-                if (type != 'trash') {
+                if (mail_view_type != 'trash') {
                     menu.one('a.mail_menu_action_markasstarred').ancestor('li').show();
                     separator = true;
                 }
@@ -182,7 +180,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                     }
                 }
                 //Starred or unstarred
-                if (type != 'trash' && node.one('.mail_flags a span').hasClass('mail_starred')) {
+                if (mail_view_type != 'trash' && node.one('.mail_flags a span').hasClass('mail_starred')) {
                     var nodes = node.siblings(function(obj) {
                         return obj.hasClass('mail_selected') && obj.one('.mail_flags a span.mail_starred');
                     });
@@ -191,9 +189,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                     }
                 } else {
                     var nodes = node.siblings(function(obj) {
-                        return obj.hasClass('mail_selected') &&  obj.one('.mail_flags a span.mail_unstarred');
+                        return obj.hasClass('mail_selected') && obj.one('.mail_flags a span.mail_unstarred');
                     });
-                    if (type != 'trash' && !nodes.size()) {
+                    if (mail_view_type != 'trash' && !nodes.size()) {
                         menu.one('a.mail_menu_action_markasstarred').ancestor('li').hide();
                     }
                 }
@@ -201,21 +199,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         }
         mail_show_label_actions(separator);
     };
-
-    // var mail_customize_menu_labels = function () {
-    //     var isdefault = true;
-    //     var nodes = Y.all('.mail_menu_labels input[type="checkbox"]');
-    //     Y.each(nodes, function(node) {
-    //         isdefault = isdefault && (node.get('checked') === mail_checkbox_labels_default[node.get('value')]);
-    //     });
-    //     if (isdefault) {
-    //         Y.one('.mail_menu_label_apply').addClass('mail_hidden');
-    //         Y.one('.mail_menu_label_newlabel').removeClass('mail_hidden');
-    //     } else {
-    //         Y.one('.mail_menu_label_newlabel').addClass('mail_hidden');
-    //         Y.one('.mail_menu_label_apply').removeClass('mail_hidden');
-    //     }
-    // };
 
     var mail_label_default_values = function () {
         var grouplabels;
@@ -253,6 +236,10 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 }
             });
         });
+        if (mail_view_type == 'label') {
+            num = parseInt(Y.one('input[name="itemid"]').get('value'), 10);
+            mail_checkbox_labels_default[num] = true;
+        }
     };
 
     var mail_label_set_values = function () {
@@ -268,17 +255,25 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         node = (typeof node !== 'undefined' ? node : false);
         var grouplabels;
         var elem;
+        var labelid = 0;
         if (mail_message_view) {
             grouplabels = Y.one('.mail_group_labels');
         } else {
             grouplabels = node.ancestor('.mail_item').one('.mail_group_labels');
         }
         grouplabels.empty();
+        if (mail_view_type == 'label') {
+            labelid = parseInt(Y.one('input[name="itemid"]').get('value'), 10);
+        }
         var values = Y.all('.mail_menu_labels input:checked').get('value');
         Y.each(values, function (value) {
             value = parseInt(value, 10);
-            elem = Y.Node.create('<span class="mail_label mail_label_'+M.local_mail.mail_labels[value].color+' mail_label_'+value+'">'+M.local_mail.mail_labels[value].name+'</span>')
-            grouplabels.append(elem);
+            if (value != labelid) {
+                elem = Y.Node.create('<span class="mail_label mail_label_'+M.local_mail.mail_labels[value].color+' mail_label_'+value+'">'+M.local_mail.mail_labels[value].name+'</span>');
+                grouplabels.append(elem);
+            } else if (!mail_message_view) {
+                    grouplabels.ancestor('.mail_item').addClass('mail_hidden');
+            }
         });
     };
 
@@ -304,7 +299,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         if (bool) {
             Y.one('.mail_more_actions').removeClass('mail_button_disabled');
         } else {
-            if (Y.one("input[name=type]").get('value') != 'label') {
+            if (mail_view_type != 'label') {
                 Y.one('.mail_more_actions').addClass('mail_button_disabled');
             }
             mail_hide_menu_actions();
@@ -416,7 +411,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     };
 
     //Success call
-    var handleSuccess = function (transactionid, response, arguments) {
+    var handleSuccess = function (transactionid, response, args) {
         var obj = Y.JSON.parse(response.responseText);
         var img;
 
@@ -457,7 +452,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     };
 
     //Failure call
-    var handleFailure = function (transactionid, response, arguments) {
+    var handleFailure = function (transactionid, response, args) {
         console.log(response);
     };
 
@@ -476,11 +471,11 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             if(action == 'togglestarred') {
                 obj = node.one('span');
                 if (obj.hasClass('mail_starred')) {
-                    action = 'unstarred'
+                    action = 'unstarred';
                     obj.replaceClass('mail_starred', 'mail_unstarred');
                     node.set('title', M.util.get_string('unstarred','local_mail'));
                 } else {
-                    action = 'starred'
+                    action = 'starred';
                     obj.replaceClass('mail_unstarred', 'mail_starred');
                     node.set('title', M.util.get_string('starred','local_mail'));
                 }
@@ -506,14 +501,20 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         } else {//List messages view
             if(action == 'viewmail') {
                 nodes.empty();
-                ids = /m=(\d+)/.exec(node.get('href'))[1];
+                var url = node.get('href');
+                if (url.match(/compose\.php/)){
+                    document.location.href = url;
+                    return 0;
+                } else {
+                    ids = /m=(\d+)/.exec(node.get('href'))[1];
+                }
             }else if (action == 'togglestarred') {
                 obj = node.ancestor('.mail_item').one('input.mail_checkbox');
                 nodes = Y.all(obj);
                 if (node.one('span').hasClass('mail_starred')) {
-                    action = 'unstarred'
+                    action = 'unstarred';
                 } else {
-                    action = 'starred'
+                    action = 'starred';
                 }
                 ids = obj.get('value');
             } else if(action == 'perpage'){
@@ -526,12 +527,14 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 nodes.each(function (node) {
                     ancestor = node.ancestor('.mail_item');
                     if (action == 'starred') {
-                        if(child = ancestor.one('.mail_unstarred')) {
+                        child = ancestor.one('.mail_unstarred');
+                        if(child) {
                             child.replaceClass('mail_unstarred', 'mail_starred');
                             child.ancestor('a').set('title', M.util.get_string('starred','local_mail'));
                         }
                     } else if(action == 'unstarred') {
-                        if(child = ancestor.one('.mail_starred')) {
+                        child = ancestor.one('.mail_starred');
+                        if(child) {
                             child.replaceClass('mail_starred', 'mail_unstarred');
                             child.ancestor('a').set('title', M.util.get_string('unstarred','local_mail'));
                         }
@@ -554,7 +557,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             data: {
                 msgs: ids,
                 sesskey: Y.one('input[name="sesskey"]').get('value'),
-                type: Y.one('input[name="type"]').get('value'),
+                type: mail_view_type,
                 offset: Y.one('input[name="offset"]').get('value'),
                 action: action,
                 mailview: mail_view
@@ -580,7 +583,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     };
 
     var mail_label_post = function(action) {
-        var params = new Array();
+        var params = [];
         params.push('offset='+Y.one('input[name="offset"]').get('value'));
         params.push('sesskey='+Y.one('input[name="sesskey"]').get('value'));
         params.push(action+'=1');
@@ -589,21 +592,20 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     };
 
     var mail_update_url = function() {
-        var params = new Array();
+        var params = [];
         var offset;
         var m;
         var type;
 
         if (history.pushState) {
-            type = Y.one('input[name="type"]').get('value');
-            params.push('t='+type);
+            params.push('t='+mail_view_type);
             if (mail_message_view) {
                 params.push('m='+Y.one('input[name=m]').get('value'));
             }
-            if (type == 'course') {
+            if (mail_view_type == 'course') {
                 params.push('c='+Y.one('input[name="itemid"]').get('value'));
             } else {
-                if (type == 'label') {
+                if (mail_view_type == 'label') {
                     params.push('l='+Y.one('input[name="itemid"]').get('value'));
                 }
             }
@@ -813,11 +815,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         e.preventDefault();
         mail_doaction('viewmail', this);
     }, 'a.mail_link');
-
-    //Click label checkbox
-    // Y.one("div.region-content").delegate('click', function(e) {
-    //     mail_customize_menu_labels();
-    // }, '.mail_menu_labels input');
 
     //Click label checkbox
     Y.one("div.region-content").delegate('click', function(e) {

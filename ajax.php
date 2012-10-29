@@ -131,6 +131,13 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'setlabels';
         array_push($params, $messages);
         array_push($params, explode(',', $labelids));
+        array_push($params, $mailview);
+        array_push($params, array(
+                                    'itemid' => $itemid,
+                                    'type' => $type,
+                                    'offset' => $offset,
+                                    'mailpagesize' => $mailpagesize
+                                ));
     }
     echo json_encode(call_user_func_array($func, $params));
 } else {
@@ -225,9 +232,12 @@ function setgoback($itemid, $type, $offset, $mailpagesize){
     );
 }
 
-function setlabels($messages, $labelids)
+function setlabels($messages, $labelids, $mailview, $data)
 {
     global $USER;
+
+    $rethtml = false;
+    $content = '';
 
     $labels = local_mail_label::fetch_user($USER->id);
     foreach ($messages as $message) {
@@ -236,14 +246,21 @@ function setlabels($messages, $labelids)
                 if (in_array($label->id(), $labelids)) {
                     $message->add_label($label);
                 } else {
+                    if ($data['type'] == 'label' and $label->id() == $data['itemid']) {
+                        $rethtml = true;
+                    }
                     $message->remove_label($label);
                 }
             }
         }
     }
+    if (!$mailview && $rethtml) {
+        $totalcount = local_mail_message::count_index($USER->id, $data['type'], $data['itemid']);
+        $content = print_messages($data['itemid'], $data['type'], $data['offset'], $data['mailpagesize'], $totalcount);
+    }
     return array(
-        'info' => '',
-        'html' => ''//print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
+        'info' => get_info(),
+        'html' => $content
     );
 }
 
