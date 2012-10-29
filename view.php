@@ -346,6 +346,7 @@ if ($removelbl) {
 
     echo $OUTPUT->container_end();
 
+    echo html_writer::start_tag('div');
     echo html_writer::empty_tag('input', array(
         'type' => 'hidden',
         'name' => 'sesskey',
@@ -371,6 +372,7 @@ if ($removelbl) {
             'value' => $labelid,
         ));
     }
+    echo html_writer::end_tag('div');
 
     $refs = $message->references();
     if (!empty($refs)) {

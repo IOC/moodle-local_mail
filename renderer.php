@@ -117,7 +117,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $prevtitle,
             'type' => 'submit',
             'name' => 'prevpage',
-            'tooltip' => get_string('previous'),
+            'title' => get_string('previous'),
             'class' => 'mail_button singlebutton',
         );
         if (!$offset) {
@@ -130,7 +130,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $nexttitle,
             'type' => 'submit',
             'name' => 'nextpage',
-            'tooltip' => get_string('next'),
+            'title' => get_string('next'),
             'class' => 'mail_button singlebutton',
         );
         if ($offset === false or ($offset + $count) == $totalcount) {
@@ -247,7 +247,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $output = html_writer::empty_tag('input', $attributes);
         //List labels and options
         $labels = local_mail_label::fetch_user($USER->id);
-        $output .= html_writer::start_tag('span', array('class' => 'mail_hidden mail_labelselect'));
+        $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_labelselect'));
         foreach ($labels as $key => $label) {
             $items[$key] =  html_writer::checkbox('mail_menu_label_' . $key, $label->id(), false, $label->name(), array('class' => 'mail_label mail_label_'. $label->color()));
         }
@@ -255,7 +255,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $items[] = html_writer::link('#', get_string('newlabel', 'local_mail'), array('class' => 'mail_menu_label_newlabel'));
         $items[] = html_writer::link('#', get_string('applychanges', 'local_mail'), array('class' => 'mail_menu_label_apply'));
         $output .= html_writer::alist($items, array('class' => 'mail_menu_labels'));
-        $output .= html_writer::end_tag('span');
+        $output .= html_writer::end_tag('div');
         return $output;
     }
 
@@ -290,10 +290,10 @@ class local_mail_renderer extends plugin_renderer_base {
         $output = html_writer::start_tag('span', array('class' => 'mail_hidden mail_button mail_checkbox_all'));
         $output .= html_writer::checkbox('selectall', '', false);
         $url = $this->output->pix_url('t/expanded', 'moodle');
-        $output .= html_writer::empty_tag('img', array('src' => $url));
+        $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expand'));
         $output .= html_writer::end_tag('span');
         //Menu options
-        $output .= html_writer::start_tag('span', array('class' => 'mail_hidden mail_optselect'));
+        $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_optselect'));
         $items = array(
             'all' => get_string('all', 'local_mail'),
             'none' => get_string('none', 'local_mail'),
@@ -306,7 +306,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $items[$key] = html_writer::link('#', $item, array('class' => 'mail_menu_option_' . $key));
         }
         $output .= html_writer::alist($items, array('class' => 'mail_menu_options'));
-        $output .= html_writer::end_tag('span');
+        $output .= html_writer::end_tag('div');
         return $output;
     }
 
@@ -327,10 +327,10 @@ class local_mail_renderer extends plugin_renderer_base {
         $output = html_writer::start_tag('span', array('class' => 'mail_hidden singlebutton mail_button mail_more_actions'));
         $output .= html_writer::tag('span', get_string('moreactions', 'local_mail'));
         $url = $this->output->pix_url('t/expanded', 'moodle');
-        $output .= html_writer::empty_tag('img', array('src' => $url));
+        $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
         $output .= html_writer::end_tag('span');
         //Menu options
-        $output .= html_writer::start_tag('span', array('class' => 'mail_hidden mail_actselect'));
+        $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_actselect'));
         $items = array(
             'markasread' => get_string('markasread', 'local_mail'),
             'markasunread' => get_string('markasunread', 'local_mail'),
@@ -344,7 +344,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $items[$key] = html_writer::link('#', $item, array('class' => 'mail_menu_action_' . $key));
         }
         $output .= html_writer::alist($items, array('class' => 'mail_menu_actions'));
-        $output .= html_writer::end_tag('span');
+        $output .= html_writer::end_tag('div');
         return $output;
     }
 
@@ -589,6 +589,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $content .= html_writer::tag('div', $string.' '.$link, array('class' => 'mail_item'));
             $content .= $this->output->container_end();
         }
+        $content .= html_writer::start_tag('div');
         $content .= html_writer::empty_tag('input', array(
                 'type' => 'hidden',
                 'name' => 'type',
@@ -609,7 +610,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 'name' => 'itemid',
                 'value' => $itemid,
         ));
-
+        $content .= html_writer::end_tag('div');
         $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
         $nums = array('5', '10', '20', '50', '100');
         $cont = count($nums) - 1;

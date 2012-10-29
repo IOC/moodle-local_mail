@@ -345,6 +345,7 @@ function getmail($message, $type, $reply, $offset, $labelid) {
 
     $content .= $OUTPUT->container_end();
 
+    $content .= html_writer::start_tag('div');
     $content .= html_writer::empty_tag('input', array(
         'type' => 'hidden',
         'name' => 'sesskey',
@@ -370,6 +371,7 @@ function getmail($message, $type, $reply, $offset, $labelid) {
             'value' => $labelid,
         ));
     }
+    $content .= html_writer::end_tag('div');
 
     $content .= html_writer::end_tag('form');
     $refs = $message->references();
