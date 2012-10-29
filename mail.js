@@ -272,7 +272,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 elem = Y.Node.create('<span class="mail_label mail_label_'+M.local_mail.mail_labels[value].color+' mail_label_'+value+'">'+M.local_mail.mail_labels[value].name+'</span>');
                 grouplabels.append(elem);
             } else if (!mail_message_view) {
-                    grouplabels.ancestor('.mail_item').addClass('mail_hidden');
+                grouplabels.ancestor('.mail_item').remove();
             }
         });
     };
@@ -533,17 +533,21 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                             child.ancestor('a').set('title', M.util.get_string('starred','local_mail'));
                         }
                     } else if(action == 'unstarred') {
-                        child = ancestor.one('.mail_starred');
-                        if(child) {
-                            child.replaceClass('mail_starred', 'mail_unstarred');
-                            child.ancestor('a').set('title', M.util.get_string('unstarred','local_mail'));
+                        if (mail_view_type == 'starred') {
+                            ancestor.remove();
+                        } else {
+                            child = ancestor.one('.mail_starred');
+                            if(child) {
+                                child.replaceClass('mail_starred', 'mail_unstarred');
+                                child.ancestor('a').set('title', M.util.get_string('unstarred','local_mail'));
+                            }
                         }
                     } else if(action == 'markasread') {
                         ancestor.removeClass('mail_unread');
                     } else if(action == 'markasunread') {
                         ancestor.addClass('mail_unread');
                     } else if(action == 'delete') {
-                        ancestor.addClass('mail_hidden');
+                        ancestor.remove();
                     } else if(action == 'setlabels') {
                         mail_assign_labels(node);
                     }

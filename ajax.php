@@ -62,6 +62,14 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'setstarred';
         array_push($params, $messages);
         array_push($params, false);
+        array_push($params, array(
+                            'type' => $type,
+                            'mailview' => $mailview,
+                            'itemid' => $itemid,
+                            'type' => $type,
+                            'offset' => $offset,
+                            'mailpagesize' => $mailpagesize
+                        ));
     } elseif ($action === 'markasread') {
         $func = 'setread';
         array_push($params, $messages);
@@ -131,8 +139,8 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'setlabels';
         array_push($params, $messages);
         array_push($params, explode(',', $labelids));
-        array_push($params, $mailview);
         array_push($params, array(
+                                    'mailview' => $mailview,
                                     'itemid' => $itemid,
                                     'type' => $type,
                                     'offset' => $offset,
@@ -144,17 +152,26 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
     echo json_encode(array('msgerror' => 'Invalid data'));
 }
 
-function setstarred ($messages, $bool) {
+function setstarred ($messages, $bool, $data = false) {
     global $USER;
 
+    $content = '';
     foreach ($messages as $message) {
         if ($message->viewable($USER->id)) {
             $message->set_starred($USER->id, $bool);
         }
     }
+
+    if ($data and !$data['mailview'] and $data['type'] == 'starred') {
+        $totalcount = local_mail_message::count_index($USER->id, $data['type'], $data['itemid']);
+        if ($data['offset'] > $totalcount - 1) {
+           $data['offset'] = min(0, $data['offset']-$data['mailpagesize']);
+        }
+        $content = print_messages($data['itemid'], $data['type'], $data['offset'], $data['mailpagesize'], $totalcount);
+    }
     return array(
         'info' => '',
-        'html' => ''
+        'html' => $content
     );
 }
 
@@ -232,7 +249,7 @@ function setgoback($itemid, $type, $offset, $mailpagesize){
     );
 }
 
-function setlabels($messages, $labelids, $mailview, $data)
+function setlabels($messages, $labelids, $data)
 {
     global $USER;
 
@@ -254,8 +271,11 @@ function setlabels($messages, $labelids, $mailview, $data)
             }
         }
     }
-    if (!$mailview && $rethtml) {
+    if (!$data['mailview'] && $rethtml) {
         $totalcount = local_mail_message::count_index($USER->id, $data['type'], $data['itemid']);
+        if ($data['offset'] > $totalcount-1) {
+           $data['offset'] = min(0, $data['offset']-$data['mailpagesize']);
+        }
         $content = print_messages($data['itemid'], $data['type'], $data['offset'], $data['mailpagesize'], $totalcount);
     }
     return array(
