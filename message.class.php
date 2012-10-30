@@ -146,13 +146,15 @@ class local_mail_message {
             . ' u.username, u.firstname, u.lastname, u.email, u.picture, u.imagealt, u.maildisplay'
             . ' FROM {local_mail_message_users} mu'
             . ' JOIN {user} u ON u.id = mu.userid'
-            . ' WHERE mu.messageid  IN (' . implode(',', $ids) . ')';
+            . ' WHERE mu.messageid  IN (' . implode(',', $ids) . ')'
+            . ' ORDER BY u.lastname, u.firstname';
         $user_records = $DB->get_records_sql($sql);
 
         $sql = 'SELECT ml.id AS recordid, ml.messageid, l.id, l.userid, l.name, l.color'
             . ' FROM {local_mail_message_labels} ml'
             . ' JOIN {local_mail_labels} l ON l.id = ml.labelid'
-            . ' WHERE ml.messageid  IN (' . implode(',', $ids) . ')';
+            . ' WHERE ml.messageid  IN (' . implode(',', $ids) . ')'
+            . ' ORDER BY l.name';
         $label_records = $DB->get_records_sql($sql);
 
         foreach ($ids as $id) {
