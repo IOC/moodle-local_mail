@@ -90,7 +90,7 @@ class local_mail_label {
      function save($name, $color) {
         global $DB;
 
-        assert(in_array($color, self::valid_colors()));
+        assert(!$color or in_array($color, self::valid_colors()));
         assert(strlen($name) > 0);
 
         $record = new stdClass;
