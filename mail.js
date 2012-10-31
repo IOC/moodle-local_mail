@@ -375,7 +375,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var mail_enable_all_buttons = function(bool) {
         var mail_buttons = Y.all('.mail_toolbar > input').get('name');
 
-        Y.each(mail_buttons, (function(value){
+        Y.each(mail_buttons, (function(value) {
             mail_enable_button(value, bool);
         }));
         if (bool) {

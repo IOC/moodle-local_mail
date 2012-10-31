@@ -548,13 +548,16 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function toolbar($type, $replyall = false, $paging = null, $trash = false) {
+        $toolbardown = false;
         if ($type === 'reply') {
             $output = $this->reply();
             //all recipients
             $output .= $this->replyall($replyall);
             $output .= $this->forward();
+            $toolbardown = true;
         } elseif ($type === 'forward') {
             $output = $this->forward();
+            $toolbardown = true;
         } else {
             $selectall = $this->selectall();
             $delete = $this->delete($trash);
@@ -584,7 +587,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $clearer = $this->output->container('', 'clearer');
             $output = $goback . $selectall . $labels . $read . $unread . $pagingbar . $delete . $extended . $more . $clearer;
         }
-        return $this->output->container($output, 'mail_toolbar');
+        return $this->output->container($output, ($toolbardown?'mail_toolbar_down':'mail_toolbar'));
     }
 
     function users($message, $userid, $type, $itemid) {
