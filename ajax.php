@@ -3,15 +3,18 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/local/mail/lib.php');
 
-$action   = optional_param('action', false, PARAM_ALPHA);
-$type     = optional_param('type', false, PARAM_ALPHA);
-$msgs     = optional_param('msgs', '', PARAM_SEQUENCE);
-$labelids = optional_param('labelids', '', PARAM_SEQUENCE);
-$itemid   = optional_param('itemid', 0, PARAM_INT);
-$offset   = optional_param('offset', 0, PARAM_INT);
-$perpage  = optional_param('perpage', 0, PARAM_INT);
-$sesskey  = optional_param('sesskey', null, PARAM_RAW);
-$mailview = optional_param('mailview', false, PARAM_BOOL);
+$action     = optional_param('action', false, PARAM_ALPHA);
+$type       = optional_param('type', false, PARAM_ALPHA);
+$msgs       = optional_param('msgs', '', PARAM_SEQUENCE);
+$labelids   = optional_param('labelids', '', PARAM_SEQUENCE);
+$itemid     = optional_param('itemid', 0, PARAM_INT);
+$messageid  = optional_param('m', 0, PARAM_INT);
+$offset     = optional_param('offset', 0, PARAM_INT);
+$perpage    = optional_param('perpage', 0, PARAM_INT);
+$sesskey    = optional_param('sesskey', null, PARAM_RAW);
+$mailview   = optional_param('mailview', false, PARAM_BOOL);
+$labelname  = optional_param('labelname', false, PARAM_ALPHANUMEXT);
+$labelcolor = optional_param('labelcolor', false, PARAM_ALPHANUMEXT);
 
 
 $courseid = ($type == 'course'?$itemid:$SITE->id);
@@ -28,7 +31,9 @@ $valid_actions = array(
     'perpage',
     'viewmail',
     'goback',
-    'setlabels'
+    'assignlabels',
+    'newlabel',
+    'setlabel'
 );
 
 if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
@@ -37,15 +42,16 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         echo json_encode(array('msgerror' => get_string('invalidsesskey', 'error')));
         die;
     }
-    if (empty($msgs) and ($action != 'prevpage' and $action != 'nextpage'and $action != 'perpage')){
+    if (empty($msgs) and ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'setlabel')){
         echo json_encode(array('msgerror' => get_string('nomessageserror', 'local_mail')));
         die;
     }
-    if ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'goback') {
+    if ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'goback' and $action != 'setlabel') {
         if ($action == 'viewmail') {
             $message = local_mail_message::fetch($msgs);
             if (!$message or !$message->viewable($USER->id)) {
                 echo json_encode(array('msgerror' => get_string('invalidmessage', 'local_mail')));
+                die;
             }
         } else {
             $msgsids = explode(',', $msgs);
@@ -135,8 +141,8 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         array_push($params, $type);
         array_push($params, $offset);
         array_push($params, $mailpagesize);
-    } elseif ($action === 'setlabels') {
-        $func = 'setlabels';
+    } elseif ($action === 'assignlabels') {
+        $func = 'assignlabels';
         array_push($params, $messages);
         array_push($params, explode(',', $labelids));
         array_push($params, array(
@@ -146,6 +152,30 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
                                     'offset' => $offset,
                                     'mailpagesize' => $mailpagesize
                                 ));
+    } elseif ($action === 'newlabel') {
+        $func = 'newlabel';
+        $data = array('t='.$type);
+        array_push($params, $messages);
+        array_push($params, $labelname);
+        array_push($params, $labelcolor);
+        if ($type == 'course') {
+            array_push($data, 'c='.$itemid);
+        } elseif ($type == 'label') {
+            array_push($data, 'l='.$itemid);
+        }
+        if ($mailview) {
+            array_push($data, 'm='.$messageid);
+        }
+        if ($offset) {
+            array_push($data, 'offset='.$offset);
+        }
+        array_push($params, $data);
+    } elseif ($action === 'setlabel') {
+        $func = 'setlabel';
+        array_push($params, $type);
+        array_push($params, $itemid);
+        array_push($params, $labelname);
+        array_push($params, $labelcolor);
     }
     echo json_encode(call_user_func_array($func, $params));
 } else {
@@ -249,7 +279,7 @@ function setgoback($itemid, $type, $offset, $mailpagesize){
     );
 }
 
-function setlabels($messages, $labelids, $data)
+function assignlabels($messages, $labelids, $data)
 {
     global $USER;
 
@@ -373,7 +403,6 @@ function getmail($message, $type, $reply, $offset, $labelid) {
     }
     $content .= html_writer::end_tag('div');
 
-    $content .= html_writer::end_tag('form');
     $refs = $message->references();
     if (!empty($refs)) {
         $content .= $mailoutput->references(local_mail_message::fetch_many($refs));
@@ -382,6 +411,58 @@ function getmail($message, $type, $reply, $offset, $labelid) {
     return array(
         'info' => '',
         'html' => $content
+    );
+}
+
+function setlabel($type, $labelid, $labelname, $labelcolor) {
+    global $CFG;
+
+    $error = '';
+    $label = local_mail_label::fetch($labelid);
+    $colors = local_mail_label::valid_colors();
+    if ($label) {
+        if ($labelname and in_array($labelcolor, $colors)) {
+            $label->save($labelname, $labelcolor);
+        } else {
+            $error = (!$labelname?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
+        }
+    } else {
+        $error = get_string('invalidlabel', 'local_mail');
+    }
+    return array(
+        'msgerror' => $error,
+        'info' => '',
+        'html' => '',
+        'redirect' => $CFG->wwwroot . '/local/mail/view.php?t=' . $type . '&l=' . $labelid
+    );
+}
+
+function newlabel($messages, $labelname, $labelcolor, $data) {
+    global $CFG, $USER;
+
+    $error = '';
+    $labelname = trim($labelname);
+    $colors = local_mail_label::valid_colors();
+    $validcolor = (in_array($labelcolor, $colors) or $labelcolor == 'nocolor');
+    if (!empty($labelname) and $validcolor) {
+        if ($labelcolor == 'nocolor') {
+            $labelcolor = '';
+        }
+        $newlabel = local_mail_label::create($USER->id, $labelname, $labelcolor);
+        foreach ($messages as $message) {
+            if ($message->viewable($USER->id) and !$message->deleted($USER->id)) {
+                $message->add_label($newlabel);
+            }
+        }
+    } else {
+        $error = (empty($labelname)?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
+    }
+
+    return array(
+        'msgerror' => $error,
+        'info' => '',
+        'html' => '',
+        'redirect' => $CFG->wwwroot . '/local/mail/view.php?' . implode('&', $data)
     );
 }
 

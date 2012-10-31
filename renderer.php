@@ -369,6 +369,61 @@ class local_mail_renderer extends plugin_renderer_base {
         return $content;
     }
 
+    function editlabelform() {
+        $content = html_writer::start_tag('div', array('id' => 'local_mail_form_edit_label', 'class' => 'local_mail_form mail_hidden'));
+        $content .= html_writer::start_tag('div', array('class' => 'label_form'));
+        $content .= html_writer::start_tag('div', array('class' => 'label_name'));
+        $text = get_string('labelname', 'local_mail');
+        $content .= html_writer::label($text, 'local_mail_edit_label_name');
+        $content .= html_writer::empty_tag('input', array(
+                'type' => 'text',
+                'id' => 'local_mail_edit_label_name',
+                'name' => 'local_mail_edit_label_name',
+                'value' => '',
+        ));
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::start_tag('div', array('class' => 'label_color'));
+        $colors = local_mail_label::valid_colors();
+        $options['nocolor'] = '';
+        foreach ($colors as $color) {
+            $options[$color] = $color;
+        }
+        $text = get_string('labelcolor', 'local_mail');
+        $content .= html_writer::label($text, 'local_mail_edit_label_color');
+        $content .=  html_writer::select($options, 'local_mail_edit_label_color', '', array('' => 'choosedots'), array('id' => 'local_mail_edit_label_color', 'class' => 'mail_label_colors'));
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::end_tag('div');
+        return $content;
+    }
+
+    function newlabelform() {
+        $content = html_writer::start_tag('div', array('id' => 'local_mail_form_new_label', 'class' => 'local_mail_form mail_hidden'));
+        $content .= html_writer::start_tag('div', array('class' => 'label_form'));
+        $content .= html_writer::start_tag('div', array('class' => 'label_name'));
+        $text = get_string('labelname', 'local_mail');
+        $content .= html_writer::label($text, 'local_mail_new_label_name');
+        $content .= html_writer::empty_tag('input', array(
+                'type' => 'text',
+                'id' => 'local_mail_new_label_name',
+                'name' => 'local_mail_new_label_name',
+                'value' => '',
+        ));
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::start_tag('div', array('class' => 'label_color'));
+        $colors = local_mail_label::valid_colors();
+        $options['nocolor'] = '';
+        foreach ($colors as $color) {
+            $options[$color] = $color;
+        }
+        $text = get_string('labelcolor', 'local_mail');
+        $content .= html_writer::label($text, 'local_mail_new_label_color');
+        $content .=  html_writer::select($options, 'local_mail_new_label_color', '', array('' => 'choosedots'), array('id' => 'local_mail_new_label_color', 'class' => 'mail_label_colors'));
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::end_tag('div');
+        return $content;
+    }
     function references($references, $reply = false) {
         $class = 'mail_references';
         $header = 'h3';
@@ -480,6 +535,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $output .= $this->output->container_end();
         }
         $output .= $this->output->container_end();
+        $output .= $this->newlabelform();
         if (!$reply) {
             if ($message->sender()->id !== $USER->id) {
                 $output .= $this->toolbar('reply', ($totalusers > 1));
@@ -562,7 +618,7 @@ class local_mail_renderer extends plugin_renderer_base {
 
         if (!$ajax) {
             $url = new moodle_url($this->page->url);
-            $content .= html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
+            $content .= html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'id' => 'local_mail_main_form'));
         }
         $paging = array(
             'offset' => $offset,
@@ -610,6 +666,8 @@ class local_mail_renderer extends plugin_renderer_base {
                 'name' => 'itemid',
                 'value' => $itemid,
         ));
+        $content .= $this->editlabelform();
+        $content .= $this->newlabelform();
         $content .= html_writer::end_tag('div');
         $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
         $nums = array('5', '10', '20', '50', '100');
@@ -640,7 +698,6 @@ class local_mail_renderer extends plugin_renderer_base {
         if (!$ajax) {
             $content .= html_writer::end_tag('form');
         }
-
 
         return $this->output->container($content);
     }

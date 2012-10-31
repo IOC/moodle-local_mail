@@ -1,8 +1,10 @@
-YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
+YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', function(Y) {
 
     var mail_message_view = false;
     var mail_checkbox_labels_default = {};
     var mail_view_type = '';
+    var mail_edit_label_panel;
+    var mail_new_label_panel;
 
     var init = function(){
         mail_view_type = Y.one('input[name="type"]').get('value');
@@ -13,6 +15,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         Y.one('span.mail_more_actions').removeClass('mail_hidden');
         mail_hide_noscript_buttons();
         mail_enable_all_buttons(mail_message_view);
+        if (!mail_message_view) {
+            mail_select_none();
+        }
         if (mail_view_type == 'trash') {
             mail_remove_action('.mail_menu_action_markasstarred');
             mail_remove_action('.mail_menu_action_markasunstarred');
@@ -25,6 +30,82 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             }
         }
         mail_update_menu_actions();
+        mail_create_edit_label_panel();
+        mail_create_new_label_panel();
+    };
+
+    var mail_create_edit_label_panel = function () {
+        var title = M.util.get_string('editlabel', 'local_mail');
+        var obj = (Y.one('.mail_list')?Y.one('.mail_list'):Y.one('.mail_view'));
+        var position = obj.getXY();
+        var width = 400;
+        var posx = position[0]+(Y.one('body').get('offsetWidth')/2)-width;
+        mail_edit_label_panel = new Y.Panel({
+            srcNode      : '#local_mail_form_edit_label',
+            headerContent: title,
+            width        : width,
+            zIndex       : 5,
+            centered     : false,
+            modal        : true,
+            visible      : false,
+            render       : true,
+            xy           : [posx,position[1]],
+            plugins      : [Y.Plugin.Drag]
+        });
+        mail_edit_label_panel.addButton({
+            value  : M.util.get_string('submit', 'moodle'),
+            section: Y.WidgetStdMod.FOOTER,
+            action : function (e) {
+                e.preventDefault();
+                mail_edit_label_panel.hide();
+                mail_doaction('setlabel');
+            }
+        });
+        mail_edit_label_panel.addButton({
+            value  : M.util.get_string('cancel', 'moodle'),
+            section: Y.WidgetStdMod.FOOTER,
+            action : function (e) {
+                e.preventDefault();
+                mail_edit_label_panel.hide();
+            }
+        });
+    };
+
+    var mail_create_new_label_panel = function () {
+        var title = M.util.get_string('newlabel', 'local_mail');
+        var obj = (Y.one('.mail_list')?Y.one('.mail_list'):Y.one('.mail_view'));
+        var position = obj.getXY();
+        var width = 400;
+        var posx = position[0]+(Y.one('body').get('offsetWidth')/2)-width;
+        mail_new_label_panel = new Y.Panel({
+            srcNode      : '#local_mail_form_new_label',
+            headerContent: title,
+            width        : width,
+            zIndex       : 5,
+            centered     : false,
+            modal        : true,
+            visible      : false,
+            render       : true,
+            xy           : [posx,position[1]],
+            plugins      : [Y.Plugin.Drag]
+        });
+        mail_new_label_panel.addButton({
+            value  : M.util.get_string('submit', 'moodle'),
+            section: Y.WidgetStdMod.FOOTER,
+            action : function (e) {
+                e.preventDefault();
+                mail_new_label_panel.hide();
+                mail_doaction('newlabel');
+            }
+        });
+        mail_new_label_panel.addButton({
+            value  : M.util.get_string('cancel', 'moodle'),
+            section: Y.WidgetStdMod.FOOTER,
+            action : function (e) {
+                e.preventDefault();
+                mail_new_label_panel.hide();
+            }
+        });
     };
 
     var mail_hide_actions = function() {
@@ -145,6 +226,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         var menu = Y.one('.mail_menu_actions');
         var checkbox = node.one('input[type=checkbox]');
         var separator = false;
+        var nodes;
 
         if (checkbox.get('checked')) {
             //Read or unread
@@ -181,14 +263,14 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 }
                 //Starred or unstarred
                 if (mail_view_type != 'trash' && node.one('.mail_flags a span').hasClass('mail_starred')) {
-                    var nodes = node.siblings(function(obj) {
+                    nodes = node.siblings(function(obj) {
                         return obj.hasClass('mail_selected') && obj.one('.mail_flags a span.mail_starred');
                     });
                     if (!nodes.size()) {
                         menu.one('a.mail_menu_action_markasunstarred').ancestor('li').hide();
                     }
                 } else {
-                    var nodes = node.siblings(function(obj) {
+                    nodes = node.siblings(function(obj) {
                         return obj.hasClass('mail_selected') && obj.one('.mail_flags a span.mail_unstarred');
                     });
                     if (mail_view_type != 'trash' && !nodes.size()) {
@@ -284,9 +366,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     var mail_enable_button = function(name, bool) {
         bool = (typeof bool !== 'undefined' ? bool : false);
         if (bool) {
-            Y.one('.mail_toolbar input[name='+name+']').set('disabled','');
+            Y.one('.mail_toolbar input[name="'+name+'"]').set('disabled','');
         } else {
-            Y.one('.mail_toolbar input[name='+name+']').set('disabled','disabled');
+            Y.one('.mail_toolbar input[name="'+name+'"]').set('disabled','disabled');
         }
     };
 
@@ -303,11 +385,11 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 Y.one('.mail_more_actions').addClass('mail_button_disabled');
             }
             mail_hide_menu_actions();
-            Y.one('.mail_checkbox_all input[name=selectall]').set('checked','');
+            Y.one('.mail_checkbox_all input[name="selectall"]').set('checked','');
         }
         if(!mail_message_view && !Y.all('.mail_item > input').size()) {
             Y.one('.mail_checkbox_all').addClass('mail_button_disabled');
-            Y.one('.mail_checkbox_all input[name=selectall]').set('disabled','disabled').set('checked','');
+            Y.one('.mail_checkbox_all input[name="selectall"]').set('disabled','disabled').set('checked','');
         }
     };
 
@@ -419,7 +501,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             alert(obj.msgerror);
         } else {
             if (obj.html) {
-                Y.one('div.region-content form').setContent(obj.html);
+                Y.one('#local_mail_main_form').setContent(obj.html);
                 init();
                 mail_update_url();
             }
@@ -447,6 +529,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                         Y.one('.mail_label_'+index+' a').setContent(img+value);
                     }));
                 }
+            }
+            if(obj.redirect) {
+                document.location.href = obj.redirect;
             }
         }
     };
@@ -493,7 +578,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                 mail_message_view = false;
             } else if(action == 'goback') {
                 mail_message_view = false;
-            } else if(action == 'setlabels') {
+            } else if(action == 'assignlabels') {
                 mail_assign_labels();
             }
             mail_view = true;
@@ -548,7 +633,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
                         ancestor.addClass('mail_unread');
                     } else if(action == 'delete') {
                         ancestor.remove();
-                    } else if(action == 'setlabels') {
+                    } else if(action == 'assignlabels') {
                         mail_assign_labels(node);
                     }
                 });
@@ -572,7 +657,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
             }
         };
         if (Y.one('input[name="m"]')) {
-            cfg.data.itemid = Y.one('input[name="m"]').get('value');
+            cfg.data.m = Y.one('input[name="m"]').get('value');
         }
         if(Y.one('input[name="itemid"]')) {
             cfg.data.itemid = Y.one('input[name="itemid"]').get('value');
@@ -580,19 +665,71 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         if (action == 'perpage') {
             cfg.data.perpage = node.get('innerText');
         }
-        if (action == 'setlabels') {
+        if (action == 'assignlabels') {
             cfg.data.labelids = Y.all('.mail_menu_labels input:checked').get('value').join();
+        }
+        if (action == 'setlabel') {
+            obj = Y.one('#local_mail_edit_label_color');
+            cfg.data.labelname = Y.one('#local_mail_edit_label_name').get('value');
+            if (!cfg.data.labelname) {
+                alert(M.util.get_string('erroremptylabelname', 'local_mail'));
+                mail_label_edit();
+                return false;
+            }
+            cfg.data.labelcolor = obj.get('options').item(obj.get('selectedIndex')).get('value');
+        }
+        if (action == 'newlabel') {
+            obj = Y.one('#local_mail_new_label_color');
+            cfg.data.labelname = Y.one('#local_mail_new_label_name').get('value');
+            if (!cfg.data.labelname) {
+                alert(M.util.get_string('erroremptylabelname', 'local_mail'));
+                mail_label_new();
+                return false;
+            }
+            cfg.data.labelcolor = obj.get('options').item(obj.get('selectedIndex')).get('value');
         }
         request = Y.io(M.cfg.wwwroot + '/local/mail/ajax.php', cfg);
     };
 
-    var mail_label_post = function(action) {
+    var mail_label_confirm_delete = function(e) {
+        var labelid;
+        var message;
+        labelid = Y.one('input[name="itemid"]').get('value');
+        message = M.util.get_string('labeldeleteconfirm', 'local_mail', M.local_mail.mail_labels[labelid].name);
+        M.util.show_confirm_dialog(e, {
+                                        'callback' : mail_label_remove,
+                                        'message' : message,
+                                        'continuelabel': M.util.get_string('delete', 'local_mail')
+                                    }
+        );
+    };
+
+    var mail_label_remove = function() {
         var params = [];
         params.push('offset='+Y.one('input[name="offset"]').get('value'));
         params.push('sesskey='+Y.one('input[name="sesskey"]').get('value'));
-        params.push(action+'=1');
-        var url = Y.one('.region-content form').get('action');
-        document.location.href =  url+'&'+params.join('&');
+        params.push('removelbl=1');
+        params.push('confirmlbl=1');
+        var url = Y.one('#local_mail_main_form').get('action');
+        document.location.href = url+'&'+params.join('&');
+    };
+
+    var mail_label_new = function() {
+        mail_new_label_panel.show();
+        Y.one('#local_mail_new_label_color option[value="nocolor"]').set('selected', 'selected');
+        Y.one('#local_mail_form_new_label').removeClass('mail_hidden');
+        Y.one('#local_mail_new_label_name').focus();
+    };
+
+    var mail_label_edit = function() {
+        var labelid = Y.one('input[name="itemid"]').get('value');
+        var labelname = M.local_mail.mail_labels[labelid].name;
+        var labelcolor = M.local_mail.mail_labels[labelid].color;
+        Y.one('#local_mail_edit_label_name').set('value', labelname);
+        Y.one('#local_mail_edit_label_color option[value="'+labelcolor+'"]').set('selected', 'selected');
+        mail_edit_label_panel.show();
+        Y.one('#local_mail_form_edit_label').removeClass('mail_hidden');
+        Y.one('#local_mail_edit_label_name').focus();
     };
 
     var mail_update_url = function() {
@@ -604,7 +741,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         if (history.pushState) {
             params.push('t='+mail_view_type);
             if (mail_message_view) {
-                params.push('m='+Y.one('input[name=m]').get('value'));
+                params.push('m='+Y.one('input[name="m"]').get('value'));
             }
             if (mail_view_type == 'course') {
                 params.push('c='+Y.one('input[name="itemid"]').get('value'));
@@ -655,7 +792,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     Y.one("div.region-content").delegate('click', function(e) {
         mail_hide_menu_options();
         mail_hide_menu_labels();
-    }, '.mail_checkbox_all > input[name=selectall]');
+    }, '.mail_checkbox_all > input[name="selectall"]');
 
     //Toggle menu actions
     Y.one("div.region-content").delegate('click', function(e) {
@@ -761,13 +898,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     //Menu action editlabel
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
-        mail_label_post('editlbl');
+        mail_label_edit();
     }, '.mail_menu_action_editlabel');
 
     //Menu action removelabel
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
-        mail_label_post('removelbl');
+        mail_label_confirm_delete(e);
     }, '.mail_menu_action_removelabel');
 
     //Starred and unstarred
@@ -781,25 +918,25 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('delete');
-    }, 'input[name=delete]');
+    }, 'input[name="delete"]');
 
     //Prev page button
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('prevpage');
-    }, 'input[name=prevpage]');
+    }, 'input[name="prevpage"]');
 
     //Prev page button
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('nextpage');
-    }, 'input[name=nextpage]');
+    }, 'input[name="nextpage"]');
 
     //Go back button
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('goback');
-    }, 'input[name=goback]');
+    }, 'input[name="goback"]');
 
     //Mail per page
     Y.one("div.region-content").delegate('click', function(e) {
@@ -820,13 +957,19 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', function(Y) {
         mail_doaction('viewmail', this);
     }, 'a.mail_link');
 
-    //Click label checkbox
+    //Click apply changes on labels
     Y.one("div.region-content").delegate('click', function(e) {
         mail_hide_menu_labels();
-        mail_doaction('setlabels');
+        mail_doaction('assignlabels');
     }, '.mail_menu_label_apply');
 
-    //Show all hidden elements
+    //Click new label
+    Y.one("div.region-content").delegate('click', function(e) {
+        mail_hide_menu_labels();
+        mail_label_new();
+    }, '.mail_menu_label_newlabel');
+
+    //Initialize
     init();
     mail_update_url();
 });

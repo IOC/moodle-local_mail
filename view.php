@@ -198,6 +198,9 @@ if ($removelbl) {
             $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_ALPHANUMEXT));
             $validcolor = (in_array($data->newlabelcolor, $colors) or $data->newlabelcolor === 'nocolor');
             if (!empty($data->newlabelname) and $validcolor) {
+                if ($data->newlabelcolor == 'nocolor') {
+                    $data->newlabelcolor = '';
+                }
                 $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);
                 if (!isset($data->labelid)){
                     $data->labelid = array();
@@ -325,10 +328,15 @@ if ($removelbl) {
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->string_for_js('starred', 'local_mail');
     $PAGE->requires->string_for_js('unstarred', 'local_mail');
+    $PAGE->requires->string_for_js('editlabel', 'local_mail');
+    $PAGE->requires->string_for_js('newlabel', 'local_mail');
+    $PAGE->requires->string_for_js('erroremptylabelname', 'local_mail');
+    $PAGE->requires->string_for_js('submit', 'moodle');
+    $PAGE->requires->string_for_js('cancel', 'moodle');
     $PAGE->requires->js_init_code($jslabels);
 
     echo $OUTPUT->header();
-    echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url));
+    echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'id' => 'local_mail_main_form'));
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $mailoutput->toolbar('view', false, null, ($type === 'trash'));
     echo $OUTPUT->container_start('mail_view');
@@ -471,6 +479,13 @@ if ($removelbl) {
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->string_for_js('starred', 'local_mail');
     $PAGE->requires->string_for_js('unstarred', 'local_mail');
+    $PAGE->requires->string_for_js('labeldeleteconfirm', 'local_mail');
+    $PAGE->requires->string_for_js('delete', 'local_mail');
+    $PAGE->requires->string_for_js('editlabel', 'local_mail');
+    $PAGE->requires->string_for_js('newlabel', 'local_mail');
+    $PAGE->requires->string_for_js('erroremptylabelname', 'local_mail');
+    $PAGE->requires->string_for_js('submit', 'moodle');
+    $PAGE->requires->string_for_js('cancel', 'moodle');
     $PAGE->requires->js_init_code($jslabels);
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $OUTPUT->header();

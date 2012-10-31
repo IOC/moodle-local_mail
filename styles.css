@@ -517,3 +517,36 @@
     background-position: 93% 50%;
     padding-right: 1.5em !important;
 }
+
+
+#page-local-mail-view #confirmdialog{
+    width: 400px!important;
+}
+
+/* Edit label form */
+.local_mail_form .label_form  {
+    text-align: center;
+    padding: 1em 2em;
+    margin: 0 auto 1em auto;
+    width: 50%;
+}
+
+.local_mail_form .label_name,
+.local_mail_form .label_color{
+   clear: both;
+   padding: 0.5em 0;
+}
+
+.local_mail_form .label_name label,
+.local_mail_form .label_color label{
+    float: left;
+    text-align: right;
+    width: 15%;
+}
+
+.local_mail_form .label_name input,
+.local_mail_form .label_color select{
+    clear: right;
+    float: left;
+    margin-left: 1em;
+}
