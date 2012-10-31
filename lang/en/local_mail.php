@@ -43,6 +43,7 @@ $string['messageprovider:mail'] = 'Mail received notification';
 $string['moreactions'] = 'More';
 $string['mymail'] = 'My mail';
 $string['newlabel'] = 'New label';
+$string['nocolor'] = 'No color';
 $string['nolabels'] = 'No labels available.';
 $string['nomessages'] = 'No messages.';
 $string['nomessageserror'] = 'Action required needs at least one message selected';

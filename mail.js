@@ -716,7 +716,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     var mail_label_new = function() {
         mail_new_label_panel.show();
-        Y.one('#local_mail_new_label_color option[value="nocolor"]').set('selected', 'selected');
         Y.one('#local_mail_form_new_label').removeClass('mail_hidden');
         Y.one('#local_mail_new_label_name').focus();
     };

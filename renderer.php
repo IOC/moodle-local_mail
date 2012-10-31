@@ -384,13 +384,13 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::end_tag('div');
         $content .= html_writer::start_tag('div', array('class' => 'label_color'));
         $colors = local_mail_label::valid_colors();
-        $options['nocolor'] = '';
         foreach ($colors as $color) {
             $options[$color] = $color;
         }
         $text = get_string('labelcolor', 'local_mail');
         $content .= html_writer::label($text, 'local_mail_edit_label_color');
-        $content .=  html_writer::select($options, 'local_mail_edit_label_color', '', array('' => 'choosedots'), array('id' => 'local_mail_edit_label_color', 'class' => 'mail_label_colors'));
+        $text = get_string('nocolor', 'local_mail');
+        $content .=  html_writer::select($options, 'local_mail_edit_label_color', '', array('' => $text), array('id' => 'local_mail_edit_label_color', 'class' => 'mail_label_colors'));
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
@@ -412,13 +412,13 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::end_tag('div');
         $content .= html_writer::start_tag('div', array('class' => 'label_color'));
         $colors = local_mail_label::valid_colors();
-        $options['nocolor'] = '';
         foreach ($colors as $color) {
             $options[$color] = $color;
         }
         $text = get_string('labelcolor', 'local_mail');
         $content .= html_writer::label($text, 'local_mail_new_label_color');
-        $content .=  html_writer::select($options, 'local_mail_new_label_color', '', array('' => 'choosedots'), array('id' => 'local_mail_new_label_color', 'class' => 'mail_label_colors'));
+        $text = get_string('nocolor', 'local_mail');
+        $content .=  html_writer::select($options, 'local_mail_new_label_color', '', array('' => $text), array('id' => 'local_mail_new_label_color', 'class' => 'mail_label_colors'));
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');

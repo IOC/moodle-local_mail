@@ -421,7 +421,7 @@ function setlabel($type, $labelid, $labelname, $labelcolor) {
     $label = local_mail_label::fetch($labelid);
     $colors = local_mail_label::valid_colors();
     if ($label) {
-        if ($labelname and in_array($labelcolor, $colors)) {
+        if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {
             $label->save($labelname, $labelcolor);
         } else {
             $error = (!$labelname?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
@@ -443,11 +443,8 @@ function newlabel($messages, $labelname, $labelcolor, $data) {
     $error = '';
     $labelname = trim($labelname);
     $colors = local_mail_label::valid_colors();
-    $validcolor = (in_array($labelcolor, $colors) or $labelcolor == 'nocolor');
+    $validcolor = (!$labelcolor or in_array($labelcolor, $colors));
     if (!empty($labelname) and $validcolor) {
-        if ($labelcolor == 'nocolor') {
-            $labelcolor = '';
-        }
         $newlabel = local_mail_label::create($USER->id, $labelname, $labelcolor);
         foreach ($messages as $message) {
             if ($message->viewable($USER->id) and !$message->deleted($USER->id)) {
