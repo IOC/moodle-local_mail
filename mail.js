@@ -354,6 +354,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             button.removeClass('mail_hidden');
             mail_enable_button(button, bool);
         }));
+        if (mail_view_type == 'label') {
+            mail_enable_button(Y.one('.mail_toolbar .mail_more_actions'), true);
+        }
     };
 
     var mail_main_checkbox = function(bool){
