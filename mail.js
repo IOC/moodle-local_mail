@@ -184,7 +184,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var mail_add_arrow_menu_labels = function() {
         var node = Y.one('input[name="assignlbl"]');
         node.addClass('mail_down_arrow');
-        node.setStyle('background-image', 'url(\''+M.util.image_url('t/expanded', 'moodle')+'\')');
+        node.setStyle('background', 'url(\''+M.util.image_url('t/expanded', 'moodle')+'\') no-repeat scroll 93% 50% #f1f1f1');
     };
 
     var mail_hide_noscript_buttons = function() {

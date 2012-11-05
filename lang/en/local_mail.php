@@ -23,6 +23,7 @@ $string['erroremptycourse'] = 'Please specifiy a course.';
 $string['erroremptylabelname'] = 'Please specify a label name.';
 $string['erroremptyrecipients'] = 'Please specifiy at least one recipient.';
 $string['erroremptysubject'] = 'Please specify a subject.';
+$string['errorrepeatedlabelname'] = 'Label name already exists';
 $string['errorinvalidcolor'] = 'Invalid color';
 $string['from'] = 'From';
 $string['inbox'] = 'Inbox';

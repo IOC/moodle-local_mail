@@ -102,7 +102,12 @@ if ($removelbl) {
     if ($data = $mform->get_data()) {
         if (isset($data->submitbutton)) {
             $data->labelname = trim(clean_param($data->labelname, PARAM_TEXT));
-            if ($data->labelname and in_array($data->labelcolor, $colors)) {
+            $labels = local_mail_label::fetch_user($USER->id);
+            $repeatedname = false;
+            foreach ($labels as $label) {
+                $repeatedname = $repeatedname || ($label->name() === $data->labelname);
+            }
+            if (!$repeatedname and $data->labelname and in_array($data->labelcolor, $colors)) {
                 $label->save($data->labelname, $data->labelcolor);
             }
         }
@@ -198,7 +203,11 @@ if ($removelbl) {
             $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_TEXT));
             $data->newlabelname = preg_replace('/\s+/', ' ', $data->newlabelname);
             $validcolor = (!$data->newlabelcolor or in_array($data->newlabelcolor, $colors));
-            if (!empty($data->newlabelname) and $validcolor) {
+            $repeatedname = false;
+            foreach ($labels as $label) {
+                $repeatedname = $repeatedname || ($label->name() === $data->newlabelname);
+            }
+            if (!$repeatedname and !empty($data->newlabelname) and $validcolor) {
                 $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);
                 if (!isset($data->labelid)){
                     $data->labelid = array();

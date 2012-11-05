@@ -415,17 +415,26 @@ function getmail($message, $type, $reply, $offset, $labelid) {
 }
 
 function setlabel($type, $labelid, $labelname, $labelcolor) {
-    global $CFG;
+    global $CFG, $USER;
 
     $error = '';
     $label = local_mail_label::fetch($labelid);
     $colors = local_mail_label::valid_colors();
     $labelname = preg_replace('/\s+/', ' ', $labelname);
     if ($label) {
-        if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {
-            $label->save($labelname, $labelcolor);
+        $labels = local_mail_label::fetch_user($USER->id);
+        $repeatedname = false;
+        foreach ($labels as $label) {
+            $repeatedname = $repeatedname || ($label->name() === $labelname);
+        }
+        if (!$repeatedname) {
+            if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {
+                $label->save($labelname, $labelcolor);
+            } else {
+                $error = (!$labelname?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
+            }
         } else {
-            $error = (!$labelname?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
+            $error = get_string('errorrepeatedlabelname', 'local_mail');
         }
     } else {
         $error = get_string('invalidlabel', 'local_mail');
@@ -443,17 +452,27 @@ function newlabel($messages, $labelname, $labelcolor, $data) {
 
     $error = '';
     $labelname = trim($labelname);
+    $labelname = preg_replace('/\s+/', ' ', $labelname);
     $colors = local_mail_label::valid_colors();
     $validcolor = (!$labelcolor or in_array($labelcolor, $colors));
-    if (!empty($labelname) and $validcolor) {
-        $newlabel = local_mail_label::create($USER->id, $labelname, $labelcolor);
-        foreach ($messages as $message) {
-            if ($message->viewable($USER->id) and !$message->deleted($USER->id)) {
-                $message->add_label($newlabel);
+    $labels = local_mail_label::fetch_user($USER->id);
+    $repeatedname = false;
+    foreach ($labels as $label) {
+        $repeatedname = $repeatedname || ($label->name() === $labelname);
+    }
+    if (!$repeatedname) {
+        if (!empty($labelname) and $validcolor) {
+            $newlabel = local_mail_label::create($USER->id, $labelname, $labelcolor);
+            foreach ($messages as $message) {
+                if ($message->viewable($USER->id) and !$message->deleted($USER->id)) {
+                    $message->add_label($newlabel);
+                }
             }
+        } else {
+            $error = (empty($labelname)?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
         }
     } else {
-        $error = (empty($labelname)?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
+        $error = get_string('errorrepeatedlabelname', 'local_mail');
     }
 
     return array(

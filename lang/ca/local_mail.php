@@ -23,6 +23,7 @@ $string['erroremptycourse'] = 'Si us plau indiqueu un curs.';
 $string['erroremptylabelname'] = 'Si us plau indiqueu un nom d\'etiqueta.';
 $string['erroremptyrecipients'] = 'Indiqueu un destinatari com a mínim.';
 $string['erroremptysubject'] = 'Indiqueu l\'assumpte.';
+$string['errorrepeatedlabelname'] = 'El nom d\'etiqueta ja existeix';
 $string['errorinvalidcolor'] = 'Color no vàlid';
 $string['from'] = 'De';
 $string['inbox'] = 'Safata d\'entrada';
