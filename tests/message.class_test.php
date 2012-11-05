@@ -553,6 +553,25 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
+    function test_set_deleted_draft() {
+        $message = local_mail_message::create(201, 101);
+
+        $message->set_deleted(201, true);
+
+        $this->assertTrue($message->deleted(201));
+        $this->assertNotIndex(201, 'drafts', 0, $message->id());
+        $this->assertNotIndex(201, 'course', $message->course()->id, $message->id());
+        $this->assertIndex(201, 'trash', 0, $message->time(), $message->id(), false);
+        $this->assertMessage($message);
+
+        $message->set_deleted(201, false);
+
+        $this->assertIndex(201, 'drafts', 0, $message->time(), $message->id(), false);
+        $this->assertIndex(201, 'course', $message->course()->id, $message->time(), $message->id(), false);
+        $this->assertNotIndex(201, 'trash', 0, $message->id());
+        $this->assertMessage($message);
+    }
+
     function test_set_starred() {
         $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);

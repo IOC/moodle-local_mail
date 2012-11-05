@@ -287,9 +287,7 @@ if ($removelbl) {
 
     if ($delete) {
         require_sesskey();
-        if ($message->editable($USER->id)) {
-            $message->discard();
-        } elseif ($message->viewable($USER->id)) {
+        if ($message->viewable($USER->id)) {
             $message->set_deleted($USER->id, !$message->deleted($USER->id));
         }
         redirect($url);
@@ -434,9 +432,7 @@ if ($removelbl) {
         require_sesskey();
         foreach ($messages as $message) {
             if (in_array($message->id(), $msgs)) {
-                if ($message->editable($USER->id)) {
-                    $message->discard();
-                } elseif ($message->viewable($USER->id)) {
+                if ($message->viewable($USER->id)) {
                     $message->set_deleted($USER->id, !$message->deleted($USER->id));
                 }
                 $totalcount -= 1;

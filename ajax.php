@@ -231,9 +231,7 @@ function setdelete ($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
 
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
     foreach ($messages as $message) {
-        if ($message->editable($USER->id)) {
-            $message->discard();
-        } elseif ($message->viewable($USER->id)) {
+        if ($message->viewable($USER->id)) {
             $message->set_deleted($USER->id, $bool);
         }
         $totalcount -= 1;

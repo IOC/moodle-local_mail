@@ -458,7 +458,7 @@ class local_mail_message {
         global $DB;
 
         assert($this->has_user($userid));
-        assert(!$this->draft);
+        assert(!$this->draft or $this->role[$userid] == 'from');
 
         if ($this->deleted[$userid] == (bool) $value) {
             return;
@@ -475,7 +475,7 @@ class local_mail_message {
         } else {
             $this->delete_index($userid, 'trash');
             if ($this->role[$userid] == 'from') {
-                $this->create_index($userid, 'sent');
+                $this->create_index($userid, $this->draft ? 'drafts' : 'sent');
             } else {
                 $this->create_index($userid, 'inbox');
             }
