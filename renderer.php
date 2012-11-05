@@ -251,9 +251,13 @@ class local_mail_renderer extends plugin_renderer_base {
         foreach ($labels as $key => $label) {
             $items[$key] =  html_writer::checkbox('mail_menu_label_' . $key, $label->id(), false, $label->name(), array('class' => 'mail_label mail_label_'. $label->color()));
         }
-        $items[] = html_writer::tag('span','', array('class' => 'mail_menu_label_separator'));
+        if (!empty($labels)) {
+            $items[] = html_writer::tag('span','', array('class' => 'mail_menu_label_separator'));
+        }
         $items[] = html_writer::link('#', get_string('newlabel', 'local_mail'), array('class' => 'mail_menu_label_newlabel'));
-        $items[] = html_writer::link('#', get_string('applychanges', 'local_mail'), array('class' => 'mail_menu_label_apply'));
+        if (!empty($labels)) {
+            $items[] = html_writer::link('#', get_string('applychanges', 'local_mail'), array('class' => 'mail_menu_label_apply'));
+        }
         $output .= html_writer::alist($items, array('class' => 'mail_menu_labels'));
         $output .= html_writer::end_tag('div');
         return $output;
