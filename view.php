@@ -101,7 +101,7 @@ if ($removelbl) {
 
     if ($data = $mform->get_data()) {
         if (isset($data->submitbutton)) {
-            $data->labelname = trim(clean_param($data->labelname, PARAM_ALPHANUMEXT));
+            $data->labelname = trim(clean_param($data->labelname, PARAM_TEXT));
             if ($data->labelname and in_array($data->labelcolor, $colors)) {
                 $label->save($data->labelname, $data->labelcolor);
             }
@@ -149,7 +149,7 @@ if ($removelbl) {
     } else {
         $customdata["msgs"] = $msgs;
     }
-    $customdata["colors"]["nocolor"] = "";
+    $customdata["colors"][""] = get_string('nocolor', 'local_mail');
     foreach ($colors as $color) {
         $customdata["colors"][$color] = $color;
     }
@@ -195,12 +195,9 @@ if ($removelbl) {
     if ($data = $mform->get_data()) {
         if (isset($data->submitbutton)) {
             $newlabel = false;
-            $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_ALPHANUMEXT));
-            $validcolor = (in_array($data->newlabelcolor, $colors) or $data->newlabelcolor === 'nocolor');
+            $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_TEXT));
+            $validcolor = (!$data->newlabelcolor or in_array($data->newlabelcolor, $colors));
             if (!empty($data->newlabelname) and $validcolor) {
-                if ($data->newlabelcolor == 'nocolor') {
-                    $data->newlabelcolor = '';
-                }
                 $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);
                 if (!isset($data->labelid)){
                     $data->labelid = array();

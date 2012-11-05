@@ -13,7 +13,7 @@ $offset     = optional_param('offset', 0, PARAM_INT);
 $perpage    = optional_param('perpage', 0, PARAM_INT);
 $sesskey    = optional_param('sesskey', null, PARAM_RAW);
 $mailview   = optional_param('mailview', false, PARAM_BOOL);
-$labelname  = optional_param('labelname', false, PARAM_ALPHANUMEXT);
+$labelname  = optional_param('labelname', false, PARAM_TEXT);
 $labelcolor = optional_param('labelcolor', false, PARAM_ALPHANUMEXT);
 
 
