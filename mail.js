@@ -10,10 +10,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         mail_view_type = Y.one('input[name="type"]').get('value');
         if (Y.one('input[name="m"]')) {
             mail_message_view = true;
+            Y.one('.mail_checkbox_all').remove();
         }
-        Y.one('span.mail_checkbox_all').removeClass('mail_hidden');
-        Y.one('span.mail_more_actions').removeClass('mail_hidden');
-        mail_hide_noscript_buttons();
         mail_enable_all_buttons(mail_message_view);
         if (!mail_message_view) {
             mail_select_none();
@@ -21,13 +19,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         if (mail_view_type == 'trash') {
             mail_remove_action('.mail_menu_action_markasstarred');
             mail_remove_action('.mail_menu_action_markasunstarred');
-        } else {
-            mail_add_arrow_menu_labels();
-            if (mail_view_type == 'label' && !mail_message_view) {
-                Y.one('input[name="editlbl"]').remove();
-                Y.one('input[name="removelbl"]').remove();
-                Y.one('.mail_toolbar_sep').remove();
-            }
         }
         mail_update_menu_actions();
         mail_create_edit_label_panel();
@@ -181,21 +172,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
-    var mail_add_arrow_menu_labels = function() {
-        var node = Y.one('input[name="assignlbl"]');
-        node.addClass('mail_down_arrow');
-        node.setStyle('background', 'url(\''+M.util.image_url('t/expanded', 'moodle')+'\') no-repeat scroll 93% 50% #f1f1f1');
-    };
-
-    var mail_hide_noscript_buttons = function() {
-        if (mail_message_view) {
-            Y.one('.mail_checkbox_all').remove();
-            Y.one('input[name="unread"]').remove();
-        } else {
-            Y.all('.mail_toolbar .mail_noscript_button').addClass('mail_hidden');
-        }
-    };
-
     var mail_toggle_menu_actions = function() {
         var button = Y.one('.mail_more_actions');
         var menu = Y.one('.mail_actselect');
@@ -208,7 +184,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     };
 
     var mail_toggle_menu_labels = function() {
-        var button = Y.one('input[name="assignlbl"]');
+        var button = Y.one('.mail_assignlbl');
         var menu = Y.one('.mail_labelselect');
         var position = button.getXY();
         if (!button.hasClass('mail_button_disabled')) {
@@ -363,34 +339,21 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         mail_enable_all_buttons(Y.all('.mail_selected').size());
     };
 
-    var mail_enable_button = function(name, bool) {
+    var mail_enable_button = function(button, bool) {
         bool = (typeof bool !== 'undefined' ? bool : false);
         if (bool) {
-            Y.one('.mail_toolbar input[name="'+name+'"]').set('disabled','');
-        } else {
-            Y.one('.mail_toolbar input[name="'+name+'"]').set('disabled','disabled');
+            button.removeClass('mail_button_disabled');
+        } else if(!button.hasClass('mail_checkbox_all')){
+            button.addClass('mail_button_disabled');
         }
     };
 
     var mail_enable_all_buttons = function(bool) {
-        var mail_buttons = Y.all('.mail_toolbar > input').get('name');
-
-        Y.each(mail_buttons, (function(value) {
-            mail_enable_button(value, bool);
+        var mail_buttons = Y.all('.mail_toolbar .mail_buttons .mail_button');
+        Y.each(mail_buttons, (function(button) {
+            button.removeClass('mail_hidden');
+            mail_enable_button(button, bool);
         }));
-        if (bool) {
-            Y.one('.mail_more_actions').removeClass('mail_button_disabled');
-        } else {
-            if (mail_view_type != 'label') {
-                Y.one('.mail_more_actions').addClass('mail_button_disabled');
-            }
-            mail_hide_menu_actions();
-            Y.one('.mail_checkbox_all input[name="selectall"]').set('checked','');
-        }
-        if(!mail_message_view && !Y.all('.mail_item > input').size()) {
-            Y.one('.mail_checkbox_all').addClass('mail_button_disabled');
-            Y.one('.mail_checkbox_all input[name="selectall"]').set('disabled','disabled').set('checked','');
-        }
     };
 
     var mail_main_checkbox = function(bool){
@@ -803,13 +766,14 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     //Toggle menu actions
     Y.one("div.region-content").delegate('click', function(e) {
-        e.preventDefault();
+        //e.preventDefault();
         e.stopPropagation();
         mail_label_default_values();
         mail_toggle_menu_labels();
         mail_hide_menu_options();
         mail_hide_menu_actions();
-    }, 'input[name="assignlbl"]');
+    //}, 'input[name="assignlbl"]');
+    }, '.mail_assignlbl');
 
     //Menu select all
     Y.one("div.region-content").delegate('click', function(e) {
@@ -915,9 +879,10 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     //Delete button
     Y.one("div.region-content").delegate('click', function(e) {
-        e.preventDefault();
-        mail_doaction('delete');
-    }, 'input[name="delete"]');
+        if (!this.hasClass('mail_button_disabled')) {
+            mail_doaction('delete');
+        }
+    }, '.mail_delete');
 
     //Prev page button
     Y.one("div.region-content").delegate('click', function(e) {
@@ -935,7 +900,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('goback');
-    }, 'input[name="goback"]');
+    }, '.mail_goback');
 
     //Mail per page
     Y.one("div.region-content").delegate('click', function(e) {

@@ -194,6 +194,7 @@
 
 .mail_toolbar .mail_checkbox_all img,
 .mail_toolbar .mail_more_actions img,
+.mail_toolbar .mail_assignlbl img,
 .mail_toolbar .mail_checkbox_all input {
     vertical-align: middle;
 }
@@ -349,6 +350,10 @@
     float: right;
     margin-top: 0.5em;
 }
+
+.mail_buttons {
+    float: left;
+ }
 
 .mail_perpage span{
     margin: 0 0.5em;
@@ -520,13 +525,6 @@
 .mail_hidden {
     display: none !important;
 }
-
-.mail_down_arrow {
-    background-repeat: no-repeat;
-    background-position: 93% 50%;
-    padding-right: 1.5em !important;
-}
-
 
 #page-local-mail-view #confirmdialog{
     width: 400px!important;

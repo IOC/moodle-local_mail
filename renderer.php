@@ -138,6 +138,7 @@ class local_mail_renderer extends plugin_renderer_base {
         }
         $next = html_writer::empty_tag('input', $params);
         return $this->output->container($str . ' ' . $prev . $next, 'mail_paging');
+        //return html_writer::tag('span', $str . ' ' . $prev . $next, array('class' => 'mail_paging'));
     }
     
     function summary($message, $userid, $type, $itemid) {
@@ -171,7 +172,13 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
-        return html_writer::empty_tag('input', $attributes);
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        $output .= html_writer::start_tag('span', array('class' => 'singlebutton mail_button mail_delete mail_button_disabled mail_hidden'));
+        $output .= html_writer::tag('span', $label);
+        $output .= html_writer::end_tag('span');
+        return $output;
     }
 
     function reply() {
@@ -244,7 +251,14 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
-        $output = html_writer::empty_tag('input', $attributes);
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        $output .= html_writer::start_tag('span', array('class' => 'singlebutton mail_button mail_assignlbl mail_button_disabled mail_hidden'));
+        $output .= html_writer::tag('span', $label);
+        $url = $this->output->pix_url('t/expanded', 'moodle');
+        $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
+        $output .= html_writer::end_tag('span');
         //List labels and options
         $labels = local_mail_label::fetch_user($USER->id);
         $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_labelselect'));
@@ -269,25 +283,27 @@ class local_mail_renderer extends plugin_renderer_base {
             'type' => 'submit',
             'name' => 'read',
             'value' => $label,
-            'class' => 'mail_button singlebutton mail_noscript_button'
+            'class' => 'mail_button singlebutton'
         );
-        return html_writer::empty_tag('input', $attributes);
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        return $output;
     }
 
     function unread($type) {
         $label = get_string('markasunread', 'local_mail');
-        $class = 'mail_button singlebutton mail_noscript_button';
-        if ($type !== 'view') {
-            $class .= ' mail_noscript_button';
-        }
+        $class = 'mail_button singlebutton';
         $attributes = array(
             'type' => 'submit',
             'name' => 'unread',
             'value' => $label,
             'class' => $class
         );
-
-        return html_writer::empty_tag('input', $attributes);
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        return $output;
     }
 
     function selectall() {
@@ -323,12 +339,15 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $label,
             'class' => $class
         );
-
-        return html_writer::empty_tag('input', $attributes);
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        $output .= html_writer::tag('span', $label, array('class' => 'mail_hidden singlebutton mail_button mail_goback mail_hidden'));
+        return $output;
     }
 
     function moreactions() {
-        $output = html_writer::start_tag('span', array('class' => 'mail_hidden singlebutton mail_button mail_more_actions'));
+        $output = html_writer::start_tag('span', array('class' => 'mail_hidden singlebutton mail_button mail_more_actions mail_hidden'));
         $output .= html_writer::tag('span', get_string('moreactions', 'local_mail'));
         $url = $this->output->pix_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
@@ -360,8 +379,9 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
-        $content = html_writer::tag('span', '', array('class' => 'mail_toolbar_sep'));
-        $content .= html_writer::empty_tag('input', $attributes);
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::tag('span', '', array('class' => 'mail_toolbar_sep'));
+        $output .= html_writer::empty_tag('input', $attributes);
         $label = get_string('removelabel', 'local_mail');
         $attributes = array(
             'type' => 'submit',
@@ -369,8 +389,9 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
-        $content .= html_writer::empty_tag('input', $attributes);
-        return $content;
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        return $output;
     }
 
     function editlabelform() {
@@ -589,7 +610,8 @@ class local_mail_renderer extends plugin_renderer_base {
             }
             $more = $this->moreactions();
             $clearer = $this->output->container('', 'clearer');
-            $output = $goback . $selectall . $labels . $read . $unread . $pagingbar . $delete . $extended . $more . $clearer;
+            $left = html_writer::tag('div', $goback . $selectall . $labels . $read . $unread . $delete . $extended . $more, array('class' => 'mail_buttons'));
+            $output = $left . $pagingbar . $clearer ;
         }
         return $this->output->container($output, ($toolbardown?'mail_toolbar_down':'mail_toolbar'));
     }
