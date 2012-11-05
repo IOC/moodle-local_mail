@@ -196,6 +196,7 @@ if ($removelbl) {
         if (isset($data->submitbutton)) {
             $newlabel = false;
             $data->newlabelname = trim(clean_param($data->newlabelname, PARAM_TEXT));
+            $data->newlabelname = preg_replace('/\s+/', ' ', $data->newlabelname);
             $validcolor = (!$data->newlabelcolor or in_array($data->newlabelcolor, $colors));
             if (!empty($data->newlabelname) and $validcolor) {
                 $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);

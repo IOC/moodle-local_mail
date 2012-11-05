@@ -420,6 +420,7 @@ function setlabel($type, $labelid, $labelname, $labelcolor) {
     $error = '';
     $label = local_mail_label::fetch($labelid);
     $colors = local_mail_label::valid_colors();
+    $labelname = preg_replace('/\s+/', ' ', $labelname);
     if ($label) {
         if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {
             $label->save($labelname, $labelcolor);
