@@ -83,6 +83,10 @@
     text-decoration: none;
 }
 
+.mail_list a {
+    outline: 0;
+}
+
 .mail_list .mail_users,
 .mail_list .mail_summary,
 .mail_list .mail_date,
