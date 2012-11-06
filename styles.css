@@ -83,10 +83,6 @@
     text-decoration: none;
 }
 
-.mail_list .mail_link:active {
-    background-color: #eee;
-}
-
 .mail_list .mail_users,
 .mail_list .mail_summary,
 .mail_list .mail_date,
