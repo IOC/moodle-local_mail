@@ -7,6 +7,7 @@ $action     = optional_param('action', false, PARAM_ALPHA);
 $type       = optional_param('type', false, PARAM_ALPHA);
 $msgs       = optional_param('msgs', '', PARAM_SEQUENCE);
 $labelids   = optional_param('labelids', '', PARAM_SEQUENCE);
+$labeltsids = optional_param('labeltsids', '', PARAM_SEQUENCE);
 $itemid     = optional_param('itemid', 0, PARAM_INT);
 $messageid  = optional_param('m', 0, PARAM_INT);
 $offset     = optional_param('offset', 0, PARAM_INT);
@@ -145,6 +146,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'assignlabels';
         array_push($params, $messages);
         array_push($params, explode(',', $labelids));
+        array_push($params, explode(',', $labeltsids));
         array_push($params, array(
                                     'mailview' => $mailview,
                                     'itemid' => $itemid,
@@ -277,7 +279,7 @@ function setgoback($itemid, $type, $offset, $mailpagesize){
     );
 }
 
-function assignlabels($messages, $labelids, $data)
+function assignlabels($messages, $labelids, $labeltsids, $data)
 {
     global $USER;
 
@@ -294,7 +296,9 @@ function assignlabels($messages, $labelids, $data)
                     if ($data['type'] == 'label' and $label->id() == $data['itemid']) {
                         $rethtml = true;
                     }
-                    $message->remove_label($label);
+                    if (!in_array($label->id(), $labeltsids)) {
+                        $message->remove_label($label);
+                    }
                 }
             }
         }
@@ -423,7 +427,7 @@ function setlabel($type, $labelid, $labelname, $labelcolor) {
         $labels = local_mail_label::fetch_user($USER->id);
         $repeatedname = false;
         foreach ($labels as $label) {
-            $repeatedname = $repeatedname || ($label->name() === $labelname);
+            $repeatedname = $repeatedname || (($label->name() === $labelname) and ($label->id() != $labelid));
         }
         if (!$repeatedname) {
             if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {

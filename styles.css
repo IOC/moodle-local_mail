@@ -61,9 +61,10 @@
 }
 
 .mail_list .mail_item {
-    padding: 0 0.5em;
+    padding: 0 0.5em 0 0;
     border-top: 1px solid #ddd;
     white-space: nowrap;
+    clear: right;
 }
 
 
@@ -73,6 +74,10 @@
 
 .mail_list .mail_link:focus {
     outline: 0;
+}
+
+.mail_list .mail_link {
+    margin-left: 0.5em;
 }
 
 .mail_list .mail_link,
@@ -94,17 +99,41 @@
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
-    padding: 0.5em 1%;
+    padding: 0.5em 0.5em;
     vertical-align: middle;
 }
 
 .mail_list .mail_checkbox {
-    width: 2%;
+    margin: 0 1em 0 0.5em;
     text-overflow: ellipsis;
 }
 
+.mail_adv_checkbox {
+    display: inline-block;
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+}
+
+.mail_list .mail_adv_checkbox {
+    margin: 0 0.5em;
+}
+
+.mail_checkbox0 {
+    background: transparent url('pix/icons.png') no-repeat 0 0;
+}
+
+.mail_checkbox1 {
+    background: transparent url('pix/icons.png') no-repeat -18px 0;
+}
+
+.mail_checkbox2 {
+    background: transparent url('pix/icons.png') no-repeat -36px 0;
+}
+
 .mail_list .mail_users {
-    width: 29%;
+    width: 30%;
     text-overflow: ellipsis;
 }
 
@@ -119,8 +148,9 @@
 }
 
 .mail_list .mail_date {
-    width: 15%;
+    float: right;
     text-align: right;
+    margin-left: -15%;
 }
 
 .mail_list .mail_unread {
@@ -132,8 +162,9 @@
     white-space: nowrap;
     overflow: hidden;
     vertical-align: middle;
-    min-width: 2%;
+    min-width: 1%;
     height: 18px;
+    text-align: center;
 }
 
 .mail_list .mail_selected {
@@ -142,18 +173,18 @@
 
 /* Mail starred */
 
-.mail_starred {
-    display:inline-block;
-    width: 18px;
-    height: 18px;
-    background: transparent url('pix/starred.png') no-repeat right top;
-}
-
 .mail_unstarred {
     display:inline-block;
     width: 18px;
     height: 18px;
-    background: transparent url('pix/unstarred.png') no-repeat right top;
+    background: transparent url('pix/icons.png') no-repeat -54px 0;
+}
+
+.mail_starred {
+    display:inline-block;
+    width: 18px;
+    height: 18px;
+    background: transparent url('pix/icons.png') no-repeat -72px 0;
 }
 
 /* Toolbar */
@@ -226,10 +257,6 @@
     left: 225px;
 }
 
-.mail_toolbar .mail_labelselect label{
-    cursor: pointer;
-}
-
 .mail_toolbar .mail_menu_action_separator,
  .mail_toolbar .mail_menu_label_separator {
     display: block;
@@ -257,14 +284,15 @@
 .mail_toolbar .mail_menu_actions li:hover,
 .mail_toolbar .mail_menu_labels li:hover {
     background-color: #f1f1f1;
+    cursor: pointer;
 }
 
-.mail_toolbar .mail_menu_labels li input{
+.mail_toolbar .mail_menu_labels .mail_adv_checkbox{
     display: inline-block;
-    margin-left: 0.5em;
+    margin: 0 0.5em 0 0.1em;
 }
 
-.mail_toolbar .mail_menu_labels li label{
+.mail_toolbar .mail_menu_labels .mail_label_name{
     display: inline-block;
     width: 80%;
 }
@@ -275,12 +303,12 @@
     margin-right: 4px;
 }
 
-.mail_toolbar .mail_button span:before {
+/*.mail_toolbar .mail_button span:before {
     content: "";
     display: inline-block;
     vertical-align: middle;
     height: 100%;
-}
+}*/
 
 .mail_toolbar .mail_button:before {
     content: "";
