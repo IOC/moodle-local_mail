@@ -306,6 +306,44 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
+    var mail_customize_menu_label = function() {
+        if(mail_label_check_default_values()) {
+            Y.one('.mail_menu_labels .mail_menu_label_newlabel').removeClass('mail_hidden');
+            Y.one('.mail_menu_labels .mail_menu_label_apply').addClass('mail_hidden');
+        } else {
+            Y.one('.mail_menu_labels .mail_menu_label_newlabel').addClass('mail_hidden');
+            Y.one('.mail_menu_labels .mail_menu_label_apply').removeClass('mail_hidden');
+        }
+    }
+
+    var mail_label_check_default_values = function () {
+        var isdefault = true;
+        var classname;
+        var labelid;
+        var num;
+
+        if (!mail_message_view) {
+            var labels = Y.all('.mail_menu_labels .mail_adv_checkbox');
+            var total = mail_get_checkboxs_checked().size();
+
+            Y.each(labels, function(label, index) {
+                classname = label.getAttribute('class');
+                num = /mail_label_value_(\d+)/.exec(classname);
+                if (num) {
+                    labelid = num[1];
+                }
+                if (mail_checkbox_labels_default[labelid] == total) {
+                    isdefault = isdefault && label.hasClass('mail_checkbox1');
+                } else if(mail_checkbox_labels_default[labelid] > 0) {
+                    isdefault = isdefault && label.hasClass('mail_checkbox2');
+                } else {
+                    isdefault = isdefault && label.hasClass('mail_checkbox0');
+                }
+            });
+        }
+        return isdefault;
+    };
+
     var mail_label_set_values = function () {
         var total = (mail_message_view?1:mail_get_checkboxs_checked().size());
         var state;
@@ -878,6 +916,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         //e.preventDefault();
         e.stopPropagation();
         mail_label_default_values();
+        mail_customize_menu_label();
         mail_toggle_menu_labels();
         mail_hide_menu_options();
         mail_hide_menu_actions();
@@ -1048,6 +1087,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     //Click label on menu labels
     Y.one("div.region-content").delegate('click', function(e) {
         mail_menu_label_selection(this);
+        mail_customize_menu_label();
     }, '.mail_menu_labels li');
 
     //Initialize
