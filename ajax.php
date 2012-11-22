@@ -16,6 +16,11 @@ $sesskey    = optional_param('sesskey', null, PARAM_RAW);
 $mailview   = optional_param('mailview', false, PARAM_BOOL);
 $labelname  = optional_param('labelname', false, PARAM_TEXT);
 $labelcolor = optional_param('labelcolor', false, PARAM_ALPHANUMEXT);
+$search     = optional_param('search', '', PARAM_CLEAN);
+$groupid    = optional_param('groupid', 0, PARAM_INT);
+$roleid     = optional_param('roleid', 0, PARAM_INT);
+$roleids    = optional_param('roleids', '', PARAM_SEQUENCE);
+$recipients = optional_param('recipients', '', PARAM_SEQUENCE);
 
 
 $courseid = ($type == 'course'?$itemid:$SITE->id);
@@ -34,7 +39,9 @@ $valid_actions = array(
     'goback',
     'assignlabels',
     'newlabel',
-    'setlabel'
+    'setlabel',
+    'getrecipients',
+    'updaterecipients'
 );
 
 if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
@@ -43,12 +50,14 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         echo json_encode(array('msgerror' => get_string('invalidsesskey', 'error')));
         die;
     }
+    $params = array();
+
     if (empty($msgs) and ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'setlabel')){
         echo json_encode(array('msgerror' => get_string('nomessageserror', 'local_mail')));
         die;
     }
     if ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'goback' and $action != 'setlabel') {
-        if ($action == 'viewmail') {
+        if ($action == 'viewmail' or $action == 'getrecipients' or $action == 'updaterecipients') {
             $message = local_mail_message::fetch($msgs);
             if (!$message or !$message->viewable($USER->id)) {
                 echo json_encode(array('msgerror' => get_string('invalidmessage', 'local_mail')));
@@ -178,6 +187,17 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         array_push($params, $itemid);
         array_push($params, $labelname);
         array_push($params, $labelcolor);
+    } elseif ($action === 'getrecipients') {
+        $func = 'getrecipients';
+        array_push($params, $message);
+        array_push($params, $search);
+        array_push($params, $groupid);
+        array_push($params, $roleid);
+    } elseif ($action === 'updaterecipients') {
+        $func = 'updaterecipients';
+        array_push($params, $message);
+        array_push($params, explode(',', $recipients));
+        array_push($params, explode(',', $roleids));
     }
     echo json_encode(call_user_func_array($func, $params));
 } else {
@@ -229,7 +249,7 @@ function setread ($messages, $bool, $mailview = false) {
 }
 
 function setdelete ($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
-    global $PAGE, $USER;
+    global $USER;
 
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
     foreach ($messages as $message) {
@@ -538,4 +558,111 @@ function get_info() {
     }
 
     return $count;
+}
+
+function getrecipients($message, $search, $groupid, $roleid) {
+    global $CFG, $USER, $DB, $PAGE;
+    $maxusers = 100;
+    $participants = array();
+    $recipients = array();
+
+    $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
+
+    list($esql, $params) = get_enrolled_sql($context, NULL, $groupid, true);
+    $joins = array("FROM {user} u");
+    $wheres = array();
+
+    $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
+            'id', 'firstname', 'lastname','picture', 'imagealt', 'email'));
+    $select = "SELECT u.id, u.firstname, u.lastname, u.picture, u.imagealt, u.email, ra.roleid$extrasql";
+    $joins[] = "JOIN ($esql) e ON e.id = u.id";
+    $joins[] = 'LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid '
+            . get_related_contexts_string($context) . ')'
+            . ' LEFT JOIN {role} r ON r.id = ra.roleid';
+
+    // performance hacks - we preload user contexts together with accounts
+    list($ccselect, $ccjoin) = context_instance_preload_sql('u.id', CONTEXT_USER, 'ctx');
+    $select .= $ccselect;
+    $joins[] = $ccjoin;
+
+    $from = implode("\n", $joins);
+
+    if (!empty($search)) {
+        $fullname = $DB->sql_fullname('u.firstname','u.lastname');
+        $wheres[] = "(". $DB->sql_like($fullname, ':search1', false, false) .") ";
+        $params['search1'] = "%$search%";
+    }
+
+    $from = implode("\n", $joins);
+    $wheres[] = 'u.id <> :guestid AND u.deleted = 0 AND u.confirmed = 1 AND u.id <> :userid';
+    if ($roleid != 0) {
+        $wheres[] = 'r.id = :roleid';
+        $params['roleid'] = $roleid;
+    }
+
+    $params['userid'] = $USER->id;
+    $params['guestid'] = $CFG->siteguest;
+    $where = "WHERE " . implode(" AND ", $wheres);
+
+    $sort = 'ORDER BY u.lastname ASC, u.firstname ASC';
+
+    $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
+
+    if ($matchcount <= $maxusers) {
+        $to = $message->recipients('to');
+        $cc = $message->recipients('cc');
+        $bcc = $message->recipients('bcc');
+        // list of users
+        $rs = $DB->get_recordset_sql("$select $from $where $sort", $params);
+        foreach ($rs as $rec) {
+            if (!array_key_exists($rec->id, $participants)) {
+                $rec->role = '';
+                if (array_key_exists($rec->id, $to)) {
+                    $rec->role = 'to';
+                    array_push($recipients, $rec->id);
+                } elseif (array_key_exists($rec->id, $cc)) {
+                    $rec->role = 'cc';
+                    array_push($recipients, $rec->id);
+                } elseif (array_key_exists($rec->id, $bcc)) {
+                    $rec->role = 'bcc';
+                    array_push($recipients, $rec->id);
+                }
+                $participants[$rec->id] = $rec;
+            }
+        }
+        $rs->close();
+    } else {
+        $participants = false;
+    }
+    $mailoutput = $PAGE->get_renderer('local_mail');
+    return array(
+        'msgerror' => '',//print_r($participants,true),
+        'info' => $recipients,
+        'html' => $mailoutput->recipientslist($participants)
+    );
+}
+
+function updaterecipients($message, $recipients, $roleids) {
+    foreach ($recipients as $key => $recipient) {
+        $role = false;
+        if ($roleids[$key] === '0') {
+            $role = 'to';
+        } elseif ($roleids[$key] === '1') {
+            $role = 'cc';
+        } elseif ($roleids[$key] === '2') {
+            $role = 'bcc';
+        }
+        if ($message->has_recipient($recipient)) {
+            $message->remove_recipient($recipient);
+        }
+        if ($role) {
+            $message->add_recipient($role, $recipient);
+        }
+    }
+    return array(
+        'msgerror' => '',
+        'info' => '',
+        'html' => '',
+        'redirect' => 'ok'
+    );
 }

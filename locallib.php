@@ -3,6 +3,7 @@
 require_once($CFG->libdir . '/filelib.php');
 require_once('label.class.php');
 require_once('message.class.php');
+require_once($CFG->dirroot.'/group/lib.php');
 
 define('MAIL_PAGESIZE', 10);
 define('LOCAL_MAIL_MAXFILES', 5);

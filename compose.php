@@ -3,6 +3,7 @@
 require_once('../../config.php');
 require_once('locallib.php');
 require_once('compose_form.php');
+require_once('recipients_selector.php');
 
 $messageid = required_param('m', PARAM_INT);
 $remove = optional_param_array('remove', false, PARAM_INT);
@@ -106,6 +107,14 @@ if ($data = $mform->get_data()) {
 echo $OUTPUT->header();
 $mform->display();
 $mailoutput = $PAGE->get_renderer('local_mail');
+
+//Recipients form ajax
+echo $mailoutput->recipientsform($message->course()->id, $message->sender()->id);
+$PAGE->requires->js('/local/mail/recipients.js');
+$PAGE->requires->string_for_js('emptyrecipients', 'local_mail');
+$PAGE->requires->string_for_js('shortaddto', 'local_mail');
+$PAGE->requires->string_for_js('shortaddcc', 'local_mail');
+$PAGE->requires->string_for_js('shortaddbcc', 'local_mail');
 if (!empty($refs)) {
     echo $mailoutput->references($references, true);
 }

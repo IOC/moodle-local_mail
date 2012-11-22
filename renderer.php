@@ -455,6 +455,132 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::end_tag('div');
         return $content;
     }
+
+    function recipientsform($courseid, $userid) {
+        global $COURSE;
+
+        $options = array();
+        $content = html_writer::start_tag('div', array('id' => 'local_mail_recipients_form', 'class' => 'local_mail_form mail_hidden'));
+        $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_toolbar'));
+        $owngroups = groups_get_user_groups($courseid, $userid);
+
+        //Roles
+        $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+        $roles = get_roles_used_in_context($context);
+        foreach ($roles as $key => $role) {
+            $options[$key] = $role->name;
+        }
+        $text = get_string('roles', 'moodle');
+        $content .= html_writer::start_tag('span', array('class' => 'roleselector'));
+        $content .= html_writer::label($text, 'local_mail_roles');
+        $text = get_string('all', 'local_mail');
+        $content .= html_writer::select($options, 'local_mail_roles', '', array('' => $text), array('id' => 'local_mail_recipients_roles', 'class' => ''));
+        $content .= html_writer::end_tag('span');
+        //Groups
+        if (!empty($owngroups) and $COURSE->groupmode != 1) {
+            unset($options);
+            $groups = groups_get_all_groups($courseid);
+            foreach ($groups as $key => $group) {
+                $options[$key] = $group->name;
+            }
+            $text = get_string('groups', 'moodle');
+            $content .= html_writer::start_tag('span', array('class' => 'groupselector'));
+            $content .= html_writer::label($text, 'local_mail_recipients_groups');
+            $text = get_string('allparticipants', 'moodle');
+            $content .= html_writer::select($options, 'local_mail_recipients_groups', '', array('' => $text), array('id' => 'local_mail_recipients_groups', 'class' => ''));
+            $content .= html_writer::end_tag('span');
+        }
+        $content .= html_writer::tag('div', '', array('class' => 'mail_separator'));
+        $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_search'));
+        $attributes = array(
+                'type'  => 'text',
+                'name'  => 'recipients_search',
+                'value' => '',
+                'size'  => '50',
+                'class' => 'mail_search'
+        );
+        $text = get_string('search', 'local_mail');
+        $content .= html_writer::label($text, 'recipients_search');
+        $content .= html_writer::empty_tag('input', $attributes);
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::tag('div', '', array('id' => 'local_mail_recipients_list', 'class' => 'mail_form_recipients'));
+        $content .= html_writer::start_tag('div', array('class' => 'mail_search_loading'));
+        $content .= $this->output->pix_icon('i/loading', get_string('actions'), 'moodle', array('class' => 'loading_icon'));
+        $content .= html_writer::end_tag('div');
+        $content .= html_writer::end_tag('div');
+        return $content;
+    }
+
+    function recipientslist($participants) {
+        $content = '';
+        if ($participants === false) {
+            return get_string('toomanyrecipients', 'local_mail');
+        } elseif (empty($participants)){
+            return '';
+        }
+        foreach ($participants as $key => $participant) {
+                $selected = ($participant->role == 'to' or $participant->role == 'cc' or $participant->role == 'bcc');
+                if ($selected) {
+                    $rolestring = get_string('shortadd'.$participant->role, 'local_mail').':';
+                    $hidden = '';
+                    $recipselected = ' mail_recipient_selected';
+                } else {
+                    $rolestring = '';
+                    $hidden = ' mail_hidden';
+                    $recipselected = '';
+                }
+                $content .= html_writer::start_tag('div', array('class' => 'mail_form_recipient' . $recipselected));
+                $content .= html_writer::tag('span', $rolestring, array('class' => 'mail_form_recipient_role' . $hidden, 'data-role-recipient' => $participant->id));
+                $content .= $this->output->user_picture($participant, array('link' => false));
+                $content .= html_writer::tag('span', fullname($participant), array('class' => 'mail_form_recipient_name'));
+                $content .= html_writer::start_tag('span', array('class' => 'mail_recipient_actions'));
+                $attributes = array(
+                   'type' => 'button',
+                   'name' => "to[{$participant->id}]",
+                   'value' => get_string('to', 'local_mail')
+                );
+                if ($selected) {
+                    $attributes['disabled'] = 'disabled';
+                    $attributes['class'] = 'mail_hidden';
+                }
+                $content .= html_writer::empty_tag('input', $attributes);
+                $attributes = array(
+                   'type' => 'button',
+                   'name' => "cc[{$participant->id}]",
+                   'value' => get_string('shortaddcc', 'local_mail')
+                );
+                if ($selected) {
+                    $attributes['disabled'] = 'disabled';
+                    $attributes['class'] = 'mail_hidden';
+                }
+                $content .= html_writer::empty_tag('input', $attributes);
+                $attributes = array(
+                   'type' => 'button',
+                   'name' => "bcc[{$participant->id}]",
+                   'value' => get_string('shortaddbcc', 'local_mail')
+                );
+                if ($selected) {
+                    $attributes['disabled'] = 'disabled';
+                    $attributes['class'] = 'mail_hidden';
+                }
+                $content .= html_writer::empty_tag('input', $attributes);
+                $attributes = array('type' => 'image',
+                                'name' => "remove[{$participant->id}]",
+                                'src' => $this->output->pix_url('t/delete'),
+                                'alt' => get_string('remove'));
+                if (!$selected) {
+                    $attributes['class'] = 'mail_novisible';
+                    $attributes['disabled'] = 'disabled';
+                }
+                $content .= html_writer::empty_tag('input', $attributes);
+                $content .= html_writer::end_tag('span');
+                $content .= html_writer::end_tag('div');
+        }
+        $content .= html_writer::end_tag('div');
+        return $content;
+    }
+
     function references($references, $reply = false) {
         $class = 'mail_references';
         $header = 'h3';

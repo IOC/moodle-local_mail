@@ -1,0 +1,353 @@
+YUI(M.yui.loader, {skin: 'night'}).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', function(Y) {
+
+    var mail_recipients_panel;
+    var timeout;
+    var mail_recipients;
+    var mail_existing_recipients = [];
+
+    var init = function () {
+        mail_create_recipients_panel();
+        mail_reset_recipients();
+    };
+
+    var mail_create_recipients_panel = function () {
+        var title = 'FIX:Header';//M.util.get_string('editlabel', 'local_mail');
+        var width = 500;
+        var obj = Y.one('#region-main');
+        var position = obj.getXY();
+        var posx = position[0]+(Y.one('body').get('offsetWidth')/2)-width;
+        mail_recipients_panel = new Y.Panel({
+            srcNode      : '#local_mail_recipients_form',
+            headerContent: title,
+            width        : width,
+            autoScroll   : true,
+            zIndex       : 3000,
+            centered     : false,
+            modal        : false,
+            visible      : false,
+            render       : true,
+            xy           : [posx,position[1]],
+            plugins      : [Y.Plugin.Drag]
+        });
+        mail_recipients_panel.plug(Y.Plugin.Drag,{handles:['.yui3-widget-hd']});
+        mail_recipients_panel.addButton({
+            value  : 'FIX:Apply changes',//M.util.get_string('submit', 'moodle'),
+            section: Y.WidgetStdMod.FOOTER,
+            action : function (e) {
+                e.preventDefault();
+                mail_recipients_panel.hide();
+                mail_doaction('updaterecipients');
+            }
+        });
+    };
+
+    //Success call
+    var handleSuccess = function (transactionid, response, args) {
+        var obj = Y.JSON.parse(response.responseText);
+        var search;
+        var offset = 0;
+        var img;
+        clearInterval(timeout);
+        if (obj.msgerror) {
+            alert(obj.msgerror);
+        } else {
+            if(obj.redirect) {
+                document.location.reload();
+            }
+            Y.one('.mail_search_loading').hide();
+            if (obj.html) {
+                Y.one('#local_mail_recipients_list').setContent(obj.html);
+                mail_update_recipients_state();
+            } else {
+                Y.one('#local_mail_recipients_list').setContent(M.util.get_string('emptyrecipients','local_mail'));
+            }
+            if (obj.info) {
+                mail_existing_recipients = obj.info.slice(0);
+            }
+        }
+    };
+
+    //Failure call
+    var handleFailure = function (transactionid, response, args) {
+        clearInterval(timeout);
+        console.log(response);
+    };
+
+    //Update screen data and async call
+    var mail_doaction = function(action){
+        var search;
+        var cfg;
+        var recipients = '';
+        var roleids = '';
+        var node;
+
+        Y.one('.mail_search_loading').show();
+
+        node = Y.one('input[name="recipients_search"]');
+        search = node.get('value');
+        search = search.replace(/^\s+|\s+$/g, '');
+        node.set('value', search);
+
+        if (action == 'updaterecipients') {
+            if (mail_existing_recipients) {
+                Y.Array.each(mail_existing_recipients, function(recipient, index) {
+                    if (mail_recipients[3].indexOf(recipient) != -1) {
+                        recipients += mail_recipients[3][index]+',';
+                        roleids += '3,';
+                    }
+                });
+            }
+            for (var i=0;i<mail_recipients.length;i++){
+                for (var j=0;j<mail_recipients[i].length;j++){
+                    recipients += mail_recipients[i][j]+',';
+                    roleids += i+',';
+                }
+            }
+            recipients = recipients.replace(/,$/, '');
+            roleids = roleids.replace(/,$/, '');
+        } else {
+            action = 'getrecipients';
+        }
+
+        //Ajax call
+        cfg =  {
+            method: 'POST',
+            data: {
+                msgs:    Y.one('input[name="m"]').get('value'),
+                sesskey: Y.one('input[name="sesskey"]').get('value'),
+                search:  search,
+                groupid: getgroupid(),
+                roleid:  getroleid(),
+                action:  action
+            },
+            on: {
+                success:handleSuccess,
+                failure:handleFailure
+            }
+        };
+
+        if (action == 'updaterecipients') {
+            cfg.data.recipients = recipients;
+            cfg.data.roleids = roleids;
+        }
+
+        request = Y.io(M.cfg.wwwroot + '/local/mail/ajax.php', cfg);
+    };
+
+    var wait = function() {
+        clearInterval(timeout);
+        timeout = setTimeout(function(){mail_doaction('search');}, 1000);
+    };
+
+    var getgroupid = function() {
+        var select = Y.one('#local_mail_recipients_groups');
+        return (select?select.get('options').item(select.get('selectedIndex')).get('value'):0);
+    };
+
+    var getroleid = function() {
+        var select = Y.one('#local_mail_recipients_roles');
+        return (select?select.get('options').item(select.get('selectedIndex')).get('value'):0);
+    };
+
+    var setassignedrecipients = function() {
+        var nodes = Y.all('.mail_recipient input[name^="remove"]');
+        var name;
+        if (nodes) {
+            nodes.each(function (node) {
+                name = /\d+/.exec(node.get('name'));
+            });
+        }
+    };
+
+    var mail_recipient_action = function(node) {
+        var name = node.get('name');
+        var role = /^\w+/.exec(name)[0];
+        var userid = /\[(\d+)\]/.exec(name)[1];
+        var noderolestring;
+        node.set('disabled', 'disabled');
+        if (node.get('type') === 'image') {
+            node.addClass('mail_novisible');
+            node.siblings('input').set('disabled', '');
+            node.siblings('input').removeClass('mail_hidden');
+            node.ancestor('.mail_form_recipient').removeClass('mail_recipient_selected');
+            noderolestring = node.ancestor('.mail_recipient_actions').siblings('.mail_form_recipient_role');
+            noderolestring.set('innerHTML', '');
+            noderolestring.addClass('mail_hidden');
+            mail_remove_recipient(userid, [0,1,2]);
+        } else {
+            mail_hide_recipients_button('to', userid);
+            mail_hide_recipients_button('cc', userid);
+            mail_hide_recipients_button('bcc', userid);
+            node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
+            noderolestring = node.ancestor('.mail_recipient_actions').siblings('.mail_form_recipient_role');
+            noderolestring.set('innerHTML', M.util.get_string('shortadd'+role, 'local_mail')+':');
+            noderolestring.removeClass('mail_hidden');
+            node.siblings('input[type="button"]').set('disabled', 'disabled');
+            node.siblings('input[type="button"]').addClass('mail_hidden');
+            node.siblings('.mail_recipient_actions input[type="image"]').removeClass('mail_novisible');
+            node.siblings('.mail_recipient_actions input[type="image"]').set('disabled', '');
+            mail_add_recipient(userid, role);
+        }
+    };
+
+    var mail_add_recipient = function(userid, role) {
+        var addto = false;
+        if (role == 'to') {
+            mail_recipients[0].push(userid);
+            mail_remove_recipient(userid, [1,2,3]);
+        } else if (role == 'cc') {
+            mail_recipients[1].push(userid);
+            mail_remove_recipient(userid, [0,2,3]);
+        } else if (role == 'bcc') {
+            mail_recipients[2].push(userid);
+            mail_remove_recipient(userid, [0,1,3]);
+        }
+    };
+
+    var mail_remove_recipient = function(userid, roles) {
+        var pos;
+        Y.Array.each(roles, function(role) {
+            pos = mail_recipients[role].indexOf(userid);
+            if (pos != -1) {
+                mail_recipients[role].splice(pos, 1);
+            } else {
+                if (mail_existing_recipients.indexOf(userid) != -1 && mail_recipients[3].indexOf(userid) == -1) {
+                    mail_recipients[3].push(userid);
+                }
+            }
+        });
+    };
+
+    var mail_reset_recipients =  function() {
+        mail_recipients = [
+            [],//to
+            [],//cc
+            [],//bcc
+            []//remove
+        ];
+    };
+
+    var mail_update_recipients_state = function () {
+        var node;
+        Y.Array.each(mail_recipients[0], function (recipient) {
+            mail_hide_recipients_button('to', recipient);
+            mail_hide_recipients_button('cc', recipient);
+            mail_hide_recipients_button('bcc', recipient);
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            if (node) {
+                node.set('innerHTML', M.util.get_string('shortaddto', 'local_mail')+':');
+                node.removeClass('mail_hidden');
+                node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
+            }
+            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            if (node) {
+                node.set('disabled', '');
+                node.removeClass('mail_novisible');
+            }
+        });
+        Y.Array.each(mail_recipients[1], function (recipient) {
+            mail_hide_recipients_button('cc', recipient);
+            mail_hide_recipients_button('to', recipient);
+            mail_hide_recipients_button('bcc', recipient);
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            if (node) {
+                node.set('innerHTML', M.util.get_string('shortaddcc', 'local_mail')+':');
+                node.removeClass('mail_hidden');
+                node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
+            }
+            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            if (node) {
+                node.set('disabled', '');
+                node.removeClass('mail_novisible');
+            }
+        });
+        Y.Array.each(mail_recipients[2], function (recipient) {
+            mail_hide_recipients_button('bcc', recipient);
+            mail_hide_recipients_button('to', recipient);
+            mail_hide_recipients_button('cc', recipient);
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            if (node) {
+                node.set('innerHTML', M.util.get_string('shortaddbcc', 'local_mail')+':');
+                node.removeClass('mail_hidden');
+                node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
+            }
+            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            if (node) {
+                node.set('disabled', '');
+                node.removeClass('mail_novisible');
+            }
+        });
+        Y.Array.each(mail_recipients[3], function (recipient) {
+            mail_show_recipients_button('to', recipient);
+            mail_show_recipients_button('cc', recipient);
+            mail_show_recipients_button('bcc', recipient);
+            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            if (node) {
+                node.addClass('mail_novisible');
+                node.set('disabled', 'disabled');
+                node.ancestor('.mail_form_recipient').removeClass('mail_recipient_selected');
+            }
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            if (node) {
+                node.set('innerHTML', '');
+                node.addClass('mail_hidden');
+            }
+        });
+    };
+
+    var mail_show_recipients_button = function (role, recipient) {
+        var node = Y.one('.mail_recipient_actions input[name="'+role+'['+recipient+']"]');
+        if (node) {
+            node.set('disabled', '');
+            node.removeClass('mail_hidden');
+        }
+    };
+
+    var mail_hide_recipients_button = function (role, recipient) {
+        var node = Y.one('.mail_recipient_actions input[name="'+role+'['+recipient+']"]');
+        if (node) {
+            node.set('disabled', 'disabled');
+            node.addClass('mail_hidden');
+        }
+    };
+
+    //Click label on recipients button
+    Y.one("div.region-content").delegate('click', function(e) {
+        e.preventDefault();
+        mail_reset_recipients();
+        mail_doaction('');
+        mail_recipients_panel.show();
+        Y.one('#local_mail_recipients_form').removeClass('mail_hidden');
+    }, '#id_recipients');
+
+    //Change on group select
+    Y.one("div.region-content").delegate('change', function(e) {
+        e.preventDefault();
+        mail_doaction('setgroup');
+    }, '#local_mail_recipients_groups');
+
+    //Change on role select
+    Y.one("div.region-content").delegate('change', function(e) {
+        e.preventDefault();
+        mail_doaction('setrole');
+    }, '#local_mail_recipients_roles');
+
+    //Keyup on search input
+    Y.one("div.region-content").delegate('keyup', function(e) {
+        wait();
+    }, 'input[name="recipients_search"]');
+
+    //Keydown on search input
+    Y.one("div.region-content").delegate('keydown', function(e) {
+        clearInterval(timeout);
+    }, 'input[name="recipients_search"]');
+
+    //Click on recipient action
+    Y.one("div.region-content").delegate('click', function(e) {
+        e.preventDefault();
+        mail_recipient_action(this);
+    }, '.mail_recipient_actions input');
+
+    init();
+    
+});

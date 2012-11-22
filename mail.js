@@ -865,6 +865,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
+    /*** Click events ***/
+
     //Background selection
     Y.one("div.region-content").delegate('click', function(e) {
         var ancestor = this.ancestor('.mail_item');
