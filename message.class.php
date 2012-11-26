@@ -129,7 +129,7 @@ class local_mail_message {
         }
 
         $sql = 'SELECT m.id, m.courseid, m.subject, m.content, m.format,'
-            . ' m.draft, m.time, c.shortname, c.fullname'
+            . ' m.draft, m.time, c.shortname, c.fullname, c.groupmode'
             . ' FROM {local_mail_messages} m'
             . ' JOIN {course} c ON c.id = m.courseid'
             . ' WHERE m.id  IN (' . implode(',', $ids) . ')';
@@ -589,6 +589,7 @@ class local_mail_message {
             'id' => $record->courseid,
             'shortname' => $record->shortname,
             'fullname' => $record->fullname,
+            'groupmode' => $record->groupmode,
         );
         $this->subject = $record->subject;
         $this->content = $record->content;
@@ -643,6 +644,7 @@ class local_mail_message {
 
         $record->shortname = $course->shortname;
         $record->fullname = $course->fullname;
+        $record->groupmode = $course->groupmode;
 
         return $record;
     }
@@ -690,7 +692,7 @@ class local_mail_message {
     private static function fetch_course($courseid) {
         global $DB;
         $conditions = array('id' => $courseid);
-        $fields = 'id, shortname, fullname';
+        $fields = 'id, shortname, fullname, groupmode';
         return $DB->get_record('course', $conditions, $fields, MUST_EXIST);
     }
 
