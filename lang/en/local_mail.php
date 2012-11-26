@@ -54,6 +54,7 @@ $string['none'] = 'None';
 $string['norecipient'] = '(no recipient)';
 $string['noselectedmessages'] = 'No messages selected';
 $string['nosubject'] = '(no subject)';
+$string['notingroup'] = 'You are not part of any group';
 $string['pagingempty'] = 'None de {$a}';
 $string['pagingsingle'] = '{$a->index} of {$a->total}';
 $string['pagingmultiple'] = '{$a->first}-{$a->last} of {$a->total}';

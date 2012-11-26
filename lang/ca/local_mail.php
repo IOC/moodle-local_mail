@@ -54,6 +54,7 @@ $string['none'] = 'Cap';
 $string['norecipient'] = '(sense destinataris)';
 $string['noselectedmessages'] = 'Cap missatge seleccionat';
 $string['nosubject'] = '(sense assumpte)';
+$string['notingroup'] = 'No esteu a cap grup';
 $string['pagingempty'] = 'Cap de {$a}';
 $string['pagingsingle'] = '{$a->index} de {$a->total}';
 $string['pagingmultiple'] = '{$a->first}-{$a->last} de {$a->total}';

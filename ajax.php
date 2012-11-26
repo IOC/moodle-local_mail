@@ -568,6 +568,21 @@ function getrecipients($message, $search, $groupid, $roleid) {
 
     $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
 
+    if ($message->course()->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
+        $groups = groups_get_user_groups($message->course()->id, $message->sender()->id);
+        if (count($groups[0]) == 0) {
+                $mailoutput = $PAGE->get_renderer('local_mail');
+                return array(
+                    'msgerror' => '',
+                    'html' => $mailoutput->recipientslist($participants)
+        );
+        } else {
+            if (!in_array($groupid, $groups[0])) {
+                $groupid = $groups[0][0];
+            }
+        }
+    }
+
     list($esql, $params) = get_enrolled_sql($context, NULL, $groupid, true);
     $joins = array("FROM {user} u");
     $wheres = array();
@@ -636,7 +651,7 @@ function getrecipients($message, $search, $groupid, $roleid) {
     }
     $mailoutput = $PAGE->get_renderer('local_mail');
     return array(
-        'msgerror' => '',//print_r($participants,true),
+        'msgerror' => '',//"$select $from $where $sort",//'',//print_r($participants,true),
         'info' => $recipients,
         'html' => $mailoutput->recipientslist($participants)
     );

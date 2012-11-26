@@ -23,7 +23,7 @@ YUI(M.yui.loader, {skin: 'night'}).use('io-base', 'node', 'json-parse', 'panel',
             autoScroll   : true,
             zIndex       : 3000,
             centered     : false,
-            modal        : false,
+            modal        : true,
             visible      : false,
             render       : true,
             xy           : [posx,position[1]],
@@ -48,12 +48,13 @@ YUI(M.yui.loader, {skin: 'night'}).use('io-base', 'node', 'json-parse', 'panel',
         var offset = 0;
         var img;
         clearInterval(timeout);
+        if(obj.redirect) {
+            M.core_formchangechecker.set_form_submitted();
+            Y.one('#mform1').submit();
+        }
         if (obj.msgerror) {
             alert(obj.msgerror);
         } else {
-            if(obj.redirect) {
-                document.location.reload();
-            }
             Y.one('.mail_search_loading').hide();
             if (obj.html) {
                 Y.one('#local_mail_recipients_list').setContent(obj.html);
