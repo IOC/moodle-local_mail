@@ -1,4 +1,4 @@
-YUI(M.yui.loader, {skin: 'night'}).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', function(Y) {
+YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', function(Y) {
 
     var mail_recipients_panel;
     var timeout;
@@ -11,7 +11,7 @@ YUI(M.yui.loader, {skin: 'night'}).use('io-base', 'node', 'json-parse', 'panel',
     };
 
     var mail_create_recipients_panel = function () {
-        var title = 'FIX:Header';//M.util.get_string('editlabel', 'local_mail');
+        var title = M.util.get_string('addrecipients', 'local_mail');
         var width = 500;
         var obj = Y.one('#region-main');
         var position = obj.getXY();
@@ -31,12 +31,14 @@ YUI(M.yui.loader, {skin: 'night'}).use('io-base', 'node', 'json-parse', 'panel',
         });
         mail_recipients_panel.plug(Y.Plugin.Drag,{handles:['.yui3-widget-hd']});
         mail_recipients_panel.addButton({
-            value  : 'FIX:Apply changes',//M.util.get_string('submit', 'moodle'),
+            value  : M.util.get_string('applychanges', 'local_mail'),
             section: Y.WidgetStdMod.FOOTER,
             action : function (e) {
                 e.preventDefault();
                 mail_recipients_panel.hide();
-                mail_doaction('updaterecipients');
+                if (mail_changes_recipients()) {
+                    mail_doaction('updaterecipients');
+                }
             }
         });
     };
@@ -217,6 +219,14 @@ YUI(M.yui.loader, {skin: 'night'}).use('io-base', 'node', 'json-parse', 'panel',
                 }
             }
         });
+    };
+
+    var mail_changes_recipients = function() {
+        return (mail_recipients[0].length > 0 ||
+            mail_recipients[1].length > 0 ||
+            mail_recipients[2].length > 0 ||
+            mail_recipients[3].length > 0
+            );
     };
 
     var mail_reset_recipients =  function() {
