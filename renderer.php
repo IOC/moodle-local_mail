@@ -460,10 +460,14 @@ class local_mail_renderer extends plugin_renderer_base {
         global $COURSE;
 
         $options = array();
-        $disabledsearch = false;
-        $content = html_writer::start_tag('div', array('id' => 'local_mail_recipients_form', 'class' => 'local_mail_form mail_hidden'));
-        $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_toolbar'));
+
         $owngroups = groups_get_user_groups($courseid, $userid);
+        $content = html_writer::start_tag('div', array('id' => 'local_mail_recipients_form', 'class' => 'local_mail_form mail_hidden'));
+
+        if ($COURSE->groupmode == SEPARATEGROUPS and empty($owngroups[0])) {
+            return '';
+        }
+        $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_toolbar'));
 
         //Roles
         $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
@@ -481,7 +485,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $groups = groups_get_all_groups($courseid);
         if ($COURSE->groupmode == NOGROUPS or ($COURSE->groupmode == VISIBLEGROUPS and empty($groups))) {
             $content .= html_writer::tag('span', get_string('allparticipants', 'moodle'), array('class' => 'groupselector groupname'));
-        } elseif ($COURSE->groupmode != NOGROUPS and !empty($groups)) {
+        } else {
             if ($COURSE->groupmode == VISIBLEGROUPS or has_capability('moodle/site:accessallgroups', $context)) {
                 unset($options);
                 foreach ($groups as $key => $group) {
@@ -493,10 +497,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 $text = get_string('allparticipants', 'moodle');
                 $content .= html_writer::select($options, 'local_mail_recipients_groups', '', array('' => $text), array('id' => 'local_mail_recipients_groups', 'class' => ''));
                 $content .= html_writer::end_tag('span');
-            } elseif (empty($owngroups[0])) { //SEPARATEGROUPS and no user in a group
-                $content .= html_writer::tag('span', get_string('notingroup', 'local_mail'), array('class' => 'groupselector groupname'));
-                $disabledsearch = true;
-            } elseif (count($owngroups[0]) == 1) {//SEPARATEGROUPS and user in only one group
+            }elseif (count($owngroups[0]) == 1) {//SEPARATEGROUPS and user in only one group
                 $text = get_string('group', 'moodle');
                 $content .= html_writer::start_tag('span', array('class' => 'groupselector'));
                 $content .= html_writer::label("$text: ", null);
@@ -514,9 +515,6 @@ class local_mail_renderer extends plugin_renderer_base {
                 $content .= html_writer::select($options, 'local_mail_recipients_groups', '', array(key($options) => current($options)), array('id' => 'local_mail_recipients_groups', 'class' => ''));
                 $content .= html_writer::end_tag('span');
             }
-        } else {//SEPARATEGROUP and empty groups
-            $content .= html_writer::tag('span', get_string('notingroup', 'local_mail'), array('class' => 'groupselector groupname'));
-            $disabledsearch = true;
         }
         $content .= html_writer::tag('div', '', array('class' => 'mail_separator'));
          //Search
@@ -529,9 +527,6 @@ class local_mail_renderer extends plugin_renderer_base {
                 'maxlength' => '100',
                 'class' => 'mail_search'
         );
-        if ($disabledsearch) {
-            $attributes['disabled'] = 'disabled';
-        }
         $text = get_string('search', 'local_mail');
         $content .= html_writer::label($text, 'recipients_search');
         $content .= html_writer::empty_tag('input', $attributes);

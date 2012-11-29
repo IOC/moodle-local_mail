@@ -16,39 +16,43 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         var obj = Y.one('#region-main');
         var position = obj.getXY();
         var posx = position[0]+(Y.one('body').get('offsetWidth')/2)-width;
-        mail_recipients_panel = new Y.Panel({
-            srcNode      : '#local_mail_recipients_form',
-            headerContent: title,
-            width        : width,
-            autoScroll   : true,
-            zIndex       : 3000,
-            centered     : false,
-            modal        : true,
-            visible      : false,
-            render       : true,
-            xy           : [posx,position[1]],
-            plugins      : [Y.Plugin.Drag]
-        });
-        mail_recipients_panel.plug(Y.Plugin.Drag,{handles:['.yui3-widget-hd']});
-        mail_recipients_panel.addButton({
-            value  : M.util.get_string('applychanges', 'local_mail'),
-            section: Y.WidgetStdMod.FOOTER,
-            action : function (e) {
-                e.preventDefault();
-                mail_recipients_panel.hide();
-                if (mail_changes_recipients()) {
-                    mail_doaction('updaterecipients');
+
+        if (Y.one('#local_mail_recipients_form')) {
+            mail_recipients_panel = new Y.Panel({
+                srcNode      : '#local_mail_recipients_form',
+                headerContent: title,
+                width        : width,
+                autoScroll   : true,
+                zIndex       : 3000,
+                centered     : false,
+                modal        : true,
+                visible      : false,
+                render       : true,
+                xy           : [posx,position[1]],
+                plugins      : [Y.Plugin.Drag]
+            });
+            mail_recipients_panel.plug(Y.Plugin.Drag,{handles:['.yui3-widget-hd']});
+            mail_recipients_panel.addButton({
+                value  : M.util.get_string('applychanges', 'local_mail'),
+                section: Y.WidgetStdMod.FOOTER,
+                action : function (e) {
+                    e.preventDefault();
+                    mail_recipients_panel.hide();
+                    if (mail_changes_recipients()) {
+                        mail_doaction('updaterecipients');
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            mail_recipients_panel = null;
+        }
     };
 
     //Success call
     var handleSuccess = function (transactionid, response, args) {
         var obj = Y.JSON.parse(response.responseText);
-        var search;
-        var offset = 0;
-        var img;
+        var node;
+
         clearInterval(timeout);
         if(obj.redirect) {
             M.core_formchangechecker.set_form_submitted();
@@ -57,12 +61,18 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         if (obj.msgerror) {
             alert(obj.msgerror);
         } else {
-            Y.one('.mail_search_loading').hide();
+            node = Y.one('.mail_search_loading');
+            if (node) {
+                node.hide();
+            }
             if (obj.html) {
                 Y.one('#local_mail_recipients_list').setContent(obj.html);
                 mail_update_recipients_state();
             } else {
-                Y.one('#local_mail_recipients_list').setContent(M.util.get_string('emptyrecipients','local_mail'));
+                node = Y.one('#local_mail_recipients_list');
+                if (node) {
+                    node.setContent(M.util.get_string('emptyrecipients','local_mail'));
+                }
             }
             if (obj.info) {
                 mail_existing_recipients = obj.info.slice(0);
@@ -78,18 +88,23 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     //Update screen data and async call
     var mail_doaction = function(action){
-        var search;
+        var search = '';
         var cfg;
         var recipients = '';
         var roleids = '';
         var node;
 
-        Y.one('.mail_search_loading').show();
+        node = Y.one('.mail_search_loading');
+        if (node) {
+            node.show();
+        }
 
         node = Y.one('input[name="recipients_search"]');
-        search = node.get('value');
-        search = search.replace(/^\s+|\s+$/g, '');
-        node.set('value', search);
+        if (node) {
+            search = node.get('value');
+            search = search.replace(/^\s+|\s+$/g, '');
+            node.set('value', search);
+        }
 
         if (action == 'updaterecipients') {
             if (mail_existing_recipients) {
@@ -327,8 +342,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         e.preventDefault();
         mail_reset_recipients();
         mail_doaction('');
-        mail_recipients_panel.show();
-        Y.one('#local_mail_recipients_form').removeClass('mail_hidden');
+        if (mail_recipients_panel) {
+            mail_recipients_panel.show();
+            Y.one('#local_mail_recipients_form').removeClass('mail_hidden');
+        } else {
+            alert(M.util.get_string('notingroup', 'local_mail'));
+        }
     }, '#id_recipients');
 
     //Change on group select
