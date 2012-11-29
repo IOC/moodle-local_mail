@@ -833,7 +833,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         var labelname = M.local_mail.mail_labels[labelid].name;
         var labelcolor = M.local_mail.mail_labels[labelid].color;
         Y.one('#local_mail_edit_label_name').set('value', labelname);
-        Y.one('#local_mail_edit_label_color option[value="'+labelcolor+'"]').set('selected', 'selected');
+        if (labelcolor != 'nocolor') {
+            Y.one('#local_mail_edit_label_color option[value="'+labelcolor+'"]').set('selected', 'selected');
+        }
         mail_edit_label_panel.show();
         Y.one('#local_mail_form_edit_label').removeClass('mail_hidden');
         Y.one('#local_mail_edit_label_name').focus();

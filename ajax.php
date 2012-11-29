@@ -446,8 +446,8 @@ function setlabel($type, $labelid, $labelname, $labelcolor) {
     if ($label) {
         $labels = local_mail_label::fetch_user($USER->id);
         $repeatedname = false;
-        foreach ($labels as $label) {
-            $repeatedname = $repeatedname || (($label->name() === $labelname) and ($label->id() != $labelid));
+        foreach ($labels as $l) {
+            $repeatedname = $repeatedname || (($l->name() === $labelname) and ($l->id() != $labelid));
         }
         if (!$repeatedname) {
             if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {
