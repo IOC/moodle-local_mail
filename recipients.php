@@ -21,9 +21,20 @@ $activeurl = new moodle_url('/local/mail/compose.php', $params);
 local_mail_setup_page($message->course(), $url);
 navigation_node::override_active_url($activeurl);
 
-// Set up selector
+// Check group
 
 $groupid = groups_get_course_group($COURSE, true);
+
+if (!$groupid and $COURSE->groupmode == SEPARATEGROUPS and
+    !has_capability('moodle/site:accessallgroups', $PAGE->context)) {
+    echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('notingroup', 'local_mail'));
+    echo $OUTPUT->continue_button($activeurl);
+    echo $OUTPUT->footer();
+    exit;
+}
+
+// Set up selector
 
 $options = array('courseid' => $COURSE->id, 'groupid' => $groupid);
 $participants = new mail_recipients_selector('recipients', $options);
