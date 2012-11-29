@@ -471,7 +471,7 @@ class local_mail_renderer extends plugin_renderer_base {
         foreach ($roles as $key => $role) {
             $options[$key] = $role->name;
         }
-        $text = get_string('roles', 'moodle');
+        $text = get_string('role', 'moodle');
         $content .= html_writer::start_tag('span', array('class' => 'roleselector'));
         $content .= html_writer::label($text, 'local_mail_roles');
         $text = get_string('all', 'local_mail');
@@ -487,7 +487,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 foreach ($groups as $key => $group) {
                     $options[$key] = $group->name;
                 }
-                $text = get_string('groups', 'moodle');
+                $text = get_string('group', 'moodle');
                 $content .= html_writer::start_tag('span', array('class' => 'groupselector'));
                 $content .= html_writer::label($text, 'local_mail_recipients_groups');
                 $text = get_string('allparticipants', 'moodle');
@@ -497,13 +497,17 @@ class local_mail_renderer extends plugin_renderer_base {
                 $content .= html_writer::tag('span', get_string('notingroup', 'local_mail'), array('class' => 'groupselector groupname'));
                 $disabledsearch = true;
             } elseif (count($owngroups[0]) == 1) {//SEPARATEGROUPS and user in only one group
-                $content .= html_writer::tag('span', groups_get_group_name($owngroups[0][0]), array('class' => 'groupselector groupname'));
+                $text = get_string('group', 'moodle');
+                $content .= html_writer::start_tag('span', array('class' => 'groupselector'));
+                $content .= html_writer::label("$text: ", null);
+                $content .= html_writer::tag('span', groups_get_group_name($owngroups[0][0]), array('class' => 'groupname'));
+                $content .= html_writer::end_tag('span');
             } elseif (count($owngroups[0]) > 1) {//SEPARATEGROUPS and user in several groups
                 unset($options);
                 foreach ($owngroups[0] as $key => $group) {
                     $options[$group] = groups_get_group_name($group);
                 }
-                $text = get_string('groups', 'moodle');
+                $text = get_string('group', 'moodle');
                 $content .= html_writer::start_tag('span', array('class' => 'groupselector'));
                 $content .= html_writer::label($text, 'local_mail_recipients_groups');
                 $text = get_string('allparticipants', 'moodle');
