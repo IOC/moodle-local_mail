@@ -307,14 +307,16 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     };
 
     var mail_customize_menu_label = function() {
-        if(mail_label_check_default_values()) {
-            Y.one('.mail_menu_labels .mail_menu_label_newlabel').removeClass('mail_hidden');
-            Y.one('.mail_menu_labels .mail_menu_label_apply').addClass('mail_hidden');
-        } else {
-            Y.one('.mail_menu_labels .mail_menu_label_newlabel').addClass('mail_hidden');
-            Y.one('.mail_menu_labels .mail_menu_label_apply').removeClass('mail_hidden');
+        if (Y.all('.mail_menu_labels li').size() > 1) {
+            if(mail_label_check_default_values()) {
+                Y.one('.mail_menu_labels .mail_menu_label_newlabel').removeClass('mail_hidden');
+                Y.one('.mail_menu_labels .mail_menu_label_apply').addClass('mail_hidden');
+            } else {
+                Y.one('.mail_menu_labels .mail_menu_label_newlabel').addClass('mail_hidden');
+                Y.one('.mail_menu_labels .mail_menu_label_apply').removeClass('mail_hidden');
+            }
         }
-    }
+    };
 
     var mail_label_check_default_values = function () {
         var isdefault = true;

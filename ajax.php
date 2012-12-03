@@ -651,7 +651,7 @@ function getrecipients($message, $search, $groupid, $roleid) {
     }
     $mailoutput = $PAGE->get_renderer('local_mail');
     return array(
-        'msgerror' => '',//"$select $from $where $sort",//'',//print_r($participants,true),
+        'msgerror' => '',
         'info' => $recipients,
         'html' => $mailoutput->recipientslist($participants)
     );
