@@ -22,6 +22,7 @@ $roleid     = optional_param('roleid', 0, PARAM_INT);
 $roleids    = optional_param('roleids', '', PARAM_SEQUENCE);
 $recipients = optional_param('recipients', '', PARAM_SEQUENCE);
 
+define('MAIL_MAXUSERS', 100);
 
 $courseid = ($type == 'course'?$itemid:$SITE->id);
 require_login($courseid);
@@ -561,8 +562,8 @@ function get_info() {
 }
 
 function getrecipients($message, $search, $groupid, $roleid) {
-    global $CFG, $USER, $DB, $PAGE;
-    $maxusers = 100;
+    global $DB, $PAGE;
+
     $participants = array();
     $recipients = array();
 
@@ -575,7 +576,7 @@ function getrecipients($message, $search, $groupid, $roleid) {
                 return array(
                     'msgerror' => '',
                     'html' => $mailoutput->recipientslist($participants)
-        );
+                );
         } else {
             if (!in_array($groupid, $groups[0])) {
                 $groupid = $groups[0][0];
@@ -583,47 +584,11 @@ function getrecipients($message, $search, $groupid, $roleid) {
         }
     }
 
-    list($esql, $params) = get_enrolled_sql($context, NULL, $groupid, true);
-    $joins = array("FROM {user} u");
-    $wheres = array();
-
-    $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
-            'id', 'firstname', 'lastname','picture', 'imagealt', 'email'));
-    $select = "SELECT u.id, u.firstname, u.lastname, u.picture, u.imagealt, u.email, ra.roleid$extrasql";
-    $joins[] = "JOIN ($esql) e ON e.id = u.id";
-    $joins[] = 'LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid '
-            . get_related_contexts_string($context) . ')'
-            . ' LEFT JOIN {role} r ON r.id = ra.roleid';
-
-    // performance hacks - we preload user contexts together with accounts
-    list($ccselect, $ccjoin) = context_instance_preload_sql('u.id', CONTEXT_USER, 'ctx');
-    $select .= $ccselect;
-    $joins[] = $ccjoin;
-
-    $from = implode("\n", $joins);
-
-    if (!empty($search)) {
-        $fullname = $DB->sql_fullname('u.firstname','u.lastname');
-        $wheres[] = "(". $DB->sql_like($fullname, ':search1', false, false) .") ";
-        $params['search1'] = "%$search%";
-    }
-
-    $from = implode("\n", $joins);
-    $wheres[] = 'u.id <> :guestid AND u.deleted = 0 AND u.confirmed = 1 AND u.id <> :userid';
-    if ($roleid != 0) {
-        $wheres[] = 'r.id = :roleid';
-        $params['roleid'] = $roleid;
-    }
-
-    $params['userid'] = $USER->id;
-    $params['guestid'] = $CFG->siteguest;
-    $where = "WHERE " . implode(" AND ", $wheres);
-
-    $sort = 'ORDER BY u.lastname ASC, u.firstname ASC';
+    list($select, $from, $where, $sort, $params) = getsqlrecipients($message->course()->id, $search, $groupid, $roleid);
 
     $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
 
-    if ($matchcount <= $maxusers) {
+    if ($matchcount <= MAIL_MAXUSERS) {
         $to = $message->recipients('to');
         $cc = $message->recipients('cc');
         $bcc = $message->recipients('bcc');
@@ -657,27 +622,124 @@ function getrecipients($message, $search, $groupid, $roleid) {
     );
 }
 
-function updaterecipients($message, $recipients, $roleids) {
-    foreach ($recipients as $key => $recipient) {
-        $role = false;
-        if ($roleids[$key] === '0') {
-            $role = 'to';
-        } elseif ($roleids[$key] === '1') {
-            $role = 'cc';
-        } elseif ($roleids[$key] === '2') {
-            $role = 'bcc';
-        }
-        if ($message->has_recipient($recipient)) {
-            $message->remove_recipient($recipient);
-        }
-        if ($role) {
-            $message->add_recipient($role, $recipient);
+function updaterecipients($message, $recipients, $roles) {
+    global $DB;
+
+    $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
+    $groupid = 0;
+    $severalseparategroups = false;
+
+    if ($message->course()->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
+        $groups = groups_get_user_groups($message->course()->id, $message->sender()->id);
+        if (count($groups[0]) == 0) {
+                return array(
+                    'msgerror' => '',
+                    'info' => '',
+                    'html' => '',
+                    'redirect' => 'ok'
+                );
+        } elseif(count($groups[0]) == 1) {//Only one group
+            $groupid = $groups[0][0];
+        } else {
+            $severalseparategroups = true;//Several groups
         }
     }
+
+    //Make sure recipients ids are integers
+    $recipients = clean_param_array($recipients, PARAM_INT);
+
+    foreach ($recipients as $key => $recipid) {
+        $roleids[$recipid] = (isset($roles[$key])?clean_param($roles[$key], PARAM_INT):false);
+    }
+
+    $participants = array();
+    list($select, $from, $where, $sort, $params) = getsqlrecipients($message->course()->id, '', $groupid, 0, implode(',', $recipients));
+    $rs = $DB->get_recordset_sql("$select $from $where $sort", $params);
+
+    foreach ($rs as $rec) {
+        if (!array_key_exists($rec->id, $participants)) {//Avoid duplicated users
+            if ($severalseparategroups) {
+                $valid = false;
+                foreach ($groups[0] as $group) {
+                    $valid = $valid || groups_is_member($group, $rec->id);
+                }
+                if (!$valid) {
+                    continue;
+                }
+            }
+            $role = false;
+            if ($roleids[$rec->id] === 0) {
+                $role = 'to';
+            } elseif ($roleids[$rec->id] === 1) {
+                $role = 'cc';
+            } elseif ($roleids[$rec->id] === 2) {
+                $role = 'bcc';
+            }
+            if ($message->has_recipient($rec->id)) {
+                $message->remove_recipient($rec->id);
+            }
+            if ($role) {
+                $message->add_recipient($role, $rec->id);
+            }
+            $participants[$rec->id] = true;
+        }
+    }
+
+    $rs->close();
     return array(
         'msgerror' => '',
         'info' => '',
         'html' => '',
         'redirect' => 'ok'
     );
+}
+
+function getsqlrecipients($courseid, $search, $groupid, $roleid, $recipients = false){
+    global $CFG, $USER, $DB;
+
+    $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+
+    list($esql, $params) = get_enrolled_sql($context, NULL, $groupid, true);
+    $joins = array("FROM {user} u");
+    $wheres = array();
+
+    $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
+            'id', 'firstname', 'lastname'));
+    $select = "SELECT u.id, u.firstname, u.lastname, u.picture, u.imagealt, u.email, ra.roleid$extrasql";
+    $joins[] = "JOIN ($esql) e ON e.id = u.id";
+    $joins[] = 'LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid '
+            . get_related_contexts_string($context) . ')'
+            . ' LEFT JOIN {role} r ON r.id = ra.roleid';
+
+    // performance hacks - we preload user contexts together with accounts
+    list($ccselect, $ccjoin) = context_instance_preload_sql('u.id', CONTEXT_USER, 'ctx');
+    $select .= $ccselect;
+    $joins[] = $ccjoin;
+
+    $from = implode("\n", $joins);
+
+    if (!empty($search)) {
+        $fullname = $DB->sql_fullname('u.firstname','u.lastname');
+        $wheres[] = "(". $DB->sql_like($fullname, ':search1', false, false) .") ";
+        $params['search1'] = "%$search%";
+    }
+
+    $from = implode("\n", $joins);
+    $wheres[] = 'u.id <> :guestid AND u.deleted = 0 AND u.confirmed = 1 AND u.id <> :userid';
+    if ($roleid != 0) {
+        $wheres[] = 'r.id = :roleid';
+        $params['roleid'] = $roleid;
+    }
+
+    if ($recipients) {
+        $wheres[] = 'u.id IN ('.preg_replace('/^,|,$/', '', $recipients).')';
+    }
+
+    $params['userid'] = $USER->id;
+    $params['guestid'] = $CFG->siteguest;
+    $where = "WHERE " . implode(" AND ", $wheres);
+
+    $sort = 'ORDER BY u.lastname ASC, u.firstname ASC';
+
+    return array($select, $from, $where, $sort, $params);
 }
