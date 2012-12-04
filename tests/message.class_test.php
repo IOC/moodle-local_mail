@@ -24,9 +24,9 @@ class local_mail_message_test extends local_mail_testcase {
         parent::setUp();
 
         $course = array(
-            array('id',  'shortname', 'fullname'),
-            array('101', 'C1',        'Course 1'),
-            array('102', 'C2',        'Course 2'),
+            array('id',  'shortname', 'fullname', 'groupmode'),
+            array('101', 'C1',        'Course 1', '0'),
+            array('102', 'C2',        'Course 2', '0'),
         );
         $user = array(
             array('id', 'username', 'firstname', 'lastname', 'email',        'picture', 'imagealt', 'maildisplay',),
