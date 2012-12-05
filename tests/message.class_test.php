@@ -479,6 +479,55 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(201, 'course', 101, 1234567890, $message->id(), false);
     }
 
+    function test_search_index() {
+        $message1 = local_mail_message::create(201, 101);
+        $message1->add_recipient('to', 202);
+        $message1->save('subject', 'content', 301, 1234567890);
+        $message2 = local_mail_message::create(201, 101);
+        $message2->add_recipient('to', 202);
+        $message2->save('subject foo bar', 'content', 301, 1234567890);
+        $message3 = local_mail_message::create(201, 101);
+        $message3->save('subject', 'content <p>foo</p> <p>bar</p>', 301, 1234567891);
+        $message4 = local_mail_message::create(201, 101);
+        $message4->save('subject', 'content', 301, 1234567891);
+        $message4->set_unread(201, true);
+
+        // Subject and content
+        $query = array('pattern' => ' foo  bar ');
+        $result = local_mail_message::search_index(201, 'course', 101, $query);
+        $this->assertEquals(array($message3, $message2), $result);
+
+        // Users
+        $query = array('pattern' => fullname($this->user2));
+        $result = local_mail_message::search_index(201, 'course', 101, $query);
+        $this->assertEquals(array($message2, $message1), $result);
+
+        // Unread
+        $query = array('unread' => true);
+        $result = local_mail_message::search_index(201, 'course', 101, $query);
+        $this->assertEquals(array($message4), $result);
+
+        // Date
+        $query = array('time' => 1234567890);
+        $result = local_mail_message::search_index(201, 'course', 101, $query);
+        $this->assertEquals(array($message2, $message1), $result);
+
+        // Limit
+        $query = array('limit' => 2);
+        $result = local_mail_message::search_index(201, 'course', 101, $query);
+        $this->assertEquals(array($message4, $message3), $result);
+
+        // Before
+        $query = array('before' => $message2->id());
+        $result = local_mail_message::search_index(201, 'course', 101, $query);
+        $this->assertEquals(array($message1), $result);
+
+        // After
+        $query = array('after' => $message1->id(), 'limit' => 2);
+        $result = local_mail_message::search_index(201, 'course', 101, $query);
+        $this->assertEquals(array($message3, $message2), $result);
+    }
+
     function test_send() {
         $label = local_mail_label::create(201, 'label');
         $message = local_mail_message::create(201, 101);
