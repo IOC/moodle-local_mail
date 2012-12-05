@@ -117,10 +117,8 @@ class local_mail_message {
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $item);
         $records = $DB->get_records('local_mail_index', $conditions, 'time DESC, messageid DESC',
-                                    'id, messageid', $limitfrom, $limitnum);
-        $ids = array_map(function($r) { return $r->messageid; }, $records);
-
-        return self::fetch_many($ids);
+                                    'messageid', $limitfrom, $limitnum);
+        return self::fetch_many(array_keys($records));
     }
 
     static function fetch_many(array $ids) {
@@ -163,8 +161,8 @@ class local_mail_message {
 
         foreach ($ids as $id) {
             if (isset($records[$id])) {
-                $messages[$id] = new self($records[$id], $ref_records,
-                                          $user_records, $label_records);
+                $messages[] = new self($records[$id], $ref_records,
+                                       $user_records, $label_records);
             }
         }
 
@@ -370,14 +368,14 @@ class local_mail_message {
 
     function labels($userid=false) {
         assert($userid === false or $this->has_user($userid));
-        
-        if ($userid) {
-            return array_filter($this->labels, function($label) use ($userid) {
-                return $label->userid() == $userid;
-            });
-        } else {
-            return $this->labels;
+
+        $result = array();
+        foreach ($this->labels as $label) {
+            if (!$userid or $label->userid() == $userid) {
+                $result[] = $label;
+            }
         }
+        return $result;
     }
 
     function recipients() {
@@ -386,7 +384,7 @@ class local_mail_message {
         foreach ($this->users as $user) {
             $role = $this->role[$user->id];
             if ($role != 'from' and (!$roles or in_array($role, $roles))) {
-                $result[$user->id] = $user;
+                $result[] = $user;
             }
         }
         return $result;

@@ -82,10 +82,10 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertCount(1, $message->recipients('to'));
         $this->assertCount(1, $message->recipients('cc'));
         $this->assertCount(0, $message->recipients('bcc'));
-        $this->assertEquals($this->user2, $message->recipients()[202]);
-        $this->assertEquals($this->user3, $message->recipients()[203]);
-        $this->assertEquals($this->user2, $message->recipients('to')[202]);
-        $this->assertEquals($this->user3, $message->recipients('cc')[203]);
+        $this->assertContains($this->user2, $message->recipients());
+        $this->assertContains($this->user3, $message->recipients());
+        $this->assertContains($this->user2, $message->recipients('to'));
+        $this->assertContains($this->user3, $message->recipients('cc'));
         $this->assertMessage($message);
     }
 
@@ -254,8 +254,8 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertCount(1, $result->recipients('to'));
         $this->assertCount(1, $result->recipients('cc'));
         $this->assertCount(0, $result->recipients('bcc'));
-        $this->assertEquals($this->user2, $result->recipients('to')[202]);
-        $this->assertEquals($this->user3, $result->recipients('cc')[203]);
+        $this->assertContains($this->user2, $result->recipients('to'));
+        $this->assertContains($this->user3, $result->recipients('cc'));
         $this->assertFalse($result->unread(202));
         $this->assertTrue($result->starred(202));
         $this->assertFalse($result->deleted(202));
@@ -287,10 +287,7 @@ class local_mail_message_test extends local_mail_testcase {
 
         $result = local_mail_message::fetch_index(202, 'inbox');
 
-        $ids = array($message3->id(), $message2->id(), $message1->id());
-        $this->assertEquals(array_keys($result), $ids);
-        $this->assertEquals($result[$message1->id()], $message1);
-        $this->assertEquals($result[$message2->id()], $message2);
+        $this->assertEquals(array($message3, $message2, $message1), $result);
     }
 
     function test_fetch_many() {
@@ -309,10 +306,7 @@ class local_mail_message_test extends local_mail_testcase {
 
         $result = local_mail_message::fetch_many(array($message1->id(), $message2->id()));
 
-        $this->assertCount(2, $result);
-        $this->assertEquals(array_keys($result), array($message1->id(), $message2->id()));
-        $this->assertEquals($result[$message1->id()], $message1);
-        $this->assertEquals($result[$message2->id()], $message2);
+        $this->assertEquals(array($message1, $message2), $result);
     }
 
     function test_fetch_menu() {
@@ -414,8 +408,8 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertCount(0, $message->recipients('to'));
         $this->assertCount(1, $message->recipients('cc'));
         $this->assertCount(0, $message->recipients('bcc'));
-        $this->assertEquals($this->user3, $message->recipients()[203]);
-        $this->assertEquals($this->user3, $message->recipients('cc')[203]);
+        $this->assertContains($this->user3, $message->recipients());
+        $this->assertContains($this->user3, $message->recipients('cc'));
         $this->assertMessage($message);
     }
 
@@ -441,7 +435,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(array($message->id()), $result->references());
         $this->assertEquals($this->user2, $result->sender());
         $this->assertCount(1, $result->recipients());
-        $this->assertEquals($this->user1, $result->recipients('to')[201]);
+        $this->assertContains($this->user1, $result->recipients('to'));
         $this->assertCount(1, $result->labels());
         $this->assertContains($label, $result->labels());
         $this->assertMessage($result);
@@ -459,8 +453,8 @@ class local_mail_message_test extends local_mail_testcase {
         $result = $message->reply(202, true);
 
         $this->assertCount(2, $result->recipients());
-        $this->assertEquals($this->user1, $result->recipients('to')[201]);
-        $this->assertEquals($this->user3, $result->recipients('cc')[203]);
+        $this->assertContains($this->user1, $result->recipients('to'));
+        $this->assertContains($this->user3, $result->recipients('cc'));
         $this->assertMessage($result);
     }
 
