@@ -6,6 +6,10 @@ require_once('label.class.php');
 
 class local_mail_message {
 
+    private static $index_types = array(
+        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash'
+    );
+
     private $id;
     private $course;
     private $subject;
@@ -24,7 +28,7 @@ class local_mail_message {
     static function count_index($userid, $type, $itemid=0) {
         global $DB;
 
-        assert(in_array($type, array('inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash')));
+        assert(in_array($type, self::$index_types));
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $itemid);
         return $DB->count_records('local_mail_index', $conditions);
@@ -33,7 +37,7 @@ class local_mail_message {
     static function count_index_unread($userid, $type, $itemid=0) {
         global $DB;
 
-        assert(in_array($type, array('inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash')));
+        assert(in_array($type, self::$index_types));
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $itemid, 'unread' => true);
         return $DB->count_records('local_mail_index', $conditions);
@@ -109,10 +113,10 @@ class local_mail_message {
     static function fetch_index($userid, $type, $item=0, $limitfrom=0, $limitnum=0) {
         global $DB;
 
-        assert(in_array($type, array('inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash')));
+        assert(in_array($type, self::$index_types));
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $item);
-        $records = $DB->get_records('local_mail_index', $conditions, 'time DESC',
+        $records = $DB->get_records('local_mail_index', $conditions, 'time DESC, messageid DESC',
                                     'id, messageid', $limitfrom, $limitnum);
         $ids = array_map(function($r) { return $r->messageid; }, $records);
 
@@ -165,6 +169,86 @@ class local_mail_message {
         }
 
         return $messages;
+    }
+
+    static function search_index($userid, $type, $item, array $query) {
+        global $DB;
+
+        assert(in_array($type, self::$index_types));
+        assert(empty($query['before']) or empty($query['after']));
+
+        $normalize = function($text) {
+            return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
+        };
+
+        $query['pattern'] = !empty($query['pattern']) ? $normalize($query['pattern']) : '';
+
+        $match_text = function($text) use ($normalize, $query) {
+            return strpos($normalize($text), $query['pattern']) !== false;
+        };
+
+        $match_message = function($message) use ($match_text, $query, $userid) {
+            if (empty($query['pattern']) or $match_text($message->subject()) or
+                array_filter(array_map('fullname', $message->users), $match_text)) {
+                return true;
+            }
+            $html = format_text($message->content(), $message->format());
+            return $match_text(html_to_text($html));
+        };
+
+        $sql = 'SELECT messageid FROM {local_mail_index}'
+            . ' WHERE userid = :userid AND type = :type AND item = :item';
+        $params = array('userid' => $userid, 'type' => $type, 'item' => $item);
+        $order = 'DESC';
+
+        if (!empty($query['time'])) {
+            $sql .= ' AND time <= :time';
+            $params['time'] = $query['time'];
+        }
+
+        if (!empty($query['unread'])) {
+            $sql .= ' AND unread = 1';
+        }
+
+        if (!empty($query['before'])) {
+            $from = self::fetch($query['before']);
+            $sql .= ' AND time <= :beforetime AND (time < :beforetime2 OR messageid < :beforeid)';
+            $params['beforetime'] = $from->time();
+            $params['beforetime2'] = $from->time();
+            $params['beforeid'] = $from->id();
+        } elseif (!empty($query['after'])) {
+            $from = self::fetch($query['after']);
+            $sql .= ' AND time >= :aftertime AND (time > :aftertime2 OR messageid > :afterid)';
+            $params['aftertime'] = $from->time();
+            $params['aftertime2'] = $from->time();
+            $params['afterid'] = $from->id();
+            $order = 'ASC';
+        }
+
+        $sql .= " ORDER BY time $order, messageid $order";
+
+        $fetch_messages = function() use ($DB, $sql, $params) {
+            static $offset = 0;
+            $ids = array_keys($DB->get_records_sql($sql, $params, $offset, 100));
+            $offset += 100;
+            return local_mail_message::fetch_many($ids);
+        };
+
+        $offset = 0;
+        $result = array();
+
+        while ($records = $DB->get_records_sql($sql, $params, $offset, 100)) {
+            $messages = self::fetch_many(array_keys($records));
+            $messages = array_filter($messages, $match_message);
+            $result = array_merge($result, $messages);
+            if (!empty($query['limit']) and count($result) >= $query['limit']) {
+                array_splice($result, $query['limit']);
+                break;
+            }
+            $offset += 100;
+        }
+
+        return !empty($query['after']) ? array_reverse($result) : $result;
     }
 
     function add_label(local_mail_label $label) {
