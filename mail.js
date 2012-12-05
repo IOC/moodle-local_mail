@@ -5,6 +5,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var mail_view_type = '';
     var mail_edit_label_panel;
     var mail_new_label_panel;
+    var mail_undo_function = '';
+    var mail_undo_ids = '';
 
     var init = function(){
         mail_view_type = Y.one('input[name="type"]').get('value');
@@ -639,6 +641,24 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                     }));
                 }
             }
+            //Undo last action
+            if (obj.undo && mail_undo_function != 'undo') {
+                var msg = M.util.get_string('undo'+mail_undo_function, 'local_mail', obj.undo.split(',').length);
+                if (mail_undo_function == 'delete') {
+                    mail_undo_function = 'restore';
+                } else if (mail_undo_function == 'restore') {
+                    mail_undo_function = 'delete';
+                }
+                Y.one('#mail_notification').addClass('mail_enabled').removeClass('mail_novisible');
+                Y.one('#mail_notification_message').setContent(msg);
+                mail_undo_ids = obj.undo;
+            } else {
+                if(Y.one('#mail_notification')) {
+                    Y.one('#mail_notification').removeClass('mail_enabled').addClass('mail_novisible');
+                    Y.one('#mail_notification_message').setContent('');
+                }
+                mail_undo_function = '';
+            }
             if(obj.redirect) {
                 document.location.href = obj.redirect;
             }
@@ -673,7 +693,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                     obj.replaceClass('mail_unstarred', 'mail_starred');
                     node.set('title', M.util.get_string('starred','local_mail'));
                 }
-            } else if (action == 'delete') {
+            } else if (action == 'delete' || action == 'restore') {
+                mail_undo_function = action;
                 mail_message_view = false;
             } else if (action == 'starred') {
                 node = Y.one('.mail_flags span');
@@ -702,7 +723,18 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                 } else {
                     ids = /m=(\d+)/.exec(node.get('href'))[1];
                 }
-            }else if (action == 'togglestarred') {
+            } else if (action == 'delete') {
+                    mail_undo_function = action;
+                    ids = mail_get_checkboxs_values();
+                } else if (action == 'restore') {
+                    mail_undo_function = action;
+                    ids = mail_get_checkboxs_values();
+                } else if (action == 'undo') {
+                    nodes.empty();
+                    action = mail_undo_function;
+                    mail_undo_function = 'undo';
+                    ids = mail_undo_ids;
+            } else if (action == 'togglestarred') {
                 obj = node.ancestor('.mail_item').one('.mail_adv_checkbox');
                 nodes = Y.all(obj);
                 if (node.one('span').hasClass('mail_starred')) {
@@ -740,7 +772,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                         ancestor.removeClass('mail_unread');
                     } else if(action == 'markasunread') {
                         ancestor.addClass('mail_unread');
-                    } else if(action == 'delete') {
+                    } else if(action == 'delete' || action == 'restore') {
                         ancestor.remove();
                     } else if(action == 'assignlabels') {
                         mail_assign_labels(node);
@@ -1039,7 +1071,14 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         if (!this.hasClass('mail_button_disabled')) {
             mail_doaction('delete');
         }
-    }, '.mail_delete');
+    }, '#mail_delete');
+
+    //Restore button
+    Y.one("div.region-content").delegate('click', function(e) {
+        if (!this.hasClass('mail_button_disabled')) {
+            mail_doaction('restore');
+        }
+    }, '#mail_restore');
 
     //Prev page button
     Y.one("div.region-content").delegate('click', function(e) {
@@ -1095,6 +1134,16 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         mail_menu_label_selection(this);
         mail_customize_menu_label();
     }, '.mail_menu_labels li');
+
+    //Click notification bar
+    Y.one("div.region-content").delegate('click', function(e) {
+        e.preventDefault();
+        var ancestor = Y.one('#mail_notification');
+        if (ancestor.hasClass('mail_enabled')) {
+            ancestor.removeClass('mail_enabled').addClass('mail_novisible');
+            mail_doaction('undo');
+        }
+    }, '#mail_notification_undo');
 
     //Initialize
     init();

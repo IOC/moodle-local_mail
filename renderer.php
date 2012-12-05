@@ -168,6 +168,7 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function delete($trash) {
+        $type = ($trash?'restore':'delete');
         $label = ($trash?get_string('restore', 'local_mail'):get_string('delete'));
         $attributes = array(
             'type' => 'submit',
@@ -178,7 +179,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $output = html_writer::start_tag('noscript');
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('noscript');
-        $output .= html_writer::start_tag('span', array('class' => 'singlebutton mail_button mail_delete mail_button_disabled mail_hidden'));
+        $output .= html_writer::start_tag('span', array('id' => 'mail_'. $type, 'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'));
         $output .= html_writer::tag('span', $label);
         $output .= html_writer::end_tag('span');
         return $output;
@@ -776,6 +777,14 @@ class local_mail_renderer extends plugin_renderer_base {
         return $this->output->container($output, ($toolbardown?'mail_toolbar_down':'mail_toolbar'));
     }
 
+    function notification_bar() {
+        $output = html_writer::start_tag('div', array('id' => 'mail_notification', 'class' => 'mail_novisible mail_notification'));
+        $output .= html_writer::tag('span', '', array('id' => 'mail_notification_message'));
+        $output .= html_writer::link('#', get_string('undo', 'local_mail'), array('id' => 'mail_notification_undo'));
+        $output .= html_writer::end_tag('div');
+        return $output;
+    }
+
     function users($message, $userid, $type, $itemid) {
         global $DB;
         if ($userid == $message->sender()->id) {
@@ -820,6 +829,7 @@ class local_mail_renderer extends plugin_renderer_base {
         }
 
         $content .= $this->toolbar($type, false, $paging, ($type === 'trash'));
+        $content .= $this->notification_bar();
         if ($messages) {
             $content .= $this->messagelist($messages, $userid, $type, $itemid, $offset);
         } else {

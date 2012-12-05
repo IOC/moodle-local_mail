@@ -331,11 +331,15 @@ if ($removelbl) {
     $url->param('m', $message->id());
     // Display page
     $PAGE->requires->js('/local/mail/mail.js');
-    $PAGE->requires->string_for_js('starred', 'local_mail');
-    $PAGE->requires->string_for_js('unstarred', 'local_mail');
-    $PAGE->requires->string_for_js('editlabel', 'local_mail');
-    $PAGE->requires->string_for_js('newlabel', 'local_mail');
-    $PAGE->requires->string_for_js('erroremptylabelname', 'local_mail');
+    $PAGE->requires->strings_for_js(array(
+        'starred',
+        'unstarred',
+        'editlabel',
+        'newlabel',
+        'erroremptylabelname',
+        'undodelete',
+        'undorestore'
+        ), 'local_mail');
     $PAGE->requires->string_for_js('submit', 'moodle');
     $PAGE->requires->string_for_js('cancel', 'moodle');
     $PAGE->requires->js_init_code($jslabels);
@@ -344,6 +348,7 @@ if ($removelbl) {
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'id' => 'local_mail_main_form'));
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $mailoutput->toolbar('view', false, null, ($type === 'trash'));
+    echo $mailoutput->notification_bar();
     echo $OUTPUT->container_start('mail_view');
 
     echo $OUTPUT->container_start('mail_subject');
@@ -480,13 +485,17 @@ if ($removelbl) {
     $jslabels = local_mail_js_labels();
     // Display page
     $PAGE->requires->js('/local/mail/mail.js');
-    $PAGE->requires->string_for_js('starred', 'local_mail');
-    $PAGE->requires->string_for_js('unstarred', 'local_mail');
-    $PAGE->requires->string_for_js('labeldeleteconfirm', 'local_mail');
-    $PAGE->requires->string_for_js('delete', 'local_mail');
-    $PAGE->requires->string_for_js('editlabel', 'local_mail');
-    $PAGE->requires->string_for_js('newlabel', 'local_mail');
-    $PAGE->requires->string_for_js('erroremptylabelname', 'local_mail');
+    $PAGE->requires->strings_for_js(array(
+        'starred',
+        'unstarred',
+        'labeldeleteconfirm',
+        'delete',
+        'editlabel',
+        'newlabel',
+        'erroremptylabelname',
+        'undodelete',
+        'undorestore'
+        ), 'local_mail');
     $PAGE->requires->string_for_js('submit', 'moodle');
     $PAGE->requires->string_for_js('cancel', 'moodle');
     $PAGE->requires->js_init_code($jslabels);

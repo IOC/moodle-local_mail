@@ -31,6 +31,7 @@ $valid_actions = array(
     'starred',
     'unstarred',
     'delete',
+    'restore',
     'markasread',
     'markasunread',
     'prevpage',
@@ -91,7 +92,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         $func = 'setread';
         array_push($params, $messages);
         array_push($params, true);
-    }elseif ($action === 'markasunread') {
+    } elseif ($action === 'markasunread') {
         $func = 'setread';
         array_push($params, $messages);
         array_push($params, false);
@@ -107,10 +108,10 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
                                 )
             );
         }
-    }elseif ($action === 'delete') {
+    } elseif ($action === 'delete' or $action === 'restore') {
         $func = 'setdelete';
         array_push($params, $messages);
-        array_push($params, ($type != 'trash'));
+        array_push($params, ($action == 'delete'));
         if ($type != 'course' and $type != 'label') {
             $itemid = 0;
         }
@@ -228,7 +229,7 @@ function setstarred ($messages, $bool, $data = false) {
     );
 }
 
-function setread ($messages, $bool, $mailview = false) {
+function setread($messages, $bool, $mailview = false) {
     global $USER;
 
     $html = '';
@@ -249,13 +250,15 @@ function setread ($messages, $bool, $mailview = false) {
     );
 }
 
-function setdelete ($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
+function setdelete($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
     global $USER;
 
+    $ids = array();
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
     foreach ($messages as $message) {
         if ($message->viewable($USER->id)) {
             $message->set_deleted($USER->id, $bool);
+            array_push($ids, $message->id());
         }
         $totalcount -= 1;
     }
@@ -264,7 +267,8 @@ function setdelete ($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
     }
     return array(
         'info' => get_info(),
-        'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount)
+        'html' => print_messages($itemid, $type, $offset, $mailpagesize, $totalcount),
+        'undo' => implode(",", $ids)
     );
 }
 
@@ -383,6 +387,7 @@ function getmail($message, $type, $reply, $offset, $labelid) {
     $message->set_unread($USER->id, false);
     $mailoutput = $PAGE->get_renderer('local_mail');
     $content = $mailoutput->toolbar('view', false, null, ($type === 'trash'));
+    $content .= $mailoutput->notification_bar();
     $content .= $OUTPUT->container_start('mail_view');
 
     $content .= $OUTPUT->container_start('mail_subject');

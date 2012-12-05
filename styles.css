@@ -322,7 +322,6 @@
 .mail_toolbar_down{
     font-size: 1em;
     vertical-align: middle;
-    margin-bottom: 1em;
 }
 
 .mail_toolbar .mail_paging {
@@ -433,13 +432,6 @@
     margin-right: 4px;
 }
 
-/*.mail_toolbar .mail_button span:before {
-    content: "";
-    display: inline-block;
-    vertical-align: middle;
-    height: 100%;
-}*/
-
 .mail_toolbar .mail_button:before {
     content: "";
     display: inline-block;
@@ -451,7 +443,7 @@
 .mail_toolbar_down .mail_button {
     display: inline-block;
     background-color: #f1f1f1;
-    margin: 0.4em 0.5em 1em 0;
+    margin: 0.4em 0.5em 0 0;
     padding: 0.4em 1em;
     border: 1px solid #ccc;
     border-radius: 0.2em;
@@ -524,6 +516,16 @@
 
 .mail_perpage span{
     margin: 0 0.5em;
+}
+
+/* Notification bar */
+
+.mail_notification {
+    margin: 0.5em 0;
+}
+
+#mail_notification_undo {
+    margin-left: 1em;
 }
 
 /* View mail */

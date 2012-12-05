@@ -111,13 +111,15 @@ $mailoutput = $PAGE->get_renderer('local_mail');
 //Recipients form ajax
 echo $mailoutput->recipientsform($message->course()->id, $message->sender()->id);
 $PAGE->requires->js('/local/mail/recipients.js');
-$PAGE->requires->string_for_js('emptyrecipients', 'local_mail');
-$PAGE->requires->string_for_js('shortaddto', 'local_mail');
-$PAGE->requires->string_for_js('shortaddcc', 'local_mail');
-$PAGE->requires->string_for_js('shortaddbcc', 'local_mail');
-$PAGE->requires->string_for_js('addrecipients', 'local_mail');
-$PAGE->requires->string_for_js('applychanges', 'local_mail');
-$PAGE->requires->string_for_js('notingroup', 'local_mail');
+$PAGE->requires->strings_for_js(array(
+    'emptyrecipients',
+    'shortaddto',
+    'shortaddcc',
+    'shortaddbcc',
+    'addrecipients',
+    'applychanges',
+    'notingroup'
+    ), 'local_mail');
 if (!empty($refs)) {
     echo $mailoutput->references($references, true);
 }
