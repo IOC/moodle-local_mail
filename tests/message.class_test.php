@@ -278,13 +278,17 @@ class local_mail_message_test extends local_mail_testcase {
         $message2->save('subject2', 'content2', 302);
         $message2->add_recipient('to', 202);
         $message2->send(12345567891);
+        $message3 = local_mail_message::create(201, 102);
+        $message3->save('subject3', 'content3', 302);
+        $message3->add_recipient('to', 202);
+        $message3->send(12345567891);
         $other = local_mail_message::create(202, 101);
         $other->save('subject', 'content', 0);
 
         $result = local_mail_message::fetch_index(202, 'inbox');
 
-        $this->assertCount(2, $result);
-        $this->assertEquals(array_keys($result), array($message2->id(), $message1->id()));
+        $ids = array($message3->id(), $message2->id(), $message1->id());
+        $this->assertEquals(array_keys($result), $ids);
         $this->assertEquals($result[$message1->id()], $message1);
         $this->assertEquals($result[$message2->id()], $message2);
     }

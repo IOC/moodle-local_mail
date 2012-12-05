@@ -116,7 +116,7 @@ class local_mail_message {
         assert(in_array($type, self::$index_types));
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $item);
-        $records = $DB->get_records('local_mail_index', $conditions, 'time DESC',
+        $records = $DB->get_records('local_mail_index', $conditions, 'time DESC, messageid DESC',
                                     'id, messageid', $limitfrom, $limitnum);
         $ids = array_map(function($r) { return $r->messageid; }, $records);
 
