@@ -6,6 +6,10 @@ require_once('label.class.php');
 
 class local_mail_message {
 
+    private static $index_types = array(
+        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash'
+    );
+
     private $id;
     private $course;
     private $subject;
@@ -24,7 +28,7 @@ class local_mail_message {
     static function count_index($userid, $type, $itemid=0) {
         global $DB;
 
-        assert(in_array($type, array('inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash')));
+        assert(in_array($type, self::$index_types));
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $itemid);
         return $DB->count_records('local_mail_index', $conditions);
@@ -33,7 +37,7 @@ class local_mail_message {
     static function count_index_unread($userid, $type, $itemid=0) {
         global $DB;
 
-        assert(in_array($type, array('inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash')));
+        assert(in_array($type, self::$index_types));
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $itemid, 'unread' => true);
         return $DB->count_records('local_mail_index', $conditions);
@@ -109,7 +113,7 @@ class local_mail_message {
     static function fetch_index($userid, $type, $item=0, $limitfrom=0, $limitnum=0) {
         global $DB;
 
-        assert(in_array($type, array('inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash')));
+        assert(in_array($type, self::$index_types));
 
         $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $item);
         $records = $DB->get_records('local_mail_index', $conditions, 'time DESC',
