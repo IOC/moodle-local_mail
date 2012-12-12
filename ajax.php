@@ -21,6 +21,7 @@ $groupid    = optional_param('groupid', 0, PARAM_INT);
 $roleid     = optional_param('roleid', 0, PARAM_INT);
 $roleids    = optional_param('roleids', '', PARAM_SEQUENCE);
 $recipients = optional_param('recipients', '', PARAM_SEQUENCE);
+$undo       = optional_param('undo', false, PARAM_BOOL);
 
 define('MAIL_MAXUSERS', 100);
 
@@ -53,6 +54,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         die;
     }
     $params = array();
+    $offset = max(0, $offset);
 
     if (empty($msgs) and ($action != 'prevpage' and $action != 'nextpage' and $action != 'perpage' and $action != 'setlabel')){
         echo json_encode(array('msgerror' => get_string('nomessageserror', 'local_mail')));
@@ -119,6 +121,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         array_push($params, $type);
         array_push($params, $offset);
         array_push($params, $mailpagesize);
+        array_push($params, $undo);
     } elseif ($action === 'prevpage') {
         $func = 'setprevpage';
         array_push($params, $itemid);
@@ -250,7 +253,7 @@ function setread($messages, $bool, $mailview = false) {
     );
 }
 
-function setdelete($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
+function setdelete($messages, $bool, $itemid, $type, $offset, $mailpagesize, $undo = false) {
     global $USER;
 
     $ids = array();
@@ -259,8 +262,8 @@ function setdelete($messages, $bool, $itemid, $type, $offset, $mailpagesize) {
         if ($message->viewable($USER->id)) {
             $message->set_deleted($USER->id, $bool);
             array_push($ids, $message->id());
+            $totalcount += ($undo?1:-1);
         }
-        $totalcount -= 1;
     }
     if ($offset > $totalcount-1) {
         $offset = min(0, $offset-$mailpagesize);

@@ -830,6 +830,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             }
             cfg.data.labelcolor = obj.get('options').item(obj.get('selectedIndex')).get('value');
         }
+        if (mail_undo_function == 'undo') {
+            cfg.data.undo = true;
+        }
         request = Y.io(M.cfg.wwwroot + '/local/mail/ajax.php', cfg);
     };
 
