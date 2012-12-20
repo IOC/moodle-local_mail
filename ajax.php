@@ -667,22 +667,26 @@ function getrecipients($message, $search, $groupid, $roleid) {
 
     $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
 
+    $getid = function ($recipient) {
+        return $recipient->id;
+    };
+
     if ($matchcount <= MAIL_MAXUSERS) {
-        $to = $message->recipients('to');
-        $cc = $message->recipients('cc');
-        $bcc = $message->recipients('bcc');
+        $to = array_map($getid, $message->recipients('to'));
+        $cc = array_map($getid, $message->recipients('cc'));
+        $bcc = array_map($getid, $message->recipients('bcc'));
         // list of users
         $rs = $DB->get_recordset_sql("$select $from $where $sort", $params);
         foreach ($rs as $rec) {
             if (!array_key_exists($rec->id, $participants)) {
                 $rec->role = '';
-                if (array_key_exists($rec->id, $to)) {
+                if (in_array($rec->id, $to)) {
                     $rec->role = 'to';
                     array_push($recipients, $rec->id);
-                } elseif (array_key_exists($rec->id, $cc)) {
+                } elseif (in_array($rec->id, $cc)) {
                     $rec->role = 'cc';
                     array_push($recipients, $rec->id);
-                } elseif (array_key_exists($rec->id, $bcc)) {
+                } elseif (in_array($rec->id, $bcc)) {
                     $rec->role = 'bcc';
                     array_push($recipients, $rec->id);
                 }
