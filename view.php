@@ -342,6 +342,7 @@ if ($removelbl) {
         ), 'local_mail');
     $PAGE->requires->string_for_js('submit', 'moodle');
     $PAGE->requires->string_for_js('cancel', 'moodle');
+    form_init_date_js();
     $PAGE->requires->js_init_code($jslabels);
 
     echo $OUTPUT->header();
@@ -486,18 +487,19 @@ if ($removelbl) {
     // Display page
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->strings_for_js(array(
-        'starred',
-        'unstarred',
-        'labeldeleteconfirm',
         'delete',
         'editlabel',
-        'newlabel',
         'erroremptylabelname',
+        'labeldeleteconfirm',
+        'newlabel',
+        'starred',
         'undodelete',
-        'undorestore'
+        'undorestore',
+        'unstarred'
         ), 'local_mail');
     $PAGE->requires->string_for_js('submit', 'moodle');
     $PAGE->requires->string_for_js('cancel', 'moodle');
+    form_init_date_js();
     $PAGE->requires->js_init_code($jslabels);
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $OUTPUT->header();
