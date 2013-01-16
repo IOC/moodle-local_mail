@@ -49,18 +49,31 @@ function local_mail_setup_page($course, $url) {
 }
 
 function local_mail_send_notifications($message) {
+    global $SITE;
+
+    $plaindata = new stdClass;
+    $htmldata = new stdClass;
+
     // Send the mail now!
     foreach ($message->recipients() as $userto) {
+
+        $plaindata->user = fullname($message->sender());
+        $plaindata->subject = $message->subject();
+
+        $htmldata->user = fullname($message->sender());
+        $htmldata->subject = $message->subject();
+        $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox', 'm' => $message->id()));
+        $htmldata->url = $url->out(false);
 
         $eventdata = new stdClass();
         $eventdata->component         = 'local_mail';
         $eventdata->name              = 'mail';
         $eventdata->userfrom          = $message->sender();
         $eventdata->userto            = $userto;
-        $eventdata->subject           = $message->subject();
-        $eventdata->fullmessage       = $message->content();
-        $eventdata->fullmessageformat = $message->format();
-        $eventdata->fullmessagehtml   = format_text($message->content(), $message->format());
+        $eventdata->subject           = get_string('notificationsubject', 'local_mail', $SITE->shortname);
+        $eventdata->fullmessage       = get_string('notificationbody', 'local_mail', $plaindata);
+        $eventdata->fullmessageformat = FORMAT_PLAIN;
+        $eventdata->fullmessagehtml   = get_string('notificationbodyhtml', 'local_mail', $htmldata);
         $eventdata->notification      = 1;
 
         $smallmessagestrings = new stdClass();
