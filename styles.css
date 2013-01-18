@@ -769,3 +769,9 @@
     margin-left: 1em;
     width: 10em;
 }
+
+/* Navigation node */
+
+.local_mail_new_messages {
+    font-weight: bold;
+}

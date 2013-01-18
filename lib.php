@@ -28,6 +28,9 @@ function local_mail_extends_navigation($root) {
         $text .= ' (' . $count->inbox . ')';
     }
     $node = navigation_node::create($text, null, navigation_node::TYPE_ROOTNODE);
+    if (!empty($count->inbox)) {
+        $node->add_class('local_mail_new_messages');
+    }
     $child = $root->add_node($node, 'courses');
     $child->add_class('mail_root');
 
