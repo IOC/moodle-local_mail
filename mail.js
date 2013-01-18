@@ -673,6 +673,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var handleSuccess = function (transactionid, response, args) {
         var obj = Y.JSON.parse(response.responseText);
         var img;
+        var node;
 
         if (obj.msgerror) {
             alert(obj.msgerror);
@@ -706,7 +707,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             }
             if (obj.info) {
                 if (obj.info.root) {
-                    Y.one('.mail_root span').setContent(obj.info.root);
+                    node = Y.one('.mail_root span');
+                    node.setContent(obj.info.root);
+                    if(obj.info.root.match(/\(\d+\)/)) {
+                        node.addClass('local_mail_new_messages');
+                    } else {
+                        node.removeClass('local_mail_new_messages');
+                    }
                 }
                 if (obj.info.inbox) {
                     img = Y.one('.mail_inbox a img').get('outerHTML');
