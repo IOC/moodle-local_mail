@@ -280,7 +280,7 @@ function setstarred ($messages, $bool, $search, $data = false) {
 function setread($messages, $bool, $mailview = false) {
     global $USER;
 
-    $html = '';
+    $content = '';
 
     foreach ($messages as $message) {
         if ($message->viewable($USER->id)) {
@@ -303,6 +303,7 @@ function setdelete($messages, $bool, $itemid, $type, $offset, $mailpagesize, $un
     global $USER;
 
     $ids = array();
+    $content = '';
     $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
     foreach ($messages as $message) {
         if ($message->viewable($USER->id)) {
