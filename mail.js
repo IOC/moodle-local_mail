@@ -1328,7 +1328,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         e.stopPropagation();
     }, '#mail_menu_search');
 
-    Y.on("domready", function() {
+    Y.on('contentready', function() {
         if (M.form.dateselector.calendar) {
             M.form.dateselector.calendar.selectEvent.subscribe(mail_get_selected_date);
             M.form.dateselector.calendar.cfg.setProperty('maxdate', new Date());
@@ -1336,7 +1336,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             Y.one('#dateselector-calendar-panel').setStyle('border', 0);
             M.form.dateselector.calendar.render();
         }
-    });
+    }, '#dateselector-calendar-panel');
 
     //Click on button search
     Y.one("div.region-content").delegate('keydown', function(e) {
