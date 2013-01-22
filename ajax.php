@@ -513,7 +513,7 @@ function getmail($message, $type, $reply, $offset, $labelid) {
     }
     $content = preg_replace('/^<div>|<\/div>$/', '', $content);
     return array(
-        'info' => '',
+        'info' => get_info(),
         'html' => $content
     );
 }
