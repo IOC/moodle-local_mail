@@ -710,9 +710,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                     node = Y.one('.mail_root span');
                     node.setContent(obj.info.root);
                     if(obj.info.root.match(/\(\d+\)/)) {
-                        node.addClass('local_mail_new_messages');
+                        Y.one('.mail_root').addClass('local_mail_new_messages');
                     } else {
-                        node.removeClass('local_mail_new_messages');
+                        Y.one('.mail_root').removeClass('local_mail_new_messages');
                     }
                 }
                 if (obj.info.inbox) {
