@@ -186,8 +186,9 @@ class local_mail_message {
         };
 
         $match_message = function($message) use ($match_text, $query, $userid) {
+            $users = array_merge(array($message->sender()), $message->recipients());
             if (empty($query['pattern']) or $match_text($message->subject()) or
-                array_filter(array_map('fullname', $message->users), $match_text)) {
+                array_filter(array_map('fullname', $users), $match_text)) {
                 return true;
             }
             $html = format_text($message->content(), $message->format());

@@ -44,7 +44,7 @@ $customdata['context'] = $PAGE->context;
 
 $mform = new mail_compose_form($url, $customdata);
 
-$draftareaid = file_get_submitted_draft_itemid('messae');
+$draftareaid = file_get_submitted_draft_itemid('message');
 $content = file_prepare_draft_area($draftareaid, $PAGE->context->id,
                                    'local_mail','message', $message->id(),
                                    mail_compose_form::file_options(),
