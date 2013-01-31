@@ -3,7 +3,7 @@
 require_once($CFG->dirroot . '/local/mail/locallib.php');
 
 function local_mail_course_deleted($course) {
-    $context = context_course::instance($course->id);
+    $fs = get_file_storage();
     $fs->delete_area_files($course->context->id, 'local_mail');
     local_mail_message::delete_course($course->id);
 }
