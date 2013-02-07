@@ -123,14 +123,14 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     function paging($offset, $count, $totalcount) {
-        if ($offset === false) {
-            $str = get_string('pagingempty', 'local_mail', $totalcount);
-        } elseif ($count == 1) {
+        if ($count == 1) {
             $a = array('index' => $offset + 1, 'total' => $totalcount);
             $str = get_string('pagingsingle', 'local_mail', $a);
-        } else {
+        } else if ($totalcount > 0) {
             $a = array('first' => $offset + 1, 'last' => $offset + $count, 'total' => $totalcount);
             $str = get_string('pagingmultiple', 'local_mail', $a);
+        } else {
+            $str = '';
         }
         $str = html_writer::tag('span', $str);
         $prevtitle = $this->output->larrow();

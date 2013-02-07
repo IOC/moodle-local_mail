@@ -63,7 +63,6 @@ $string['notificationbodyhtml'] = '<p>De: {$a->user}</p>
 <p>Assumpte:<a href="{$a->url}">{$a->subject}</a></p>';
 $string['notificationsubject'] = 'Nou missatge de correu a {$a}';
 $string['notingroup'] = 'No esteu a cap grup';
-$string['pagingempty'] = 'Cap de {$a}';
 $string['pagingsingle'] = '{$a->index} de {$a->total}';
 $string['pagingmultiple'] = '{$a->first}-{$a->last} de {$a->total}';
 $string['perpage'] = 'Mostra {$a} missatges';

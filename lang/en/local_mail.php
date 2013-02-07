@@ -63,7 +63,6 @@ $string['notificationbodyhtml'] = '<p>From: {$a->user}</p>
 <p>Subject: <a href="{$a->url}">{$a->subject}</a></p>';
 $string['notificationsubject'] = 'New mail message in {$a}';
 $string['notingroup'] = 'You are not part of any group';
-$string['pagingempty'] = 'None de {$a}';
 $string['pagingsingle'] = '{$a->index} of {$a->total}';
 $string['pagingmultiple'] = '{$a->first}-{$a->last} of {$a->total}';
 $string['perpage'] = 'Display {$a} messages';
