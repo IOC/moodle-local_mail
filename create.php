@@ -34,7 +34,7 @@ local_mail_setup_page($course, $url);
 // Create message
 
 if ($course->id != $SITE->id) {
-    confirm_sesskey();
+    require_sesskey();
     $message = local_mail_message::create($USER->id, $course->id);
     $params = array('m' => $message->id());
     $url = new moodle_url('/local/mail/compose.php', $params);
