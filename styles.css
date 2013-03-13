@@ -383,11 +383,6 @@
     z-index: 1;
 }
 
-.mail_toolbar .mail_optselect {
-    top: 49px;
-    left: 225px;
-}
-
 .mail_toolbar .mail_menu_action_separator,
 .mail_toolbar .mail_menu_label_separator {
     display: block;

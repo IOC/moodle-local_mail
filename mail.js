@@ -179,8 +179,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     var mail_toggle_menu = function() {
         var button = Y.one('.mail_checkbox_all');
+        var menu = Y.one('.mail_optselect');
+        var position = button.getXY();
         if (!button.hasClass('mail_button_disabled')) {
-          Y.one('.mail_optselect').toggleClass('mail_hidden');
+            position[1] += button.get('clientHeight') + 2;
+            menu.toggleClass('mail_hidden');
+            menu.setXY(position);
         }
     };
 
