@@ -770,3 +770,9 @@
 .local_mail_new_messages {
     font-weight: bold;
 }
+
+/* Local main form */
+
+#local_mail_main_form {
+    min-height: 30em;
+}
