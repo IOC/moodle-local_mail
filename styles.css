@@ -89,7 +89,9 @@
 }
 
 .mail_form_recipient_name {
+    display: inline-block;
     margin-left: 1em;
+    max-width: 50%;
 }
 
 .mail_recipient_selected {
