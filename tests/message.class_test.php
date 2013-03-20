@@ -34,7 +34,48 @@ class local_mail_message_test extends local_mail_testcase {
     private $course1, $course2, $user1, $user2, $user3;
 
     static function assertMessage(local_mail_message $message) {
-        self::assertEquals($message, local_mail_message::fetch($message->id()));
+        global $DB;
+
+        $course = $message->course();
+
+        $record = $DB->get_record('local_mail_messages', array('id' => $message->id()));
+        self::assertNotEquals(false, $record);
+        self::assertEquals($course->id, $record->courseid);
+        self::assertEquals($message->subject(), $record->subject);
+        self::assertEquals($message->content(), $record->content);
+        self::assertEquals($message->format(), $record->format);
+        self::assertEquals($message->draft(), (bool) $record->draft);
+        self::assertEquals($message->time(), $record->time);
+
+        foreach ($message->references() as $ref) {
+            $conditions = array('messageid' => $message->id(), 'reference' => $ref);
+            self::assertRecords('message_refs', $conditions);
+        }
+
+        $role_users = array(
+            'from' => array($message->sender()),
+            'to' => $message->recipients('to'),
+            'cc' => $message->recipients('cc'),
+            'bcc' => $message->recipients('bcc'),
+        );
+
+        foreach ($role_users as $role => $users) {
+            foreach ($users as $user) {
+                self::assertRecords('message_users', array(
+                    'messageid' => $message->id(),
+                    'userid' => $user->id,
+                    'role' => $role,
+                    'unread' => (int) $message->unread($user->id),
+                    'starred' => (int) $message->starred($user->id),
+                    'deleted' => (int) $message->deleted($user->id),
+                ));
+            }
+        }
+
+        foreach ($message->labels() as $label) {
+            $conditions = array('messageid' => $message->id(), 'labelid' => $label->id());
+            self::assertRecords('message_labels', $conditions);
+        }
     }
 
     function setUp() {
