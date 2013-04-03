@@ -403,23 +403,35 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         var classname;
         var labelid;
         var num;
+        var labels = Y.all('.mail_menu_labels .mail_adv_checkbox');
 
         if (!mail_message_view) {
-            var labels = Y.all('.mail_menu_labels .mail_adv_checkbox');
             var total = mail_get_checkboxs_checked().size();
-
             Y.each(labels, function(label, index) {
                 classname = label.getAttribute('class');
                 num = /mail_label_value_(\d+)/.exec(classname);
                 if (num) {
                     labelid = num[1];
+                    if (mail_checkbox_labels_default[labelid] == total) {
+                        isdefault = isdefault && label.hasClass('mail_checkbox1');
+                    } else if(mail_checkbox_labels_default[labelid] > 0) {
+                        isdefault = isdefault && label.hasClass('mail_checkbox2');
+                    } else {
+                        isdefault = isdefault && label.hasClass('mail_checkbox0');
+                    }
                 }
-                if (mail_checkbox_labels_default[labelid] == total) {
-                    isdefault = isdefault && label.hasClass('mail_checkbox1');
-                } else if(mail_checkbox_labels_default[labelid] > 0) {
-                    isdefault = isdefault && label.hasClass('mail_checkbox2');
-                } else {
-                    isdefault = isdefault && label.hasClass('mail_checkbox0');
+            });
+        } else {
+            Y.each(labels, function(label, index) {
+                classname = label.getAttribute('class');
+                num = /mail_label_value_(\d+)/.exec(classname);
+                if (num) {
+                    labelid = num[1];
+                    if (mail_checkbox_labels_default[labelid] == 1) {
+                        isdefault = isdefault && label.hasClass('mail_checkbox1');
+                    } else {
+                        isdefault = isdefault && label.hasClass('mail_checkbox0');
+                    }
                 }
             });
         }
