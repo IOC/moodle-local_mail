@@ -115,8 +115,8 @@ class mail_compose_form extends moodleform {
             $errors['subject'] = get_string('erroremptysubject', 'local_mail');
         }
 
-        // At least one "to" recipient
-        if (!empty($data['send']) and (!$message or !$message->recipients('to'))) {
+        // At least one recipient
+        if (!empty($data['send']) and (!$message or !$message->recipients())) {
             $errors['recipients'] = get_string('erroremptyrecipients', 'local_mail');
         }
 

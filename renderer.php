@@ -857,7 +857,7 @@ class local_mail_renderer extends plugin_renderer_base {
     function users($message, $userid, $type, $itemid) {
         global $DB;
         if ($userid == $message->sender()->id) {
-            if ($users = $message->recipients('to')) {
+            if ($users = array_merge($message->recipients('to'), $message->recipients('cc'), $message->recipients('bcc'))) {
                 $content = implode(', ', array_map('fullname', $users));
             } else {
                 $content = get_string('norecipient', 'local_mail');
