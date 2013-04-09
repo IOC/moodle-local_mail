@@ -381,7 +381,11 @@ class local_mail_message {
     }
 
     function references() {
-        return $this->refs;
+        $result = self::fetch_many($this->refs);
+        usort($result, function($a, $b) {
+            return $b->time() - $a->time();
+        });
+        return $result;
     }
 
     function remove_label(local_mail_label $label) {
@@ -497,11 +501,10 @@ class local_mail_message {
             $this->create_index($user->id, 'course', $this->course->id);
         }
 
-        if ($references = $this->references()) {
-            $message = self::fetch($references[0]);
+        foreach ($this->references() as $reference) {
             foreach ($this->recipients() as $user) {
-                if ($message->has_user($user->id)) {
-                    foreach ($message->labels($user->id) as $label) {
+                if ($reference->has_user($user->id)) {
+                    foreach ($reference->labels($user->id) as $label) {
                         $this->add_label($label);
                     }
                 }

@@ -526,7 +526,7 @@ function getmail($message, $type, $reply, $offset, $labelid) {
 
     $refs = $message->references();
     if (!empty($refs)) {
-        $content .= $mailoutput->references(local_mail_message::fetch_many($refs));
+        $content .= $mailoutput->references($refs);
     }
     $content = preg_replace('/^<div>|<\/div>$/', '', $content);
     return array(

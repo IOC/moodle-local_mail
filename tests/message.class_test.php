@@ -47,9 +47,11 @@ class local_mail_message_test extends local_mail_testcase {
         self::assertEquals($message->draft(), (bool) $record->draft);
         self::assertEquals($message->time(), $record->time);
 
-        foreach ($message->references() as $ref) {
-            $conditions = array('messageid' => $message->id(), 'reference' => $ref);
-            self::assertRecords('message_refs', $conditions);
+        foreach ($message->references() as $reference) {
+            self::assertRecords('message_refs', array(
+                'messageid' => $message->id(),
+                'reference' => $reference->id(),
+            ));
         }
 
         $role_users = array(
@@ -256,6 +258,8 @@ class local_mail_message_test extends local_mail_testcase {
             array('id', 'courseid', 'subject',  'content', 'format', 'draft', 'time'),
             array( 501,  101,       'subject1', 'content1', 301,      0,       1234567890 ),
             array( 502,  101,       'subject2', 'content2', 301,      1,       1234567891 ),
+            array( 503,  101,       'subject3', 'content3', 301,      0,       1234567892 ),
+            array( 504,  101,       'subject4', 'content4', 301,      0,       1234567893 ),
         ));
         $this->loadRecords('local_mail_message_refs', array(
             array('messageid', 'reference'),
@@ -269,6 +273,10 @@ class local_mail_message_test extends local_mail_testcase {
              array( 501,         202,     'to',    0,        1,          0 ),
              array( 501,         203,     'cc',    1,        0,          0 ),
              array( 502,         201,     'from',  0,        0,          0 ),
+             array( 503,         201,     'from',  0,        0,          0 ),
+             array( 503,         202,     'to',    0,        0,          0 ),
+             array( 504,         202,     'from',  0,        0,          0 ),
+             array( 504,         201,     'to',    0,        0,          0 ),
         ));
         $this->loadRecords('local_mail_message_labels', array(
             array('messageid', 'labelid'),
@@ -287,7 +295,8 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(301, $result->format());
         $this->assertFalse($result->draft());
         $this->assertEquals(1234567890, $result->time());
-        $this->assertEquals(array(504, 503), $result->references());
+        $references = array(local_mail_message::fetch(504), local_mail_message::fetch(503));
+        $this->assertEquals($references, $result->references());
         $this->assertEquals($this->user1, $result->sender());
         $this->assertFalse($result->unread(201));
         $this->assertFalse($result->starred(201));
@@ -307,7 +316,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertContains($label1, $result->labels());
         $this->assertContains($label2, $result->labels());
 
-        $this->assertFalse(local_mail_message::fetch(503));
+        $this->assertFalse(local_mail_message::fetch(505));
     }
 
     function test_fetch_index() {
@@ -396,7 +405,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(-1, $result->format());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
-        $this->assertEquals(array($message->id()), $result->references());
+        $this->assertEquals(array($message), $result->references());
         $this->assertEquals($this->user2, $result->sender());
         $this->assertCount(0, $result->recipients());
         $this->assertCount(1, $result->labels());
@@ -473,7 +482,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(-1, $result->format());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
-        $this->assertEquals(array($message->id()), $result->references());
+        $this->assertEquals(array($message), $result->references());
         $this->assertEquals($this->user2, $result->sender());
         $this->assertCount(1, $result->recipients());
         $this->assertContains($this->user1, $result->recipients('to'));

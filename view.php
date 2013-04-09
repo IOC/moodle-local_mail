@@ -412,7 +412,7 @@ if ($removelbl) {
 
     $refs = $message->references();
     if (!empty($refs)) {
-        echo $mailoutput->references(local_mail_message::fetch_many($refs));
+        echo $mailoutput->references($refs);
     }
     echo html_writer::end_tag('form');
     echo $OUTPUT->footer();
