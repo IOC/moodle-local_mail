@@ -103,18 +103,6 @@ class local_mail_label_test extends local_mail_testcase {
         $this->assertContains($label2, $result);
     }
 
-    function test_fetch_many() {
-        $label1 = local_mail_label::create(201, 'label1', 'red');
-        $label2 = local_mail_label::create(202, 'label2', 'green');
-        $label3 = local_mail_label::create(203, 'label3', 'blue');
-
-        $result = local_mail_label::fetch_many(array($label1->id(), $label2->id()));
-
-        $this->assertCount(2, $result);
-        $this->assertContains($label1, $result);
-        $this->assertContains($label2, $result);
-    }
-
     function test_save() {
         $label = local_mail_label::create(201, 'name', 'red');
 

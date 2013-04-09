@@ -689,7 +689,7 @@ class local_mail_message {
 
         foreach ($label_records as $r) {
             if ($r->messageid == $record->id) {
-                $message->labels[$r->id] = new local_mail_label($r);
+                $message->labels[$r->id] = local_mail_label::from_record($r);
             }
         }
 

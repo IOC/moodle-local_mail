@@ -26,13 +26,6 @@ class local_mail_label {
     private $name;
     private $color;
 
-    function __construct($record) {
-        $this->id = (int) $record->id;
-        $this->userid = (int) $record->userid;
-        $this->name = $record->name;
-        $this->color = $record->color;
-    }
-
     static function create($userid, $name, $color='') {
         global $DB;
 
@@ -47,7 +40,7 @@ class local_mail_label {
 
         $record->id = $DB->insert_record('local_mail_labels', $record);
 
-        return new self($record);
+        return self::from_record($record);
     }
 
     static function fetch($id) {
@@ -56,22 +49,30 @@ class local_mail_label {
         $record = $DB->get_record('local_mail_labels', array('id' => $id));
 
         if ($record) {
-            return new self($record);
+            return self::from_record($record);
         }
-    }
-
-    static function fetch_many($ids) {
-        global $DB;
-
-        $records = $DB->get_records_list('local_mail_labels', 'id', $ids);
-        return self::many($records);
     }
 
     static function fetch_user($userid) {
         global $DB;
 
+        $result = array();
+
         $records = $DB->get_records('local_mail_labels', array('userid' => $userid), 'name');
-        return self::many($records);
+        foreach ($records as $record) {
+            $result[] = self::from_record($record);
+        }
+
+        return $result;
+    }
+
+    static function from_record($record) {
+        $label = new self;
+        $label->id = (int) $record->id;
+        $label->userid = (int) $record->userid;
+        $label->name = $record->name;
+        $label->color = $record->color;
+        return $label;
     }
 
     static function valid_colors() {
@@ -122,11 +123,5 @@ class local_mail_label {
         return $this->userid;
     }
 
-    private static function many($records) {
-        $labels = array();
-        foreach ($records as $record) {
-            $labels[(int) $record->id] = new self($record);
-        }
-        return $labels;
-    }
+    private function __construct() {}
 }
