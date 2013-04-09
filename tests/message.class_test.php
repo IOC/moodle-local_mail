@@ -161,23 +161,6 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(2, $result);
     }
 
-    function test_count_index_unread() {
-        $message1 = local_mail_message::create(201, 101);
-        $message1->add_recipient('to', 202);
-        $message1->send();
-        $message1->set_unread(202, false);
-        $message2 = local_mail_message::create(201, 102);
-        $message2->add_recipient('to', 202);
-        $message2->send();
-        $message3 = local_mail_message::create(201, 102);
-        $message3->add_recipient('to', 202);
-        $message3->send();
-
-        $result = local_mail_message::count_index_unread(202, 'inbox');
-
-        $this->assertEquals(2, $result);
-    }
-
     function test_create() {
         $result = local_mail_message::create(201, 101, 1234567890);
 
