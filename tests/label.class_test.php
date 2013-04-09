@@ -29,6 +29,15 @@ class local_mail_label_test extends local_mail_testcase {
        4xx -> labels
        5xx -> maessages */
 
+    static function assertLabel(local_mail_label $label) {
+        self::assertRecords('labels', array(
+            'id' => $label->id(),
+            'userid' => $label->userid(),
+            'name' => $label->name(),
+            'color' => $label->color(),
+        ));
+    }
+
     function test_create() {
         $label = local_mail_label::create(201, 'name', 'red');
 
@@ -36,7 +45,7 @@ class local_mail_label_test extends local_mail_testcase {
         $this->assertEquals(201, $label->userid());
         $this->assertEquals('name', $label->name());
         $this->assertEquals('red', $label->color());
-        $this->assertEquals($label, local_mail_label::fetch($label->id()));
+        $this->assertLabel($label);
     }
 
     function test_delete() {
@@ -94,18 +103,6 @@ class local_mail_label_test extends local_mail_testcase {
         $this->assertContains($label2, $result);
     }
 
-    function test_fetch_many() {
-        $label1 = local_mail_label::create(201, 'label1', 'red');
-        $label2 = local_mail_label::create(202, 'label2', 'green');
-        $label3 = local_mail_label::create(203, 'label3', 'blue');
-
-        $result = local_mail_label::fetch_many(array($label1->id(), $label2->id()));
-
-        $this->assertCount(2, $result);
-        $this->assertContains($label1, $result);
-        $this->assertContains($label2, $result);
-    }
-
     function test_save() {
         $label = local_mail_label::create(201, 'name', 'red');
 
@@ -113,6 +110,6 @@ class local_mail_label_test extends local_mail_testcase {
 
         $this->assertEquals('changed', $label->name());
         $this->assertEquals('green', $label->color());
-        $this->assertEquals($label, local_mail_label::fetch($label->id()));
+        $this->assertLabel($label);
     }
 }

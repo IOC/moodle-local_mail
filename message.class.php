@@ -51,15 +51,6 @@ class local_mail_message {
         return $DB->count_records('local_mail_index', $conditions);
     }
 
-    static function count_index_unread($userid, $type, $itemid=0) {
-        global $DB;
-
-        assert(in_array($type, self::$index_types));
-
-        $conditions = array('userid' => $userid, 'type' => $type, 'item'=> $itemid, 'unread' => true);
-        return $DB->count_records('local_mail_index', $conditions);
-    }
-
     static function count_menu($userid) {
         global $DB;
 
@@ -93,13 +84,28 @@ class local_mail_message {
 
         $transaction = $DB->start_delegated_transaction();
 
-        $course = self::fetch_course($courseid);
-        $record = self::create_record($course, '', '', -1, $time);
+        $message = new self;
+        $message->course = self::fetch_course($courseid);
+        $message->users[$userid] = self::fetch_user($userid);
 
-        $user = self::fetch_user($userid);
-        $user_record = self::create_user_record($record->id, 'from', $user);
+        $record = new stdClass;
+        $record->courseid = $message->course->id;
+        $record->subject = $message->subject = '';
+        $record->content = $message->content = '';
+        $record->format = $message->format = -1;
+        $record->draft = $message->draft = true;
+        $record->time = $message->time = $time ?: time();
+        $message->id = $DB->insert_record('local_mail_messages', $record);
 
-        $message = new self($record, array(), array($user_record));
+        $record = new stdClass;
+        $record->messageid = $message->id;
+        $record->userid = $userid;
+        $record->role = $message->role[$userid] = 'from';
+        $record->unread = $message->unread[$userid] = false;
+        $record->starred = $message->starred[$userid] = false;
+        $record->deleted = $message->deleted[$userid] = false;
+        $DB->insert_record('local_mail_message_users', $record);
+
         $message->create_index($userid, 'drafts');
         $message->create_index($userid, 'course', $courseid);
 
@@ -176,11 +182,9 @@ class local_mail_message {
             . ' ORDER BY l.name';
         $label_records = $DB->get_records_sql($sql);
 
-        foreach ($ids as $id) {
-            if (isset($records[$id])) {
-                $messages[] = new self($records[$id], $ref_records,
-                                       $user_records, $label_records);
-            }
+        foreach (array_intersect($ids, array_keys($records)) as $id) {
+            $messages[] = self::from_records($records[$id], $ref_records,
+                                             $user_records, $label_records);
         }
 
         return $messages;
@@ -192,25 +196,7 @@ class local_mail_message {
         assert(in_array($type, self::$index_types));
         assert(empty($query['before']) or empty($query['after']));
 
-        $normalize = function($text) {
-            return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
-        };
-
-        $query['pattern'] = !empty($query['pattern']) ? $normalize($query['pattern']) : '';
-
-        $match_text = function($text) use ($normalize, $query) {
-            return strpos($normalize($text), $query['pattern']) !== false;
-        };
-
-        $match_message = function($message) use ($match_text, $query, $userid) {
-            $users = array_merge(array($message->sender()), $message->recipients());
-            if (empty($query['pattern']) or $match_text($message->subject()) or
-                array_filter(array_map('fullname', $users), $match_text)) {
-                return true;
-            }
-            $html = format_text($message->content(), $message->format());
-            return $match_text(html_to_text($html));
-        };
+        $query['pattern'] = !empty($query['pattern']) ? $query['pattern'] : '';
 
         $sql = 'SELECT messageid FROM {local_mail_index}'
             . ' WHERE userid = :userid AND type = :type AND item = :item';
@@ -242,26 +228,18 @@ class local_mail_message {
         }
 
         $sql .= " ORDER BY time $order, messageid $order";
-
-        $fetch_messages = function() use ($DB, $sql, $params) {
-            static $offset = 0;
-            $ids = array_keys($DB->get_records_sql($sql, $params, $offset, 100));
-            $offset += 100;
-            return local_mail_message::fetch_many($ids);
-        };
-
-        $offset = 0;
+        $ids = array_keys($DB->get_records_sql($sql, $params));
         $result = array();
-
-        while ($records = $DB->get_records_sql($sql, $params, $offset, 100)) {
-            $messages = self::fetch_many(array_keys($records));
-            $messages = array_filter($messages, $match_message);
-            $result = array_merge($result, $messages);
+        foreach (array_chunk($ids, 100) as $ids) {
+            foreach (self::fetch_many($ids) as $message) {
+                if ($message->match($userid, $query['pattern'])) {
+                    $result[] = $message;
+                }
+            }
             if (!empty($query['limit']) and count($result) >= $query['limit']) {
                 array_splice($result, $query['limit']);
                 break;
             }
-            $offset += 100;
         }
 
         return !empty($query['after']) ? array_reverse($result) : $result;
@@ -293,14 +271,16 @@ class local_mail_message {
         assert(!$this->has_recipient($userid));
         assert(in_array($role, array('to', 'cc', 'bcc')));
 
-        $user = self::fetch_user($userid);
-        $this->users[$userid] = $user;
-        $this->role[$userid] = $role;
-        $this->unread[$userid] = true;
-        $this->starred[$userid] = false;
-        $this->deleted[$userid] = false;
+        $this->users[$userid] = self::fetch_user($userid);
 
-        self::create_user_record($this->id, $role, $user);
+        $record = new stdClass;
+        $record->messageid = $this->id;
+        $record->userid = $userid;
+        $record->role = $this->role[$userid] = $role;
+        $record->unread = $this->unread[$userid] = true;
+        $record->starred = $this->starred[$userid] = false;
+        $record->deleted = $this->deleted[$userid] = false;
+        $DB->insert_record('local_mail_message_users', $record);
     }
 
     function content() {
@@ -351,18 +331,10 @@ class local_mail_message {
 
         $transaction = $DB->start_delegated_transaction();
 
-        $subject = 'FW: ' . $this->subject;
-        $record = self::create_record($this->course, $subject, '', -1, $time);
-        $user_record = self::create_user_record($record->id, 'from', $this->users[$userid]);
+        $message = self::create($userid, $this->course->id, $time);
+        $message->save('FW: ' . $this->subject, '', -1, $time);
+        $message->set_references($this);
 
-        $references = array_merge(array($this->id), $this->references());
-        $ref_records = self::create_ref_records($record->id, $references);
-
-        $message = new self($record, $ref_records, array($user_record));
-
-        $message->create_index($userid, 'drafts');
-        $message->create_index($userid, 'course', $this->course->id);
-        
         foreach ($this->labels($userid) as $label) {
             $message->add_label($label);
         }
@@ -409,7 +381,11 @@ class local_mail_message {
     }
 
     function references() {
-        return $this->refs;
+        $result = self::fetch_many($this->refs);
+        usort($result, function($a, $b) {
+            return $b->time() - $a->time();
+        });
+        return $result;
     }
 
     function remove_label(local_mail_label $label) {
@@ -454,30 +430,20 @@ class local_mail_message {
 
         $transaction = $DB->start_delegated_transaction();
 
-        $subject = 'RE: ' . $this->subject;
-        $record = self::create_record($this->course, $subject, '', -1, $time);
-
-        $references = array_merge(array($this->id), $this->references());
-        $ref_records = self::create_ref_records($record->id, $references);
-
-        $user_records = array(
-            self::create_user_record($record->id, 'from', $this->users[$userid]),
-            self::create_user_record($record->id, 'to', $this->sender()),
-        );
+        $message = self::create($userid, $this->course->id, $time);
+        $message->save('RE: ' . $this->subject, '', -1, $time);
+        $sender = $this->sender();
+        $message->add_recipient('to', $sender->id);
+        $message->set_references($this);
 
         if ($all) {
             foreach ($this->recipients('to', 'cc') as $user) {
                 if ($user->id != $userid) {
-                    $user_records[] = self::create_user_record($record->id, 'cc', $user);
+                    $message->add_recipient('cc', $user->id);
                 }
             }
         }
 
-        $message = new self($record, $ref_records, $user_records);
-
-        $message->create_index($userid, 'drafts');
-        $message->create_index($userid, 'course', $this->course->id);
-        
         foreach ($this->labels($userid) as $label) {
             $message->add_label($label);
         }
@@ -535,11 +501,10 @@ class local_mail_message {
             $this->create_index($user->id, 'course', $this->course->id);
         }
 
-        if ($references = $this->references()) {
-            $message = self::fetch($references[0]);
+        foreach ($this->references() as $reference) {
             foreach ($this->recipients() as $user) {
-                if ($message->has_user($user->id)) {
-                    foreach ($message->labels($user->id) as $label) {
+                if ($reference->has_user($user->id)) {
+                    foreach ($reference->labels($user->id) as $label) {
                         $this->add_label($label);
                     }
                 }
@@ -683,33 +648,36 @@ class local_mail_message {
         return false;
     }
 
-    private function __construct($record, $ref_records, $user_records, $label_records=array()) {
-        $this->id = (int) $record->id;
-        $this->course = (object) array(
+    private function __construct() {}
+
+    private static function from_records($record, $ref_records, $user_records, $label_records) {
+        $message = new self;
+        $message->id = (int) $record->id;
+        $message->course = (object) array(
             'id' => $record->courseid,
             'shortname' => $record->shortname,
             'fullname' => $record->fullname,
             'groupmode' => $record->groupmode,
         );
-        $this->subject = $record->subject;
-        $this->content = $record->content;
-        $this->format = (int) $record->format;
-        $this->draft = (bool) $record->draft;
-        $this->time = (int) $record->time;
+        $message->subject = $record->subject;
+        $message->content = $record->content;
+        $message->format = (int) $record->format;
+        $message->draft = (bool) $record->draft;
+        $message->time = (int) $record->time;
 
         foreach ($ref_records as $r) {
             if ($r->messageid == $record->id) {
-                $this->refs[] = $r->reference;
+                $message->refs[] = $r->reference;
             }
         }
 
         foreach ($user_records as $r) {
             if ($r->messageid == $record->id) {
-                $this->role[$r->userid] = $r->role;
-                $this->unread[$r->userid] = (bool) $r->unread;
-                $this->starred[$r->userid] = (bool) $r->starred;
-                $this->deleted[$r->userid] = (bool) $r->deleted;
-                $this->users[$r->userid] = (object) array(
+                $message->role[$r->userid] = $r->role;
+                $message->unread[$r->userid] = (bool) $r->unread;
+                $message->starred[$r->userid] = (bool) $r->starred;
+                $message->deleted[$r->userid] = (bool) $r->deleted;
+                $message->users[$r->userid] = (object) array(
                     'id' => $r->userid,
                     'username' => $r->username,
                     'firstname' => $r->firstname,
@@ -724,69 +692,11 @@ class local_mail_message {
 
         foreach ($label_records as $r) {
             if ($r->messageid == $record->id) {
-                $this->labels[$r->id] = new local_mail_label($r);
+                $message->labels[$r->id] = local_mail_label::from_record($r);
             }
         }
-    }
 
-    private static function create_record($course, $subject, $content, $format, $time) {
-        global $DB;
-
-        $record = new stdClass;
-        $record->courseid = $course->id;
-        $record->subject = $subject;
-        $record->content = $content;
-        $record->format = $format;
-        $record->draft = true;
-        $record->time = $time ?: time();
-
-        $record->id = $DB->insert_record('local_mail_messages', $record);
-
-        $record->shortname = $course->shortname;
-        $record->fullname = $course->fullname;
-        $record->groupmode = $course->groupmode;
-
-        return $record;
-    }
-
-    private static function create_ref_records($messageid, array $references) {
-        global $DB;
-
-        $records = array();
-
-        foreach ($references as $reference) {
-            $record = new stdClass;
-            $record->messageid = $messageid;
-            $record->reference = $reference;
-            $DB->insert_record('local_mail_message_refs', $record);
-            $records[] = $record;
-        }
-
-        return $records;
-    }
-
-    private static function create_user_record($messageid, $role, $user) {
-        global $DB;
-
-        $record = new stdClass;
-        $record->messageid = $messageid;
-        $record->userid = $user->id;
-        $record->role = $role;
-        $record->unread = ($role != 'from');
-        $record->starred = 0;
-        $record->deleted = 0;
-
-        $DB->insert_record('local_mail_message_users', $record);
-
-        $record->username = $user->username;
-        $record->firstname = $user->firstname;
-        $record->lastname = $user->lastname;
-        $record->email = $user->email;
-        $record->picture = $user->picture;
-        $record->imagealt = $user->imagealt;
-        $record->maildisplay = $user->maildisplay;
-
-        return $record;
+        return $message;
     }
 
     private static function fetch_course($courseid) {
@@ -833,5 +743,41 @@ class local_mail_message {
 
     private function has_user($userid) {
         return isset($this->users[$userid]);
+    }
+
+    private function match($userid, $pattern) {
+        $normalize = function($text) {
+            return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
+        };
+
+        $pattern = $normalize($pattern);
+
+        $match_text = function($text) use ($normalize, $pattern) {
+            return strpos($normalize($text), $pattern) !== false;
+        };
+
+        $users = array_merge(array($this->sender()), $this->recipients());
+        if (!$pattern or $match_text($this->subject()) or
+            array_filter(array_map('fullname', $users), $match_text)) {
+            return true;
+        }
+
+        $html = format_text($this->content(), $this->format());
+        return $match_text(html_to_text($html));
+    }
+
+    private function set_references($message) {
+        global $DB;
+
+        $this->refs = array_merge(array($message->id), $message->refs);
+
+        $DB->delete_records('local_mail_message_refs', array('messageid' => $this->id));
+
+        foreach ($this->refs as $ref) {
+            $record = new stdClass;
+            $record->messageid = $this->id;
+            $record->reference = $ref;
+            $DB->insert_record('local_mail_message_refs', $record);
+        }
     }
 }

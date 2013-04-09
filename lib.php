@@ -144,14 +144,9 @@ function local_mail_extends_navigation($root) {
 
 function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
                                $forcedownload, array $options=array()) {
-    global $USER;
+    global $SITE, $USER;
 
-    // Check course
-
-    require_login($course, true);
-    if ($context->contextlevel != CONTEXT_COURSE or $context->instanceid != $course->id) {
-        return false;
-    }
+    require_login($SITE, false);
 
     // Check message
 

@@ -34,10 +34,7 @@ if (!$message or !$message->editable($USER->id)) {
 
 // Fetch references
 
-$refs = $message->references();
-if (!empty($refs)) {
-    $references = local_mail_message::fetch_many($refs);
-}
+$references = $message->references();
 
 // Set up page
 
@@ -137,7 +134,7 @@ $PAGE->requires->strings_for_js(array(
     'applychanges',
     'notingroup'
     ), 'local_mail');
-if (!empty($refs)) {
+if (!empty($references)) {
     echo $mailoutput->references($references, true);
 }
 
