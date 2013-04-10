@@ -43,7 +43,7 @@ if ($course->id != $SITE->id) {
 
 // Setup form
 
-$courses = enrol_get_my_courses(array('id', 'shortname, fullname'));
+$courses = local_mail_get_my_courses();
 $customdata = array('courses' => $courses);
 $mform = new local_mail_create_form($url, $customdata);
 $mform->get_data();

@@ -32,7 +32,7 @@ function local_mail_extends_navigation($root) {
         return;
     }
 
-    if (!$courses = enrol_get_my_courses()) {
+    if (!$courses = local_mail_get_my_courses()) {
         return;
     }
 

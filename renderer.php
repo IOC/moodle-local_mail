@@ -100,7 +100,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $content = ($this->users($message, $userid, $type, $itemid) .
                         $this->summary($message, $userid, $type, $itemid) .
                         $this->date($message));
-            if ($message->editable($userid)) {
+            if ($message->editable($userid) and array_key_exists($message->course()->id, local_mail_get_my_courses())) {
                 $url = new moodle_url('/local/mail/compose.php', array('m' => $message->id()));
             } else {
                 $params = array('t' => $type, 'm' => $message->id(), 'offset' => $offset);
@@ -202,7 +202,7 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    function reply() {
+    function reply($enabled = true) {
         $label = get_string('reply', 'local_mail');
         $attributes = array(
             'type' => 'submit',
@@ -210,6 +210,9 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
+        if (!$enabled) {
+            $attributes['disabled'] = 'disabled';
+        }
         return html_writer::empty_tag('input', $attributes);
     }
 
@@ -236,7 +239,7 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    function forward() {
+    function forward($enabled = true) {
         $label = get_string('forward', 'local_mail');
         $attributes = array(
             'type' => 'submit',
@@ -244,6 +247,9 @@ class local_mail_renderer extends plugin_renderer_base {
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
+        if (!$enabled) {
+            $attributes['disabled'] = 'disabled';
+        }
         return html_writer::empty_tag('input', $attributes);
     }
 
@@ -792,25 +798,27 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= $this->newlabelform();
         if (!$reply) {
             if ($message->sender()->id !== $USER->id) {
-                $output .= $this->toolbar('reply', ($totalusers > 1));
+                $output .= $this->toolbar('reply', $message->course()->id, ($totalusers > 1));
             } else {
-                $output .= $this->toolbar('forward');
+                $output .= $this->toolbar('forward', $message->course()->id);
             }
         }
         $output .= $this->output->container_end();
         return $output;
     }
 
-    function toolbar($type, $replyall = false, $paging = null, $trash = false) {
+    function toolbar($type, $courseid = 0, $replyall = false, $paging = null, $trash = false) {
         $toolbardown = false;
         if ($type === 'reply') {
-            $output = $this->reply();
+            $view_course = array_key_exists($courseid, local_mail_get_my_courses());
+            $output = $this->reply($view_course);
             //all recipients
-            $output .= $this->replyall($replyall);
-            $output .= $this->forward();
+            $output .= $this->replyall(($view_course and $replyall));
+            $output .= $this->forward($view_course);
             $toolbardown = true;
         } elseif ($type === 'forward') {
-            $output = $this->forward();
+            $view_course = array_key_exists($courseid, local_mail_get_my_courses());
+            $output = $this->forward($view_course);
             $toolbardown = true;
         } else {
             $selectall = $this->selectall();
@@ -926,7 +934,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $paging['offset'] = false;
         }
 
-        $content .= $this->toolbar($type, false, $paging, ($type === 'trash'));
+        $content .= $this->toolbar($type, 0, false, $paging, ($type === 'trash'));
         $content .= $this->notification_bar();
         if ($messages) {
             $content .= $this->messagelist($messages, $userid, $type, $itemid, $offset);

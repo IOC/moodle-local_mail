@@ -129,3 +129,12 @@ function local_mail_js_labels() {
     $js .=  '}};';
     return $js;
 }
+
+function local_mail_get_my_courses() {
+    static $courses = array();
+
+    if (empty($courses)) {
+        $courses = enrol_get_my_courses(array('id', 'shortname, fullname'));
+    }
+    return $courses;
+}

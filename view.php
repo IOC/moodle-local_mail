@@ -291,11 +291,7 @@ if ($removelbl) {
         print_error('invalidmessage', 'local_mail');
     }
 
-    if (!$course = $DB->get_record('course', array('id' => $message->course()->id))) {
-        print_error('invalidcourse', 'error');
-    }
-
-    local_mail_setup_page($course, new moodle_url($url, array('m' => $messageid)));
+    local_mail_setup_page($SITE, new moodle_url($url, array('m' => $messageid)));
     navigation_node::override_active_url($url);
 
     $message->set_unread($USER->id, false);
@@ -357,15 +353,17 @@ if ($removelbl) {
         'undodelete',
         'undorestore'
         ), 'local_mail');
-    $PAGE->requires->string_for_js('submit', 'moodle');
-    $PAGE->requires->string_for_js('cancel', 'moodle');
+    $PAGE->requires->strings_for_js(array(
+        'submit',
+        'cancel'
+        ), 'moodle');
     form_init_date_js();
     $PAGE->requires->js_init_code($jslabels);
 
     echo $OUTPUT->header();
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'id' => 'local_mail_main_form'));
     $mailoutput = $PAGE->get_renderer('local_mail');
-    echo $mailoutput->toolbar('view', false, null, ($type === 'trash'));
+    echo $mailoutput->toolbar('view', $message->course()->id, false, null, ($type === 'trash'));
     echo $mailoutput->notification_bar();
     echo $OUTPUT->container_start('mail_view');
 
@@ -418,7 +416,6 @@ if ($removelbl) {
     echo $OUTPUT->footer();
 
 } else {
-
     $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
 
     if($prevpage or $nextpage) {
