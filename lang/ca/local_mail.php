@@ -85,6 +85,7 @@ $string['toomanyrecipients'] = 'La cerca conté massa resultats';
 $string['forward'] = 'Reenvia';
 $string['save'] = 'Desa';
 $string['send'] = 'Envia';
+$string['sendmessage'] = 'Envia un missatge';
 $string['sentmail'] = 'Enviats';
 $string['setlabels'] = 'Etiquetes';
 $string['starred'] = 'Destacat';

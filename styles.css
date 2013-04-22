@@ -778,3 +778,10 @@
 #local_mail_main_form {
     min-height: 30em;
 }
+
+/* User profile */
+
+.local_mail_sendmessage {
+    text-align: center;
+    margin: 1em;
+}

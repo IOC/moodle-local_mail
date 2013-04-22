@@ -140,6 +140,18 @@ function local_mail_extends_navigation($root) {
     $text = get_string('trash', 'local_mail');
     $url = new moodle_url('/local/mail/view.php', array('t' => 'trash'));
     $node->add(s($text), $url);
+
+    // User profile
+
+    if ($PAGE->url->compare(new moodle_url('/user/view.php'), URL_MATCH_BASE)) {
+        $userid = optional_param('id', false, PARAM_INT);
+        if (local_mail_valid_recipient($userid)) {
+            $vars = array('course' => $COURSE->id, 'recipient' => $userid);
+            $PAGE->requires->string_for_js('sendmessage', 'local_mail');
+            $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
+            $PAGE->requires->js('/local/mail/user.js');
+        }
+    }
 }
 
 function local_mail_pluginfile($course, $cm, $context, $filearea, $args,

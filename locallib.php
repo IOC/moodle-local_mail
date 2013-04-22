@@ -138,3 +138,30 @@ function local_mail_get_my_courses() {
     }
     return $courses;
 }
+
+function local_mail_valid_recipient($recipient) {
+    global $COURSE, $USER;
+
+    if (!$recipient or $recipient == $USER->id) {
+        return false;
+    }
+
+    $context = context_course::instance($COURSE->id);
+
+    if (!is_enrolled($context, $recipient)) {
+        return false;
+    }
+
+    if ($COURSE->groupmode == SEPARATEGROUPS and
+        !has_capability('moodle/site:accessallgroups', $context)) {
+        $ugroups = groups_get_all_groups($COURSE->id, $USER->id,
+                                         $COURSE->defaultgroupingid, 'g.id');
+        $rgroups = groups_get_all_groups($COURSE->id, $recipient,
+                                         $COURSE->defaultgroupingid, 'g.id');
+        if (!array_intersect(array_keys($ugroups), array_keys($rgroups))) {
+            return false;
+        }
+    }
+
+    return true;
+}

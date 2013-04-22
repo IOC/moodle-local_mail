@@ -85,6 +85,7 @@ $string['toomanyrecipients'] = 'Search has too many results';
 $string['forward'] = 'Forward';
 $string['save'] = 'Save';
 $string['send'] = 'Send';
+$string['sendmessage'] = 'Send a message';
 $string['sentmail'] = 'Sent';
 $string['setlabels'] = 'Labels';
 $string['starred'] = 'Starred';
