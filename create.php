@@ -55,5 +55,9 @@ $mform->get_data();
 // Display page
 
 echo $OUTPUT->header();
-$mform->display();
+if ($courses) {
+    $mform->display();
+} else {
+    echo $OUTPUT->notification(get_string('cannotcompose', 'local_mail'));
+}
 echo $OUTPUT->footer();

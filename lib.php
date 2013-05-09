@@ -32,9 +32,7 @@ function local_mail_extends_navigation($root) {
         return;
     }
 
-    if (!$courses = local_mail_get_my_courses()) {
-        return;
-    }
+    $courses = local_mail_get_my_courses();
 
     $count = local_mail_message::count_menu($USER->id);
 
@@ -48,7 +46,7 @@ function local_mail_extends_navigation($root) {
     if (!empty($count->inbox)) {
         $node->add_class('local_mail_new_messages');
     }
-    $child = $root->add_node($node, 'courses');
+    $child = $root->add_node($node, 'mycourses');
     $child->add_class('mail_root');
 
     // Compose
@@ -104,17 +102,20 @@ function local_mail_extends_navigation($root) {
 
     // Courses
 
-    $text = get_string('courses', 'local_mail');
-    $nodecourses = $node->add($text, null, navigation_node::TYPE_CONTAINER);
-    foreach ($courses as $course) {
-        $text = $course->shortname;
-        if (!empty($count->courses[$course->id])) {
-            $text .= ' (' . $count->courses[$course->id] . ')';
+    if ($courses) {
+        $text = get_string('courses', 'local_mail');
+        $nodecourses = $node->add($text, null, navigation_node::TYPE_CONTAINER);
+        foreach ($courses as $course) {
+            $text = $course->shortname;
+            if (!empty($count->courses[$course->id])) {
+                $text .= ' (' . $count->courses[$course->id] . ')';
+            }
+            $params = array('t' => 'course', 'c' => $course->id);
+            $url = new moodle_url('/local/mail/view.php', $params);
+            $child = $nodecourses->add(s($text), $url);
+            $child->hidden = !$course->visible;
+            $child->add_class('mail_course_'.$course->id);
         }
-        $params = array('t' => 'course', 'c' => $course->id);
-        $url = new moodle_url('/local/mail/view.php', $params);
-        $child = $nodecourses->add(s($text), $url);
-        $child->add_class('mail_course_'.$course->id);
     }
 
     // Labels

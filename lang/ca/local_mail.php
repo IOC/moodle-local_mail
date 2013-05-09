@@ -11,6 +11,7 @@ $string['attachments'] = 'Adjunts';
 $string['attachnumber'] = '{$a} fitxers adjunts';
 $string['bcc'] = 'Cco';
 $string['cancel'] = 'Cancel·la';
+$string['cannotcompose'] = 'No podeu redactar missatges perquè no esteu inscrit a cap curs.';
 $string['cc'] = 'Cc';
 $string['compose'] = 'Redacta';
 $string['continue'] = 'Continua';

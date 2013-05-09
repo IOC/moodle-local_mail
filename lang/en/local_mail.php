@@ -11,6 +11,7 @@ $string['attachments'] = 'Attachments';
 $string['attachnumber'] = '{$a} attachments';
 $string['bcc'] = 'Bcc';
 $string['cancel'] = 'Cancel';
+$string['cannotcompose'] = 'You cannot compose messages because you are not enrolled in any courses.';
 $string['cc'] = 'Cc';
 $string['compose'] = 'Compose';
 $string['continue'] = 'Continue';

@@ -131,10 +131,10 @@ function local_mail_js_labels() {
 }
 
 function local_mail_get_my_courses() {
-    static $courses = array();
+    static $courses = null;
 
-    if (empty($courses)) {
-        $courses = enrol_get_my_courses(array('id', 'shortname, fullname'));
+    if ($courses === null) {
+        $courses = enrol_get_my_courses();
     }
     return $courses;
 }
