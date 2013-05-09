@@ -428,10 +428,17 @@ class local_mail_message {
         assert(!$this->draft and $this->has_recipient($userid));
         assert(!$all or in_array($this->role[$userid], array('to', 'cc')));
 
+        if (preg_match('/^RE\s*(?:\[(\d+)\])?:\s*(.*)$/', $this->subject, $matches)) {
+            $n_reply = $matches[1] ? (int) $matches[1] + 1 : 2;
+            $subject = "RE [$n_reply]: {$matches[2]}";
+        } else {
+            $subject = 'RE: ' . $this->subject;
+        }
+
         $transaction = $DB->start_delegated_transaction();
 
         $message = self::create($userid, $this->course->id, $time);
-        $message->save('RE: ' . $this->subject, '', -1, $time);
+        $message->save($subject, '', -1, $time);
         $sender = $this->sender();
         $message->add_recipient('to', $sender->id);
         $message->set_references($this);

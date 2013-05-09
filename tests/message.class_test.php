@@ -508,6 +508,24 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($result);
     }
 
+    function test_reply_subject() {
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject', 'content', 301);
+        $message->add_recipient('to', 202);
+        $message->send();
+
+        $result = $message->reply(202);
+        $this->assertEquals('RE: subject', $result->subject());
+
+        $result->send();
+        $result = $result->reply(201);
+        $this->assertEquals('RE [2]: subject', $result->subject());
+
+        $result->send();
+        $result = $result->reply(202);
+        $this->assertEquals('RE [3]: subject', $result->subject());
+    }
+
     function test_save() {
         $message = local_mail_message::create(201, 101);
         $message->save('subject', 'content', 301, 1234567890);
