@@ -598,14 +598,40 @@ class local_mail_renderer extends plugin_renderer_base {
                 'type'  => 'text',
                 'name'  => 'recipients_search',
                 'value' => '',
-                'size'  => '50',
                 'maxlength' => '100',
                 'class' => 'mail_search'
         );
         $text = get_string('search', 'local_mail');
         $content .= html_writer::label($text, 'recipients_search');
         $content .= html_writer::empty_tag('input', $attributes);
+        //Select all recipients
+        $content .= html_writer::start_tag('span', array('class' => 'mail_all_recipients_actions'));
+        $attributes = array(
+           'type' => 'button',
+           'name' => "to_all",
+           'value' => get_string('to', 'local_mail')
+        );
+        $content .= html_writer::empty_tag('input', $attributes);
+        $attributes = array(
+           'type' => 'button',
+           'name' => "cc_all",
+           'value' => get_string('cc', 'local_mail')
+        );
+        $content .= html_writer::empty_tag('input', $attributes);
+        $attributes = array(
+           'type' => 'button',
+           'name' => "bcc_all",
+           'value' => get_string('bcc', 'local_mail')
+        );
+        $content .= html_writer::empty_tag('input', $attributes);
+        $attributes = array('type' => 'image',
+                                'name' => "remove_all",
+                                'src' => $this->output->pix_url('t/delete'),
+                                'alt' => get_string('remove'));
+        $content .= html_writer::empty_tag('input', $attributes);
+        $content .= html_writer::end_tag('span');
         $content .= html_writer::end_tag('div');
+
         $content .= html_writer::end_tag('div');
         $content .= html_writer::tag('div', '', array('id' => 'local_mail_recipients_list', 'class' => 'mail_form_recipients'));
         $content .= html_writer::start_tag('div', array('class' => 'mail_search_loading'));

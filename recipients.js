@@ -82,6 +82,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             if (node) {
                 node.hide();
             }
+            mail_enable_all_recipients_buttons(obj.html && /mail_form_recipient/.test(obj.html));
             if (obj.html) {
                 Y.one('#local_mail_recipients_list').setContent(obj.html);
                 mail_update_recipients_state();
@@ -225,6 +226,16 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
+    var mail_select_all_recipient_action = function(node) {
+        var role = /^[^_]*/.exec(node.get('name'));
+        var nodes = Y.all(".mail_recipient_actions input[name^="+role[0]+"]");
+        if (nodes) {
+            nodes.each(function (node) {
+                mail_recipient_action(node);
+            });
+        }
+    };
+
     var mail_add_recipient = function(userid, role) {
         var addto = false;
         if (role == 'to') {
@@ -354,6 +365,19 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
+    var mail_enable_all_recipients_buttons = function (enable) {
+        var nodes = Y.all('.mail_all_recipients_actions input');
+        if (nodes) {
+            nodes.each(function(node) {
+                if (enable) {
+                    node.set('disabled', '');
+                } else {
+                    node.set('disabled', 'disabled');
+                }
+            });
+        }
+    };
+
     //Click label on recipients button
     Y.one("div.region-content").delegate('click', function(e) {
         e.preventDefault();
@@ -394,6 +418,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         e.preventDefault();
         mail_recipient_action(this);
     }, '.mail_recipient_actions input');
+
+    //Click on select all recipients action
+    Y.one("div.region-content").delegate('click', function(e) {
+        e.preventDefault();
+        mail_select_all_recipient_action(this);
+    }, '.mail_all_recipients_actions input');
 
     init();
     
