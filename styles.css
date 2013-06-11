@@ -94,7 +94,8 @@
 .mail_form_recipient_name {
     display: inline-block;
     margin-left: 1em;
-    max-width: 50%;
+    max-width: 48%;
+    vertical-align: middle;
 }
 
 .mail_form_recipient_text {
