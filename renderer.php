@@ -661,7 +661,7 @@ class local_mail_renderer extends plugin_renderer_base {
                 }
                 $content .= html_writer::start_tag('div', array('class' => 'mail_form_recipient' . $recipselected));
                 $content .= html_writer::tag('span', $rolestring, array('class' => 'mail_form_recipient_role' . $hidden, 'data-role-recipient' => $participant->id));
-                $content .= $this->output->user_picture($participant, array('link' => false));
+                $content .= $this->output->user_picture($participant, array('link' => false, 'alttext' => false));
                 $content .= html_writer::tag('span', fullname($participant), array('class' => 'mail_form_recipient_name'));
                 $content .= html_writer::start_tag('span', array('class' => 'mail_recipient_actions'));
                 $attributes = array(
