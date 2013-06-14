@@ -133,31 +133,20 @@ class local_mail_renderer extends plugin_renderer_base {
             $str = '';
         }
         $str = html_writer::tag('span', $str);
-        $prevtitle = $this->output->larrow();
-        $params = array(
-            'value' => $prevtitle,
-            'type' => 'submit',
-            'name' => 'prevpage',
-            'title' => get_string('previous'),
-            'class' => 'mail_button singlebutton',
-        );
-        if (!$offset) {
-            $params = array_merge($params, array('disabled' => 'disabled'));
-        }
-        $prev = html_writer::empty_tag('input', $params);
 
-        $nexttitle = $this->output->rarrow();
-        $params = array(
-            'value' => $nexttitle,
-            'type' => 'submit',
-            'name' => 'nextpage',
-            'title' => get_string('next'),
-            'class' => 'mail_button singlebutton',
-        );
-        if ($offset === false or ($offset + $count) == $totalcount) {
-            $params = array_merge($params, array('disabled' => 'disabled'));
+        $prev = '<input value="' . $this->output->larrow() . '" type="submit" name="prevpage" title="'
+            . get_string('previous') . '" class="mail_button singlebutton"';
+        if (!$offset) {
+            $prev .= ' disabled="disabled"';
         }
-        $next = html_writer::empty_tag('input', $params);
+        $prev .= ' />';
+
+        $next = '<input value="'. $this->output->rarrow() .'" type="submit" name="nextpage" title="'
+            . get_string('next') . '" class="mail_button singlebutton"';
+        if ($offset === false or ($offset + $count) == $totalcount) {
+            $next .= ' disabled="disabled"';
+        }
+        $next .= ' />';
         return $this->output->container($str . ' ' . $prev . $next, 'mail_paging');
     }
     
@@ -362,15 +351,8 @@ class local_mail_renderer extends plugin_renderer_base {
 
     function goback() {
         $label = $this->output->larrow();
-        $class = 'mail_button singlebutton';
-        $attributes = array(
-            'type' => 'submit',
-            'name' => 'goback',
-            'value' => $label,
-            'class' => $class
-        );
         $output = html_writer::start_tag('noscript');
-        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= '<input type="submit" name="goback" value="'. $label .'" class="mail_button singlebutton" />';
         $output .= html_writer::end_tag('noscript');
         $output .= html_writer::tag('span', $label, array('class' => 'mail_hidden singlebutton mail_button mail_goback'));
         return $output;
