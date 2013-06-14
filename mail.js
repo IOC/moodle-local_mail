@@ -926,7 +926,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             cfg.data.itemid = Y.one('input[name="itemid"]').get('value');
         }
         if (action == 'perpage') {
-            cfg.data.perpage = node.get('innerText');
+            cfg.data.perpage = (node.get('innerText')?node.get('innerText'):node.get('textContent'));
         }
         if (action == 'assignlabels') {
             cfg.data.labelids = mail_get_labels_values(false);
