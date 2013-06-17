@@ -64,6 +64,7 @@ class mail_compose_form extends moodleform {
 
         $label = get_string('subject', 'local_mail');
         $mform->addElement('text', 'subject', $label, 'size="48"');
+        $mform->setType('subject', PARAM_TEXT);
         $text = get_string('maximumchars', '', 255);
         $mform->addRule('subject', $text, 'maxlength', 255, 'client');
 
