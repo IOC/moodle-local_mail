@@ -659,10 +659,11 @@ function local_mail_get_info() {
 }
 
 function local_mail_getrecipients($message, $search, $groupid, $roleid) {
-    global $DB, $PAGE;
+    global $DB, $PAGE, $CFG;
 
     $participants = array();
     $recipients = array();
+    $mailmaxusers = (isset($CFG->maxusersperpage)?$CFG->maxusersperpage:MAIL_MAXUSERS);
 
     $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
 
@@ -683,13 +684,13 @@ function local_mail_getrecipients($message, $search, $groupid, $roleid) {
 
     list($select, $from, $where, $sort, $params) = local_mail_getsqlrecipients($message->course()->id, $search, $groupid, $roleid);
 
-    $matchcount = $DB->count_records_sql("SELECT COUNT(u.id) $from $where", $params);
+    $matchcount = $DB->count_records_sql("SELECT COUNT(DISTINCT u.id) $from $where", $params);
 
     $getid = function ($recipient) {
         return $recipient->id;
     };
 
-    if ($matchcount <= MAIL_MAXUSERS) {
+    if ($matchcount <= $mailmaxusers) {
         $to = array_map($getid, $message->recipients('to'));
         $cc = array_map($getid, $message->recipients('cc'));
         $bcc = array_map($getid, $message->recipients('bcc'));
