@@ -26,7 +26,7 @@ function local_mail_course_deleted($course) {
 }
 
 function local_mail_extends_navigation($root) {
-    global $COURSE, $PAGE, $SESSION, $SITE, $USER;
+    global $CFG, $COURSE, $PAGE, $SESSION, $SITE, $USER;
 
     if (!get_config('local_mail', 'version')) {
         return;
@@ -144,7 +144,8 @@ function local_mail_extends_navigation($root) {
 
     // User profile
 
-    if ($PAGE->url->compare(new moodle_url('/user/view.php'), URL_MATCH_BASE)) {
+    if (empty($CFG->messaging) and
+        $PAGE->url->compare(new moodle_url('/user/view.php'), URL_MATCH_BASE)) {
         $userid = optional_param('id', false, PARAM_INT);
         if (local_mail_valid_recipient($userid)) {
             $vars = array('course' => $COURSE->id, 'recipient' => $userid);
