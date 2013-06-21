@@ -61,7 +61,7 @@ class local_mail_message {
         $sql = 'SELECT id, type, item, unread, COUNT(*) AS count'
             . ' FROM {local_mail_index}'
             . ' WHERE userid = :userid'
-            . ' GROUP BY type, item, unread';
+            . ' GROUP BY id, type, item, unread';
         $records = $DB->get_records_sql($sql, array('userid' => $userid));
 
         foreach ($records as $record) {
