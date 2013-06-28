@@ -58,7 +58,7 @@ class local_mail_message {
         $result->courses = array();
         $result->labels = array();
 
-        $sql = 'SELECT id, type, item, unread, COUNT(*) AS count'
+        $sql = 'SELECT MIN(id), type, item, unread, COUNT(*) AS count'
             . ' FROM {local_mail_index}'
             . ' WHERE userid = :userid'
             . ' GROUP BY type, item, unread';
