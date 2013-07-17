@@ -500,7 +500,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         var lblstoremain = mail_get_labels_values(true).split(',');
 
         Y.each(M.local_mail.mail_labels, function (value, index) {
-            if (lblstoadd.indexOf(index) != -1) {
+            if (Y.Array.indexOf(lblstoadd, index) != -1) {
                 if (index != labelid) {
                     elem = grouplabels.one('.mail_label_'+index);
                     if (!elem) {
@@ -508,7 +508,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                         grouplabels.append(elem);
                     }
                 }
-            } else if (lblstoremain.indexOf(index) == -1) {
+            } else if (Y.Array.indexOf(lblstoremain, index) == -1) {
                 if (!mail_message_view && index == labelid) {
                     grouplabels.ancestor('.mail_item').remove();
                 } else {
