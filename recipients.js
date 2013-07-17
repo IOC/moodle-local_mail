@@ -127,7 +127,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         if (action == 'updaterecipients') {
             if (mail_existing_recipients) {
                 Y.Array.each(mail_existing_recipients, function(recipient, index) {
-                    if (mail_recipients[3].indexOf(recipient) != -1) {
+                    if (Y.Array.indexOf(mail_recipients[3], recipient) != -1) {
                         recipients += mail_recipients[3][index]+',';
                         roleids += '3,';
                     }
@@ -253,11 +253,11 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var mail_remove_recipient = function(userid, roles) {
         var pos;
         Y.Array.each(roles, function(role) {
-            pos = mail_recipients[role].indexOf(userid);
+            pos = Y.Array.indexOf(mail_recipients[role], userid);
             if (pos != -1) {
                 mail_recipients[role].splice(pos, 1);
             } else {
-                if (mail_existing_recipients.indexOf(userid) != -1 && mail_recipients[3].indexOf(userid) == -1) {
+                if (Y.Array.indexOf(mail_existing_recipients, userid) != -1 && Y.Array.indexOf(mail_recipients[3], userid) == -1) {
                     mail_recipients[3].push(userid);
                 }
             }
