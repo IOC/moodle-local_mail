@@ -952,6 +952,16 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             }
             cfg.data.labelcolor = obj.get('options').item(obj.get('selectedIndex')).get('value');
         }
+        if (action == 'deletelabel') {
+            obj = Y.one('.mail_menu_label_deletelabel');
+            cfg.data.deletelabel = obj.get('value');
+            if (!cfg.data.deletelabel) {
+                alert(M.util.get_string('erroremptylabelname', 'local_mail'));
+                return false;
+            }
+            if(!confirm(M.util.get_string('confirmdeletelabel', 'local_mail'))) { return false; }
+
+        }
         if (mail_doing_search) {
             //Go back when searching keeps current page
             if (action == 'goback') {
@@ -1314,6 +1324,14 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         mail_hide_menu_labels();
         mail_label_new();
     }, '.mail_menu_label_newlabel');
+
+    //Click delete label
+    Y.one("div.region-content").delegate('click', function(e) {
+        e.preventDefault();
+        mail_hide_menu_labels();
+        e.currentTarget.addClass('mail_menu_label_deletelabel');
+        mail_doaction('deletelabel');
+    }, '.mail_menu_label_delete');
 
     //Click label on menu labels
     Y.one("div.region-content").delegate('click', function(e) {

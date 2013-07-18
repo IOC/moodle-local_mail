@@ -279,9 +279,16 @@ class local_mail_renderer extends plugin_renderer_base {
         $labels = local_mail_label::fetch_user($USER->id);
         $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_labelselect'));
         foreach ($labels as $key => $label) {
-            //$items[$key] =  html_writer::checkbox('mail_menu_label_' . $key, $label->id(), false, $label->name(), array('class' => 'mail_label mail_label_'. $label->color()));
             $content = html_writer::tag('span', '', array('class' => 'mail_adv_checkbox mail_checkbox0 mail_label_value_'.$label->id()));
             $content .= html_writer::tag('span', $label->name(), array('class' => 'mail_label_name'));
+            $attributes = array('type' => 'image',
+                                'name' => 'mail_menu_label_deletelabel',
+                                'value' => $label->id(),
+                                'class' => 'mail_menu_label_delete',
+                                'src' => $this->output->pix_url('t/delete'),
+                                'title' => get_string('delete', 'local_mail'),
+                                'alt' => get_string('remove'));
+            $content .= html_writer::empty_tag('input', $attributes);
             $items[$key] =  $content;
         }
         if (!empty($labels)) {

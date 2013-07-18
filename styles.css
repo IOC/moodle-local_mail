@@ -421,12 +421,18 @@
 }
 
 .mail_toolbar .mail_menu_options li,
-.mail_toolbar .mail_menu_actions li,
-.mail_toolbar .mail_menu_labels li {
+.mail_toolbar .mail_menu_actions li {
     margin: 0.1em 0;
     padding: 0;
     max-width: 100%;
     white-space: nowrap;
+}
+
+.mail_toolbar .mail_menu_labels li {
+    min-width: 100px;
+    width: auto !important;
+    width: 100px;
+
 }
 
 .mail_toolbar .mail_menu_options li:hover,
@@ -436,15 +442,23 @@
     cursor: pointer;
 }
 
-.mail_toolbar .mail_menu_labels .mail_adv_checkbox{
-    display: inline-block;
+.mail_toolbar .mail_menu_labels .mail_adv_checkbox {
     margin: 0 0.5em 0 0.1em;
 }
 
-.mail_toolbar .mail_menu_labels .mail_label_name{
-    display: inline-block;
-    width: 80%;
+.mail_toolbar .mail_menu_labels .mail_label_name {
 }
+
+.mail_toolbar .mail_menu_labels .mail_menu_label_delete {
+    position: relative;
+    right: 10px;
+    top: 5px;
+    float: right;
+    width: 14px;
+    height: 14px;
+    padding-left: 10px;
+}
+
 
 .mail_toolbar .mail_button span {
     display: inline-block;

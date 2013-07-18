@@ -16,7 +16,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/local/mail/lib.php');
 
@@ -25,6 +24,7 @@ $type       = optional_param('type', false, PARAM_ALPHA);
 $msgs       = optional_param('msgs', '', PARAM_SEQUENCE);
 $labelids   = optional_param('labelids', '', PARAM_SEQUENCE);
 $labeltsids = optional_param('labeltsids', '', PARAM_SEQUENCE);
+$deletelabel= optional_param('deletelabel', '', PARAM_INT);
 $itemid     = optional_param('itemid', 0, PARAM_INT);
 $messageid  = optional_param('m', 0, PARAM_INT);
 $offset     = optional_param('offset', 0, PARAM_INT);
@@ -67,6 +67,7 @@ $valid_actions = array(
     'assignlabels',
     'newlabel',
     'setlabel',
+    'deletelabel',
     'getrecipients',
     'updaterecipients',
     'search'
@@ -120,6 +121,7 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
             'perpageid' => $perpageid
         );
     }
+
     if ($action === 'starred') {
         $func = 'local_mail_setstarred';
         array_push($params, $messages);
@@ -226,6 +228,22 @@ if ($action and in_array($action, $valid_actions) and !empty($USER->id)) {
         array_push($params, $messages);
         array_push($params, $labelname);
         array_push($params, $labelcolor);
+        if ($type == 'course') {
+            array_push($data, 'c='.$itemid);
+        } elseif ($type == 'label') {
+            array_push($data, 'l='.$itemid);
+        }
+        if ($mailview) {
+            array_push($data, 'm='.$messageid);
+        }
+        if ($offset) {
+            array_push($data, 'offset='.$offset);
+        }
+        array_push($params, $data);
+    } elseif ($action === 'deletelabel') {
+        $func = 'local_mail_deletelabel';
+        array_push($params, $deletelabel);
+        $data = array('t='.$type);
         if ($type == 'course') {
             array_push($data, 'c='.$itemid);
         } elseif ($type == 'label') {
@@ -601,6 +619,23 @@ function local_mail_newlabel($messages, $labelname, $labelcolor, $data) {
         'info' => '',
         'html' => '',
         'redirect' => $CFG->wwwroot . '/local/mail/view.php?' . implode('&', $data)
+    );
+}
+
+function local_mail_deletelabel($itemid, $data) {
+    global $CFG;
+    $label = local_mail_label::fetch($itemid);
+    $ret = $label->delete($itemid);
+    if($ret) {
+        $error = '';
+    } else {
+        $error = get_string('invalidlabel', 'local_mail');
+    }
+    return array(
+         'msgerror' => $error,
+         'info' => '',
+         'html' => '',
+         'redirect' => $CFG->wwwroot . '/local/mail/view.php?' . implode('&', $data)
     );
 }
 
