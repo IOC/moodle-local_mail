@@ -1086,7 +1086,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     /*** Event listeners***/
 
     //Background selection
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         var ancestor = this.ancestor('.mail_item');
         mail_toggle_checkbox(this);
         ancestor.toggleClass('mail_selected');
@@ -1095,7 +1095,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_list .mail_adv_checkbox');
 
     //Select all/none
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_toggle_checkbox(this);
         mail_hide_menu_options();
@@ -1110,7 +1110,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_checkbox_all > .mail_adv_checkbox');
 
     //Toggle menu select all/none
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_toggle_menu();
         mail_hide_menu_actions();
@@ -1119,13 +1119,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_checkbox_all');
 
     //Checkbox hides other menus
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         mail_hide_menu_options();
         mail_hide_menu_labels();
     }, '.mail_checkbox_all > .mail_adv_checkbox');
 
     //Toggle menu actions
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_toggle_menu_actions();
         mail_hide_menu_options();
@@ -1134,7 +1134,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_more_actions');
 
     //Toggle menu actions
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         //e.preventDefault();
         e.stopPropagation();
         mail_label_default_values();
@@ -1146,7 +1146,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_assignlbl');
 
     //Menu select all
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
         mail_select_all();
@@ -1154,14 +1154,14 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_menu_option_all');
 
     //Menu select none
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
         mail_select_none();
     }, '.mail_menu_option_none');
 
     //Menu select read
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
         mail_select_read();
@@ -1170,7 +1170,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_menu_option_read');
 
     //Menu select unread
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
         mail_select_unread();
@@ -1179,7 +1179,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_menu_option_unread');
 
     //Menu select starred
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
         mail_select_starred();
@@ -1188,7 +1188,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '.mail_menu_option_starred');
 
     //Menu select unstarred
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
         mail_select_unstarred();
@@ -1196,95 +1196,95 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         mail_update_menu_actions();
     }, '.mail_menu_option_unstarred');
 
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         mail_check_selected();
     }, '.mail_optselect');
 
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
     }, '.mail_labelselect');
 
     //Menu action starred
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('starred');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasstarred');
 
     //Menu action unstarred
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('unstarred');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasunstarred');
 
     //Menu action markasread
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('markasread');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasread');
 
     //Menu action markasunread
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('markasunread');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasunread');
 
     //Menu action editlabel
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_label_edit();
     }, '.mail_menu_action_editlabel');
 
     //Menu action removelabel
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_label_confirm_delete(e);
     }, '.mail_menu_action_removelabel');
 
     //Starred and unstarred
-    Y.one('div.region-content').delegate('click', function(e) {
+    Y.one('#region-main').delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('togglestarred', this);
         mail_update_menu_actions();
     }, '.mail_flags a');
 
     //Delete button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         if (!this.hasClass('mail_button_disabled')) {
             mail_doaction('delete');
         }
     }, '#mail_delete');
 
     //Restore button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         if (!this.hasClass('mail_button_disabled')) {
             mail_doaction('restore');
         }
     }, '#mail_restore');
 
     //Prev page button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('prevpage');
     }, 'input[name="prevpage"]');
 
     //Prev page button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('nextpage');
     }, 'input[name="nextpage"]');
 
     //Go back button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('goback');
     }, '.mail_goback');
 
     //Mail per page
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('perpage', this);
     }, 'div.mail_perpage a');
@@ -1298,31 +1298,31 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, 'body');
 
     //Show message
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('viewmail', this);
     }, 'a.mail_link');
 
     //Click apply changes on labels
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         mail_hide_menu_labels();
         mail_doaction('assignlabels');
     }, '.mail_menu_label_apply');
 
     //Click new label
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         mail_hide_menu_labels();
         mail_label_new();
     }, '.mail_menu_label_newlabel');
 
     //Click label on menu labels
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         mail_menu_label_selection(this);
         mail_customize_menu_label();
     }, '.mail_menu_labels li');
 
     //Click notification bar undo
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         var ancestor = Y.one('#mail_notification');
         if (ancestor.hasClass('mail_enabled')) {
@@ -1332,7 +1332,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '#mail_notification_undo');
 
     //Click cancel search button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doing_search = false;
         mail_hide_menu_search();
@@ -1343,7 +1343,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
 
     //Click search button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         var date;
         mail_hide_menu_options();
@@ -1357,7 +1357,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '#mail_search');
 
     //Click menu search
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
     }, '#mail_menu_search');
 
@@ -1372,7 +1372,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '#dateselector-calendar-panel');
 
     //Click on button search
-    Y.one("div.region-content").delegate('keydown', function(e) {
+    Y.one("#region-main").delegate('keydown', function(e) {
         e.stopPropagation();
         if (e.keyCode == 13) {
             this.focus();
@@ -1381,7 +1381,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '#textsearch');
 
     //Click on button search
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         mail_do_search();
     }, '#buttonsearch');
 

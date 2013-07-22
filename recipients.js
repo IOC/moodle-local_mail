@@ -379,7 +379,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     };
 
     //Click label on recipients button
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_reset_recipients();
         mail_doaction('');
@@ -392,35 +392,35 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }, '#id_recipients');
 
     //Change on group select
-    Y.one("div.region-content").delegate('change', function(e) {
+    Y.one("#region-main").delegate('change', function(e) {
         e.preventDefault();
         mail_doaction('setgroup');
     }, '#local_mail_recipients_groups');
 
     //Change on role select
-    Y.one("div.region-content").delegate('change', function(e) {
+    Y.one("#region-main").delegate('change', function(e) {
         e.preventDefault();
         mail_doaction('setrole');
     }, '#local_mail_recipients_roles');
 
     //Keyup on search input
-    Y.one("div.region-content").delegate('keyup', function(e) {
+    Y.one("#region-main").delegate('keyup', function(e) {
         wait();
     }, 'input[name="recipients_search"]');
 
     //Keydown on search input
-    Y.one("div.region-content").delegate('keydown', function(e) {
+    Y.one("#region-main").delegate('keydown', function(e) {
         clearInterval(timeout);
     }, 'input[name="recipients_search"]');
 
     //Click on recipient action
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_recipient_action(this);
     }, '.mail_recipient_actions input');
 
     //Click on select all recipients action
-    Y.one("div.region-content").delegate('click', function(e) {
+    Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_select_all_recipient_action(this);
     }, '.mail_all_recipients_actions input');
