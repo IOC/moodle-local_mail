@@ -279,7 +279,6 @@ class local_mail_renderer extends plugin_renderer_base {
         $labels = local_mail_label::fetch_user($USER->id);
         $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_labelselect'));
         foreach ($labels as $key => $label) {
-            //$items[$key] =  html_writer::checkbox('mail_menu_label_' . $key, $label->id(), false, $label->name(), array('class' => 'mail_label mail_label_'. $label->color()));
             $content = html_writer::tag('span', '', array('class' => 'mail_adv_checkbox mail_checkbox0 mail_label_value_'.$label->id()));
             $content .= html_writer::tag('span', $label->name(), array('class' => 'mail_label_name'));
             $items[$key] =  $content;
@@ -340,7 +339,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'unread' => get_string('unread', 'local_mail'),
             'starred' => get_string('starred', 'local_mail'),
             'unstarred' => get_string('unstarred', 'local_mail')
-            );
+        );
         foreach ($items as $key => $item) {
             $items[$key] = html_writer::link('#', $item, array('class' => 'mail_menu_option_' . $key));
         }
@@ -374,7 +373,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'separator' => '',
             'editlabel' => get_string('editlabel', 'local_mail'),
             'removelabel' => get_string('removelabel', 'local_mail')
-            );
+        );
         foreach ($items as $key => $item) {
             $items[$key] = html_writer::link('#', $item, array('class' => 'mail_menu_action_' . $key));
         }
