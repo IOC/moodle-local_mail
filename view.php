@@ -351,7 +351,8 @@ if ($removelbl) {
         'newlabel',
         'erroremptylabelname',
         'undodelete',
-        'undorestore'
+        'undorestore',
+        'confirmdeletelabel'
         ), 'local_mail');
     $PAGE->requires->strings_for_js(array(
         'submit',

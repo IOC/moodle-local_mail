@@ -14,6 +14,7 @@ $string['cancel'] = 'Cancel';
 $string['cannotcompose'] = 'You cannot compose messages because you are not enrolled in any courses.';
 $string['cc'] = 'Cc';
 $string['compose'] = 'Compose';
+$string['confirmdeletelabel'] = 'Delete this label from all messages?';
 $string['continue'] = 'Continue';
 $string['courses'] = 'Courses';
 $string['delete'] = 'Delete';

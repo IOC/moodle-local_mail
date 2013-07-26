@@ -92,9 +92,10 @@ class local_mail_label {
         $DB->delete_records('local_mail_message_labels', array('labelid' => $this->id));
 
         $conditions = array('userid' => $this->userid, 'type' => 'label', 'item' => $this->id);
-        $DB->delete_records('local_mail_index', $conditions);
+        $ret = $DB->delete_records('local_mail_index', $conditions);
 
         $transaction->allow_commit();
+        return $ret;
     }
 
     function id() {
