@@ -68,6 +68,9 @@ class local_mail_message {
             if ($record->type == 'inbox' and $record->unread) {
                 $result->inbox = (int) $record->count;
             } else if ($record->type == 'drafts') {
+                if (!isset($result->drafts)) {
+                    $result->drafts = 0;
+                }
                 $result->drafts += (int) $record->count;
             } else if ($record->type == 'course' and $record->unread) {
                 $result->courses[(int) $record->item] = (int) $record->count;
