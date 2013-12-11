@@ -1135,7 +1135,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     //Toggle menu actions
     Y.one("#region-main").delegate('click', function(e) {
-        //e.preventDefault();
         e.stopPropagation();
         mail_label_default_values();
         mail_customize_menu_label();

@@ -1,5 +1,4 @@
 <?php
-
 // Local mail plugin for Moodle
 // Copyright © 2012,2013 Institut Obert de Catalunya
 //
@@ -53,10 +52,10 @@ function local_mail_extends_navigation($root) {
 
     $text = get_string('compose', 'local_mail');
     $url = new moodle_url('/local/mail/compose.php');
-    $url_recipients = new moodle_url('/local/mail/recipients.php');
+    $urlrecipients = new moodle_url('/local/mail/recipients.php');
 
     if ($PAGE->url->compare($url, URL_MATCH_BASE) or
-        $PAGE->url->compare($url_recipients, URL_MATCH_BASE)) {
+        $PAGE->url->compare($urlrecipients, URL_MATCH_BASE)) {
         $url->param('m', $PAGE->url->param('m'));
     } else {
         $url = new moodle_url('/local/mail/create.php');
@@ -153,6 +152,23 @@ function local_mail_extends_navigation($root) {
             $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
             $PAGE->requires->js('/local/mail/user.js');
         }
+    }
+
+    // Users list
+
+    if (empty($CFG->messaging) and
+        $PAGE->url->compare(new moodle_url('/user/index.php'), URL_MATCH_BASE)) {
+        $userid = optional_param('id', false, PARAM_INT);
+        $vars = array('course' => $COURSE->id);
+        $PAGE->requires->string_for_js('choosedots', 'moodle');
+        $PAGE->requires->strings_for_js(array(
+                'bulkmessage',
+                'to',
+                'cc',
+                'bcc',
+                ), 'local_mail');
+        $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
+        $PAGE->requires->js('/local/mail/users.js');
     }
 }
 

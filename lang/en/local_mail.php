@@ -10,6 +10,7 @@ $string['assigntonewlabel'] = 'Assign to a new label...';
 $string['attachments'] = 'Attachments';
 $string['attachnumber'] = '{$a} attachments';
 $string['bcc'] = 'Bcc';
+$string['bulkmessage'] = 'With selected users send a local mail...';
 $string['cancel'] = 'Cancel';
 $string['cannotcompose'] = 'You cannot compose messages because you are not enrolled in any courses.';
 $string['cc'] = 'Cc';

@@ -1,5 +1,4 @@
 <?php
-
 // Local mail plugin for Moodle
 // Copyright © 2012,2013 Institut Obert de Catalunya
 //
@@ -23,6 +22,8 @@ require_once('create_form.php');
 
 $courseid = optional_param('c', $SITE->id, PARAM_INT);
 $recipient = optional_param('r', false, PARAM_INT);
+$recipients = optional_param('rs', '', PARAM_SEQUENCE);
+$role = optional_param('local_mail_role', 0, PARAM_INT);
 
 // Setup page
 
@@ -37,7 +38,9 @@ local_mail_setup_page($course, $url);
 if ($course->id != $SITE->id) {
     require_sesskey();
     $message = local_mail_message::create($USER->id, $course->id);
-    if (local_mail_valid_recipient($recipient))  {
+    if ($recipients) {
+        local_mail_add_recipients($message, explode(',', $recipients), $role);
+    } else if (local_mail_valid_recipient($recipient)) {
         $message->add_recipient('to', $recipient);
     }
     $params = array('m' => $message->id());

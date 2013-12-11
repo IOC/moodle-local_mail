@@ -10,6 +10,7 @@ $string['assigntonewlabel'] = 'Nova etiqueta';
 $string['attachments'] = 'Adjunts';
 $string['attachnumber'] = '{$a} fitxers adjunts';
 $string['bcc'] = 'Cco';
+$string['bulkmessage'] = 'Amb els usuaris seleccionats envía un correu intern...';
 $string['cancel'] = 'Cancel·la';
 $string['cannotcompose'] = 'No podeu redactar missatges perquè no esteu inscrit a cap curs.';
 $string['cc'] = 'Cc';
