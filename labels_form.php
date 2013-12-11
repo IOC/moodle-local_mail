@@ -1,27 +1,32 @@
 <?php
-
-// Local mail plugin for Moodle
-// Copyright © 2012,2013 Institut Obert de Catalunya
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Ths program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local-mail
+ * @copyright  Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 
 require_once($CFG->libdir . '/formslib.php');
 
 class mail_labels_form extends moodleform {
 
-    function definition() {
+    public function definition() {
         global $PAGE;
 
         $mform =& $this->_form;
@@ -40,7 +45,7 @@ class mail_labels_form extends moodleform {
         if ($this->_customdata['t'] == 'course') {
             $mform->addElement('hidden', 'c', $this->_customdata['c']);
         }
-        
+
         if (isset($this->_customdata['msgs'])) {
             $msgs = $this->_customdata['msgs'];
             foreach ($msgs as $key => $msg) {
@@ -57,7 +62,7 @@ class mail_labels_form extends moodleform {
 
         $mform->addElement('header', 'listlabels', get_string('labels', 'local_mail'));
         if ($labelids) {
-            foreach($labelids as $id) {
+            foreach ($labelids as $id) {
                 $html = html_writer::tag('span', $this->_customdata['labelname'.$id], array('class' => 'mail_label '.'mail_label_'.$this->_customdata['color'.$id]));
                 $mform->addElement('advcheckbox', 'labelid['.$id.']', '', $html);
                 $mform->setDefault('labelid['.$id.']', 0);
@@ -67,7 +72,7 @@ class mail_labels_form extends moodleform {
         }
         $mform->addElement('header', 'newlabel', get_string('assigntonewlabel', 'local_mail'));
 
-        //New label
+        // New label
 
         $mform->addElement('text', 'newlabelname', get_string('labelname', 'local_mail'));
         $mform->addElement('select', 'newlabelcolor', get_string('labelcolor', 'local_mail'), $colors, array('class' => 'mail_label_colors'));
@@ -84,6 +89,5 @@ class mail_labels_form extends moodleform {
 
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
-        
     }
 }

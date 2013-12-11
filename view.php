@@ -1,21 +1,25 @@
 <?php
-
-// Local mail plugin for Moodle
-// Copyright © 2012,2013 Institut Obert de Catalunya
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Ths program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local-mail
+ * @copyright  Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once('../../config.php');
 require_once('locallib.php');
@@ -47,9 +51,15 @@ $goback     = optional_param('goback', false, PARAM_BOOL);
 $url = new moodle_url('/local/mail/view.php', array('t' => $type));
 $offset = max(0, $offset);
 
-if ($goback) $messageid = 0;
-if ($type == 'course') $url->param('c', $courseid);
-if ($type == 'label') $url->param('l', $labelid);
+if ($goback) {
+    $messageid = 0;
+}
+if ($type == 'course') {
+    $url->param('c', $courseid);
+}
+if ($type == 'label') {
+    $url->param('l', $labelid);
+}
 
 if ($removelbl) {
     require_sesskey();
@@ -83,7 +93,7 @@ if ($removelbl) {
         echo $OUTPUT->confirm(get_string('labeldeleteconfirm', 'local_mail', $label->name()), $url, $cancel);
         echo $OUTPUT->footer();
     }
-} elseif ($editlbl) {
+} else if ($editlbl) {
     require_sesskey();
     $label = local_mail_label::fetch($labelid);
     if (!$label or $label->userid() != $USER->id) {
@@ -112,7 +122,7 @@ if ($removelbl) {
     $customdata['labelname'] = $label->name();
     $customdata['labelcolor'] = $label->color();
 
-    //Create form
+    // Create form
     $mform = new mail_label_form($url, $customdata);
     $mform->set_data($customdata);
 
@@ -137,7 +147,7 @@ if ($removelbl) {
     $mform->display();
     echo $OUTPUT->footer();
 
-} elseif ($assignlbl) {
+} else if ($assignlbl) {
     $courseid = $courseid ?: $SITE->id;
 
     if (!$course = $DB->get_record('course', array('id' => $courseid))) {
@@ -147,7 +157,7 @@ if ($removelbl) {
     $url->param('offset', $offset);
     local_mail_setup_page($course, $url);
 
-    //Check whether there are messages to assign or not
+    // Check whether there are messages to assign or not
     if (!$messageid and empty($msgs)) {
         echo $OUTPUT->header();
         echo html_writer::tag('p', get_string('noselectedmessages', 'local_mail'), array('class' => 'box errorbox'));
@@ -193,13 +203,13 @@ if ($removelbl) {
     $customdata["labelids"] = array();
     if ($labels) {
         $ids = array_keys($labels);
-        foreach($labels as $label) {
+        foreach ($labels as $label) {
             $customdata['labelname'.$label->id()] = $label->name();
             $customdata['color'.$label->id()] = $label->color();
             if (!isset($messages)) {
                 $customdata['labelid['.$label->id().']'] = $message->has_label($label);
             } else {
-                foreach($messages as $message) {
+                foreach ($messages as $message) {
                     if ($message->has_label($label)) {
                         $customdata['labelid['.$label->id().']'] = 1;
                     }
@@ -209,7 +219,7 @@ if ($removelbl) {
         $customdata["labelids"] = $ids;
     }
 
-    //Create form
+    // Create form
     $mform = new mail_labels_form($url, $customdata);
 
     $mform->set_data($customdata);
@@ -226,7 +236,7 @@ if ($removelbl) {
             }
             if (!$repeatedname and !empty($data->newlabelname) and $validcolor) {
                 $newlabel = local_mail_label::create($USER->id, $data->newlabelname, $data->newlabelcolor);
-                if (!isset($data->labelid)){
+                if (!isset($data->labelid)) {
                     $data->labelid = array();
                 }
                 $data->labelid[$newlabel->id()] = 1;
@@ -283,7 +293,7 @@ if ($removelbl) {
     $mform->display();
     echo $OUTPUT->footer();
 
-} elseif ($messageid) {
+} else if ($messageid) {
     // Fetch message
 
     $message = local_mail_message::fetch($messageid);
@@ -399,7 +409,7 @@ if ($removelbl) {
             'name' => 'itemid',
             'value' => $message->course()->id,
         ));
-    } elseif ($type == 'label') {
+    } else if ($type == 'label') {
         echo html_writer::empty_tag('input', array(
             'type' => 'hidden',
             'name' => 'itemid',
@@ -418,14 +428,14 @@ if ($removelbl) {
 } else {
     $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
 
-    if($prevpage or $nextpage) {
-        if($prevpage) {
+    if ($prevpage or $nextpage) {
+        if ($prevpage) {
             $offset = max(0, $offset - $mailpagesize);
-         } elseif ($nextpage) {
+        } else if ($nextpage) {
             $offset = $offset + $mailpagesize;
-         }
-         $url->param('offset', $offset);
-         redirect($url);
+        }
+        $url->param('offset', $offset);
+        redirect($url);
     }
 
     // Set up messages
@@ -458,8 +468,8 @@ if ($removelbl) {
                 $totalcount -= 1;
             }
         }
-        if ($offset > $totalcount-1) {
-            $url->offset = min(0, $offset-$mailpagesize);
+        if ($offset > $totalcount - 1) {
+            $url->offset = min(0, $offset - $mailpagesize);
         } else {
             $url->offset = $offset;
         }

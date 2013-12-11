@@ -1,21 +1,25 @@
 <?php
-
-// Local mail plugin for Moodle
-// Copyright © 2012,2013 Institut Obert de Catalunya
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Ths program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local-mail
+ * @copyright  Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -23,12 +27,12 @@ global $CFG;
 
 abstract class local_mail_testcase extends advanced_testcase {
 
-    static function assertContains($needle, $haystack, $message = '',
+    static public function assertContains($needle, $haystack, $message = '',
                                    $ignoreCase = false, $checkForObjectIdentity = false) {
         parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
     }
 
-    static function assertIndex($userid, $type, $item, $time, $messageid, $unread) {
+    static public function assertIndex($userid, $type, $item, $time, $messageid, $unread) {
         self::assertRecords('index', array(
             'userid' => $userid,
             'type' => $type,
@@ -39,12 +43,12 @@ abstract class local_mail_testcase extends advanced_testcase {
         ));
     }
 
-    static function assertNotContains($needle, $haystack, $message = '',
+    static public function assertNotContains($needle, $haystack, $message = '',
                                       $ignoreCase = false, $checkForObjectIdentity = false) {
         parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
     }
 
-    static function assertNotIndex($userid, $type, $item, $message) {
+    static public function assertNotIndex($userid, $type, $item, $message) {
         self::assertNotRecords('index', array(
             'userid' => $userid,
             'type' => $type,
@@ -53,17 +57,17 @@ abstract class local_mail_testcase extends advanced_testcase {
         ));
     }
 
-    static function assertNotRecords($table, array $conditions = array()) {
+    static public function assertNotRecords($table, array $conditions = array()) {
         global $DB;
         self::assertFalse($DB->record_exists('local_mail_' . $table, $conditions));
     }
 
-    static function assertRecords($table, array $conditions = array()) {
+    static public function assertRecords($table, array $conditions = array()) {
         global $DB;
         self::assertTrue($DB->record_exists('local_mail_' . $table, $conditions));
     }
 
-    static function loadRecords($table, $rows) {
+    static public function loadRecords($table, $rows) {
         global $DB;
         $columns = array_shift($rows);
         foreach ($rows as $row) {
@@ -73,14 +77,14 @@ abstract class local_mail_testcase extends advanced_testcase {
             } else {
                 $DB->import_record($table, $record);
             }
-        }        
+        }
     }
 
-    function setUp() {
+    public function setUp() {
         $this->resetAfterTest(false);
     }
 
-    function tearDown() {
+    public function tearDown() {
         global $DB;
         $DB->delete_records_select('course', 'id > 100');
         $DB->delete_records_select('user', 'id > 200');

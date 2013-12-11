@@ -1,21 +1,25 @@
 <?php
-
-// Local mail plugin for Moodle
-// Copyright © 2012,2013 Institut Obert de Catalunya
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Ths program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local-mail
+ * @copyright  Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -33,7 +37,7 @@ class local_mail_message_test extends local_mail_testcase {
 
     private $course1, $course2, $user1, $user2, $user3;
 
-    static function assertMessage(local_mail_message $message) {
+    static public function assertMessage(local_mail_message $message) {
         global $DB;
 
         $course = $message->course();
@@ -54,14 +58,14 @@ class local_mail_message_test extends local_mail_testcase {
             ));
         }
 
-        $role_users = array(
+        $roleusers = array(
             'from' => array($message->sender()),
             'to' => $message->recipients('to'),
             'cc' => $message->recipients('cc'),
             'bcc' => $message->recipients('bcc'),
         );
 
-        foreach ($role_users as $role => $users) {
+        foreach ($roleusers as $role => $users) {
             foreach ($users as $user) {
                 self::assertRecords('message_users', array(
                     'messageid' => $message->id(),
@@ -80,7 +84,7 @@ class local_mail_message_test extends local_mail_testcase {
         }
     }
 
-    function setUp() {
+    public function setUp() {
         parent::setUp();
 
         $course = array(
@@ -89,7 +93,7 @@ class local_mail_message_test extends local_mail_testcase {
             array('102', 'C2',        'Course 2', '0'),
         );
         $user = array(
-            array('id', 'username', 'firstname', 'lastname', 'email',        'picture', 'imagealt', 'maildisplay',),
+            array('id', 'username', 'firstname', 'lastname', 'email',        'picture', 'imagealt', 'maildisplay'),
             array( 201, 'user1',     'User1',    'Name',     'user1@ex.org',  1,        'User 1',    1 ),
             array( 202, 'user2',     'User2',    'Name',     'user2@ex.org',  1,        'User 2',    1 ),
             array( 203, 'user3',     'User3',    'Name',     'user3@ex.org',  1,        'User 3',    1 ),
@@ -105,7 +109,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->user3 = (object) array_combine($user[0], $user[3]);
     }
 
-    function test_add_label() {
+    public function test_add_label() {
         $label1 = local_mail_label::create(201, 'name1');
         $label2 = local_mail_label::create(202, 'name2');
         $message = local_mail_message::create(201, 101);
@@ -130,12 +134,12 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(202, 'label', $label2->id(), $message->time(), $message->id(), true);
     }
 
-    function test_add_recipient() {
+    public function test_add_recipient() {
         $message = local_mail_message::create(201, 101);
 
         $message->add_recipient('to', 202);
         $message->add_recipient('cc', 203);
-        
+
         $this->assertTrue($message->has_recipient(202));
         $this->assertTrue($message->has_recipient(203));
         $this->assertCount(2, $message->recipients());
@@ -149,7 +153,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
-    function test_count_index() {
+    public function test_count_index() {
         $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
         $message1->send();
@@ -163,7 +167,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(2, $result);
     }
 
-    function test_create() {
+    public function test_create() {
         $result = local_mail_message::create(201, 101, 1234567890);
 
         $this->assertNotEquals(false, $result->id());
@@ -182,7 +186,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(201, 'course', 101, 1234567890, $result->id(), false);
     }
 
-    function test_delete_course() {
+    public function test_delete_course() {
         $label = local_mail_label::create(201, 'name');
         $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
@@ -211,7 +215,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertNotIndex(202, 'course', 101, $message2->id());
     }
 
-    function test_discard() {
+    public function test_discard() {
         $label = local_mail_label::create(202, 'name');
         $reference = local_mail_message::create(201, 101);
         $reference->add_recipient('to', 202);
@@ -235,7 +239,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertNotIndex(201, 'course', 101, $message->id());
     }
 
-    function test_editable() {
+    public function test_editable() {
         $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
 
@@ -250,7 +254,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertFalse($message->editable(203));
     }
 
-    function test_fetch() {
+    public function test_fetch() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(201, 'label2');
         $label3 = local_mail_label::create(202, 'label3');
@@ -319,7 +323,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertFalse(local_mail_message::fetch(505));
     }
 
-    function test_fetch_index() {
+    public function test_fetch_index() {
         $message1 = local_mail_message::create(201, 101);
         $message1->save('subject1', 'content1', 301);
         $message1->add_recipient('to', 202);
@@ -340,7 +344,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(array($message3, $message2, $message1), $result);
     }
 
-    function test_fetch_many() {
+    public function test_fetch_many() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(202, 'label2');
         $message1 = local_mail_message::create(201, 101);
@@ -359,7 +363,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(array($message1, $message2), $result);
     }
 
-    function test_fetch_menu() {
+    public function test_fetch_menu() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(201, 'label2');
         $message1 = local_mail_message::create(201, 101);
@@ -383,11 +387,11 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertNotEmpty($result);
         $this->assertEquals(1, $result->inbox);
         $this->assertEquals(1, $result->drafts);
-        $this->assertEquals(array(101 => 1), $result->courses); 
+        $this->assertEquals(array(101 => 1), $result->courses);
         $this->assertEquals(array($label1->id() => 1), $result->labels);
     }
 
-    function test_forward() {
+    public function test_forward() {
         $label = local_mail_label::create(202, 'label');
         $message = local_mail_message::create(201, 101);
         $message->save('subject', 'content', 301);
@@ -416,7 +420,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(202, 'label', $label->id(), 1234567890, $result->id(), false);
     }
 
-    function test_remove_label() {
+    public function test_remove_label() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(202, 'label2');
         $label3 = local_mail_label::create(202, 'label3');
@@ -445,13 +449,13 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(202, 'label', $label3->id(), $message->time(), $message->id(), true);
     }
 
-    function test_remove_recipient() {
+    public function test_remove_recipient() {
         $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->add_recipient('cc', 203);
 
         $message->remove_recipient(202);
-        
+
         $this->assertFalse($message->has_recipient(202));
         $this->assertTrue($message->has_recipient(203));
         $this->assertCount(1, $message->recipients());
@@ -463,7 +467,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
-    function test_reply() {
+    public function test_reply() {
         $label = local_mail_label::create(202, 'label');
         $message = local_mail_message::create(201, 101);
         $message->save('subject', 'content', 301);
@@ -494,7 +498,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(202, 'label', $label->id(), 1234567890, $result->id(), false);
     }
 
-    function test_reply_all() {
+    public function test_reply_all() {
         $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->add_recipient('to', 203);
@@ -508,7 +512,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($result);
     }
 
-    function test_reply_subject() {
+    public function test_reply_subject() {
         $message = local_mail_message::create(201, 101);
         $message->save('subject', 'content', 301);
         $message->add_recipient('to', 202);
@@ -526,7 +530,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals('RE [3]: subject', $result->subject());
     }
 
-    function test_save() {
+    public function test_save() {
         $message = local_mail_message::create(201, 101);
         $message->save('subject', 'content', 301, 1234567890);
 
@@ -541,7 +545,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(201, 'course', 101, 1234567890, $message->id(), false);
     }
 
-    function test_search_index() {
+    public function test_search_index() {
         $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
         $message1->save('subject', 'content', 301, 1234567890);
@@ -590,7 +594,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals(array($message3, $message2), $result);
     }
 
-    function test_send() {
+    public function test_send() {
         $label = local_mail_label::create(201, 'label');
         $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
@@ -609,7 +613,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(202, 'course', 101, 1234567890, $message->id(), true);
     }
 
-    function test_send_with_reference() {
+    public function test_send_with_reference() {
         $label = local_mail_label::create(201, 'label');
         $reference = local_mail_message::create(201, 101);
         $reference->add_recipient('to', 202);
@@ -625,7 +629,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(201, 'label', $label->id(), $message->time(), $message->id(), true);
     }
 
-    function test_set_deleted() {
+    public function test_set_deleted() {
         $label1 = local_mail_label::create(201, 'label1');
         $label2 = local_mail_label::create(202, 'label2');
         $message = local_mail_message::create(201, 101);
@@ -668,7 +672,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
-    function test_set_deleted_draft() {
+    public function test_set_deleted_draft() {
         $message = local_mail_message::create(201, 101);
 
         $message->set_deleted(201, true);
@@ -687,7 +691,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
-    function test_set_starred() {
+    public function test_set_starred() {
         $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
         $message->send();
@@ -711,7 +715,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
-    function test_set_unread() {
+    public function test_set_unread() {
         $label = local_mail_label::create(201, 'label');
         $message = local_mail_message::create(201, 101);
         $message->add_label($label);
@@ -734,7 +738,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
-    function test_viewable() {
+    public function test_viewable() {
         $message = local_mail_message::create(201, 101);
         $message->add_recipient('to', 202);
 

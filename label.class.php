@@ -1,21 +1,25 @@
 <?php
-
-// Local mail plugin for Moodle
-// Copyright © 2012,2013 Institut Obert de Catalunya
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Ths program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local-mail
+ * @copyright  Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -26,7 +30,7 @@ class local_mail_label {
     private $name;
     private $color;
 
-    static function create($userid, $name, $color='') {
+    static public function create($userid, $name, $color='') {
         global $DB;
 
         assert($userid > 0);
@@ -43,7 +47,7 @@ class local_mail_label {
         return self::from_record($record);
     }
 
-    static function fetch($id) {
+    static public function fetch($id) {
         global $DB;
 
         $record = $DB->get_record('local_mail_labels', array('id' => $id));
@@ -53,7 +57,7 @@ class local_mail_label {
         }
     }
 
-    static function fetch_user($userid) {
+    static public function fetch_user($userid) {
         global $DB;
 
         $result = array();
@@ -66,7 +70,7 @@ class local_mail_label {
         return $result;
     }
 
-    static function from_record($record) {
+    static public function from_record($record) {
         $label = new self;
         $label->id = (int) $record->id;
         $label->userid = (int) $record->userid;
@@ -75,15 +79,15 @@ class local_mail_label {
         return $label;
     }
 
-    static function valid_colors() {
+    static public function valid_colors() {
         return array('red', 'orange', 'yellow', 'green', 'blue', 'purple', 'black');
     }
 
-    function color() {
+    public function color() {
         return $this->color;
     }
 
-    function delete() {
+    public function delete() {
         global $DB;
 
         $transaction = $DB->start_delegated_transaction();
@@ -97,15 +101,15 @@ class local_mail_label {
         $transaction->allow_commit();
     }
 
-    function id() {
+    public function id() {
         return $this->id;
     }
 
-    function name() {
+    public function name() {
         return $this->name;
     }
 
-     function save($name, $color) {
+    public function save($name, $color) {
         global $DB;
 
         assert(!$color or in_array($color, self::valid_colors()));
@@ -119,9 +123,10 @@ class local_mail_label {
         $DB->update_record('local_mail_labels', $record);
     }
 
-    function userid() {
+    public function userid() {
         return $this->userid;
     }
 
-    private function __construct() {}
+    private function __construct() {
+    }
 }

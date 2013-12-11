@@ -1,21 +1,25 @@
 <?php
-
-// Local mail plugin for Moodle
-// Copyright © 2012,2013 Institut Obert de Catalunya
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Ths program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local-mail
+ * @copyright  Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -29,7 +33,7 @@ class local_mail_label_test extends local_mail_testcase {
        4xx -> labels
        5xx -> maessages */
 
-    static function assertLabel(local_mail_label $label) {
+    static public function assertLabel(local_mail_label $label) {
         self::assertRecords('labels', array(
             'id' => $label->id(),
             'userid' => $label->userid(),
@@ -38,7 +42,7 @@ class local_mail_label_test extends local_mail_testcase {
         ));
     }
 
-    function test_create() {
+    public function test_create() {
         $label = local_mail_label::create(201, 'name', 'red');
 
         $this->assertNotEquals(false, $label->id());
@@ -48,7 +52,7 @@ class local_mail_label_test extends local_mail_testcase {
         $this->assertLabel($label);
     }
 
-    function test_delete() {
+    public function test_delete() {
         $label = local_mail_label::create(201, 'label', 'red');
         $other = local_mail_label::create(201, 'other', 'green');
         $this->loadRecords('local_mail_message_labels', array(
@@ -75,7 +79,7 @@ class local_mail_label_test extends local_mail_testcase {
         $this->assertIndex(201, 'label', $other->id(), 3, 501, 0);
     }
 
-    function test_fetch() {
+    public function test_fetch() {
         $this->loadRecords('local_mail_labels', array(
             array('id', 'userid', 'name',   'color'),
             array( 401,  201,     'label1', 'red'),
@@ -91,7 +95,7 @@ class local_mail_label_test extends local_mail_testcase {
         $this->assertEquals('red', $result->color());
     }
 
-    function test_fetch_user() {
+    public function test_fetch_user() {
         $label1 = local_mail_label::create(201, 'label1', 'red');
         $label2 = local_mail_label::create(201, 'label2', 'green');
         $label3 = local_mail_label::create(202, 'label3', 'blue');
@@ -103,7 +107,7 @@ class local_mail_label_test extends local_mail_testcase {
         $this->assertContains($label2, $result);
     }
 
-    function test_save() {
+    public function test_save() {
         $label = local_mail_label::create(201, 'name', 'red');
 
         $label->save('changed', 'green');

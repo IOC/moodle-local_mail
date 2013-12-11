@@ -1,28 +1,32 @@
 <?php
-
-// Local mail plugin for Moodle
-// Copyright © 2012,2013 Institut Obert de Catalunya
+// This file is part of Moodle - http://moodle.org/
 //
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// Ths program is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * @package    local-mail
+ * @copyright  Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 
 class mail_compose_form extends moodleform {
 
-    function definition() {
+    public function definition() {
         $mform = $this->_form;
         $message = $this->_customdata['message'];
 
@@ -96,7 +100,7 @@ class mail_compose_form extends moodleform {
         $mform->closeHeaderBefore('buttonar');
     }
 
-    function validation($data, $files) {
+    public function validation($data, $files) {
         $message = $this->_customdata['message'];
 
         $errors = array();
@@ -135,11 +139,11 @@ class mail_compose_form extends moodleform {
     public static function file_options() {
         global $COURSE, $PAGE, $CFG;
 
-        $config_maxbytes = get_config('local_mail', 'maxbytes') ?: LOCAL_MAIL_MAXBYTES;
-        $config_maxfiles = get_config('local_mail', 'maxfiles');
+        $configmaxbytes = get_config('local_mail', 'maxbytes') ?: LOCAL_MAIL_MAXBYTES;
+        $configmaxfiles = get_config('local_mail', 'maxfiles');
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes,
-                                                  $COURSE->maxbytes, $config_maxbytes);
-        $maxfiles = is_numeric($config_maxfiles) ? $config_maxfiles : LOCAL_MAIL_MAXFILES;
+                                                  $COURSE->maxbytes, $configmaxbytes);
+        $maxfiles = is_numeric($configmaxfiles) ? $configmaxfiles : LOCAL_MAIL_MAXFILES;
         return array('accepted_types' => '*',
                      'maxbytes' => $maxbytes,
                      'maxfiles' => $maxfiles,
@@ -153,8 +157,8 @@ class mail_compose_form extends moodleform {
         $message = $this->_customdata['message'];
 
         $content = '';
-        
-        foreach ($users as $user) { 
+
+        foreach ($users as $user) {
             $content .= html_writer::start_tag('div', array('class' => 'mail_recipient'));
             $options = array('courseid' => $message->course(),
                              'link' => false, 'alttext' => false);
