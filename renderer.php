@@ -32,8 +32,6 @@ class local_mail_renderer extends plugin_renderer_base {
 
         if ($daysago == 0) {
             $content = userdate($time, get_string('strftimetime'));
-        } else if ($daysago <= 6) {
-            $content = userdate($time, get_string('strftimedaytime'));
         } else if ($yearsago == 0) {
             $content = userdate($time, get_string('strftimedateshort'));
         } else {
