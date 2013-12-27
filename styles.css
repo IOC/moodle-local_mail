@@ -339,6 +339,15 @@
     background: transparent url('pix/icons.png') no-repeat -72px 0;
 }
 
+.mail_attached {
+    vertical-align: middle;
+    margin: 0;
+    display:inline-block;
+    width: 18px;
+    height: 18px;
+    background: transparent url('pix/icons.png') no-repeat -90px 0;
+}
+
 /* Toolbar */
 
 .mail_toolbar,

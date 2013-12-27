@@ -759,4 +759,25 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertFalse($message->viewable(203));
         $this->assertTrue($message->viewable(203, true));
     }
+
+    public function test_fetch_index_attachment() {
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject1', 'content1', 301, false, true);
+        $message->add_recipient('to', 202);
+        $message->send(12345567890);
+
+        $result = local_mail_message::fetch_index(201, 'attachment', true);
+        $this->assertEquals(array($message), $result);
+    }
+
+    public function test_fetch_index_attachment_deleted() {
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject1', 'content1', 301 , false);
+        $message->add_recipient('to', 202);
+        $this->assertTrue($message->draft());
+
+        $result = local_mail_message::fetch_index(201, 'attachment', false);
+        $this->assertEquals(array($message), $result);
+
+    }
 }

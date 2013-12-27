@@ -43,6 +43,12 @@ class local_mail_renderer extends plugin_renderer_base {
         return html_writer::tag('span', s($content), array('class' => 'mail_date'));
     }
 
+    public function attachment($message) {
+        if ($message->has_attachment()) {
+            return html_writer::tag('span' , '' , array('class' => 'mail_attached'));
+        }
+    }
+
     public function label($label) {
         $classes = 'mail_label' . ($label->color() ? 'mail_' . $label->color() : '');
         return html_writer::tag('span', s($label->name()), array('class' => $classes));
@@ -102,6 +108,7 @@ class local_mail_renderer extends plugin_renderer_base {
             }
             $content = ($this->users($message, $userid, $type, $itemid) .
                         $this->summary($message, $userid, $type, $itemid) .
+                        $this->attachment($message) .
                         $this->date($message));
             if ($message->editable($userid) and array_key_exists($message->course()->id, local_mail_get_my_courses())) {
                 $url = new moodle_url('/local/mail/compose.php', array('m' => $message->id()));
@@ -434,6 +441,16 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('input', $attributes);
         $text = get_string('searchbyunread', 'local_mail');
         $output .= html_writer::label($text, 'searchunread');
+        $output .= html_writer::end_tag('div');
+        $attributesattach = array(
+            'type' => 'checkbox',
+            'id' => 'searchattach',
+            'name' => 'searchattach'
+        );
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributesattach);
+        $text = get_string('searchbyattach', 'local_mail');
+        $output .= html_writer::label($text, 'searchattach');
         $output .= html_writer::end_tag('div');
         $output .= html_writer::start_tag('div', array('class' => 'mail_search_datepicker'));
         $text = get_string('filterbydate', 'local_mail');

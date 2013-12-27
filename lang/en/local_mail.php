@@ -98,6 +98,7 @@ $string['replyall'] = 'Reply all';
 $string['restore'] = 'Restore';
 $string['search'] = 'Search';
 $string['searchbyunread'] = 'Unread only';
+$string['searchbyattach'] = 'Has attachment';
 $string['shortaddbcc'] = 'Bcc';
 $string['shortaddcc'] = 'Cc';
 $string['shortaddto'] = 'To';

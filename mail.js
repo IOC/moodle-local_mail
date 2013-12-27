@@ -9,6 +9,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var mail_undo_ids = '';
     var mail_search_selected = '';
     var mail_unread_selected = false;
+    var mail_attach_selected = false;
     var mail_date_selected = '';
     var mail_doing_search = false;
     var mail_after_message_search = false;
@@ -243,6 +244,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         mail_perpageid = 0;
         mail_search_selected = Y.one('#textsearch').get('value');
         mail_unread_selected = Y.one('#searchunread').get('checked');
+        mail_attach_selected = Y.one('#searchattach').get('checked');
         mail_select_none();
         mail_check_selected();
         Y.all('.mail_paging input').set('disabled', 'disabled');
@@ -254,6 +256,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         Y.one('#textsearch').set('value', mail_search_selected);
         if (mail_unread_selected) {
             Y.one('#searchunread').set('checked', 'checked');
+        }
+        if (mail_attach_selected) {
+            Y.one('#searchattach').set('checked', 'checked');
         }
     };
 
@@ -708,6 +713,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                 Y.one('.mail_paging > span').addClass('mail_hidden');
                 mail_search_selected = obj.search.query;
                 mail_unread_selected = obj.search.unread;
+                mail_attach_selected = obj.search.attach;
                 mail_date_selected = obj.search.date;
                 mail_update_form_search();
                 if (obj.search.prev) {
@@ -895,8 +901,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                 type: mail_view_type,
                 offset: Y.one('input[name="offset"]').get('value'),
                 action: action,
-                mailview: mail_view
-            },
+             },
             on: {
                 success:handleSuccess,
                 failure:handleFailure
@@ -946,6 +951,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             }
             cfg.data.search =  mail_search_selected;
             cfg.data.unread = (mail_unread_selected?'1':'');
+            cfg.data.attach = (mail_attach_selected?'1':'');
             cfg.data.time = mail_date_selected;
             cfg.data.perpageid = mail_perpageid;
             if (action == 'prevpage') {

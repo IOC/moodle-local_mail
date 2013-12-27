@@ -29,7 +29,7 @@ require_once('label.class.php');
 class local_mail_message {
 
     private static $indextypes = array(
-        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash'
+        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash', 'attachment'
     );
 
     private $id;
@@ -116,6 +116,7 @@ class local_mail_message {
 
         $message->create_index($userid, 'drafts');
         $message->create_index($userid, 'course', $courseid);
+        $message->create_index($userid, 'attachment', false);
 
         $transaction->allow_commit();
 
@@ -241,7 +242,13 @@ class local_mail_message {
         foreach (array_chunk($ids, 100) as $ids) {
             foreach (self::fetch_many($ids) as $message) {
                 if ($message->match($userid, $query['pattern'])) {
-                    $result[] = $message;
+                    if (!empty($query['attach'])) {
+                        if ($message->has_attachment()) {
+                            $result[] = $message;
+                        }
+                    } else {
+                        $result[] = $message;
+                    }
                 }
             }
             if (!empty($query['limit']) and count($result) >= $query['limit']) {
@@ -360,6 +367,19 @@ class local_mail_message {
         return $this->has_user($userid) and $this->role[$userid] != 'from';
     }
 
+    public function has_attachment() {
+        global $DB;
+        if ($DB->get_record('local_mail_index', array('type' => 'attachment', 'messageid' => $this->id, 'item' => true))) {
+            return true;
+        }
+        foreach ($this->references() as $reference) {
+            if ($reference->has_attachment()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function id() {
         return $this->id;
     }
@@ -446,7 +466,7 @@ class local_mail_message {
         $transaction = $DB->start_delegated_transaction();
 
         $message = self::create($userid, $this->course->id, $time);
-        $message->save($subject, '', -1, $time);
+        $message->save($subject, '', -1, $time, false);
         $sender = $this->sender();
         $message->add_recipient('to', $sender->id);
         $message->set_references($this);
@@ -468,7 +488,7 @@ class local_mail_message {
         return $message;
     }
 
-    public function save($subject, $content, $format, $time=false) {
+    public function save($subject, $content, $format, $time=false, $attachment=false) {
         global $DB;
 
         assert($this->draft);
@@ -485,6 +505,10 @@ class local_mail_message {
         $DB->set_field('local_mail_index', 'time', $this->time, array(
             'messageid' => $this->id,
         ));
+
+        $DB->set_field('local_mail_index', 'item', $attachment, array(
+            'messageid' => $this->id, 'type' => 'attachment'));
+
         $transaction->allow_commit();
     }
 
