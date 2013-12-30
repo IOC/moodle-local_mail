@@ -430,6 +430,18 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('div');
+         $attributes = array(
+            'type' => 'text',
+            'id' => 'textsearchfrom',
+            'name' => 'textsearchfrom',
+            'maxlength' => 45
+
+        );
+        $text = get_string('from', 'local_mail');
+        $output .= html_writer::label($text, 'textsearchfrom');
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('div');
         $attributes = array(
             'type' => 'checkbox',
             'id' => 'searchunread',

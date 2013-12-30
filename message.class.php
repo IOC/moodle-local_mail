@@ -29,7 +29,7 @@ require_once('label.class.php');
 class local_mail_message {
 
     private static $indextypes = array(
-        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash', 'attachment'
+        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash', 'attachment', 'searchfrom'
     );
 
     private $id;
@@ -206,6 +206,7 @@ class local_mail_message {
         assert(empty($query['before']) or empty($query['after']));
 
         $query['pattern'] = !empty($query['pattern']) ? $query['pattern'] : '';
+        $query['searchfrom'] = !empty($query['searchfrom']) ? $query['searchfrom'] : '';
 
         $sql = 'SELECT messageid FROM {local_mail_index}'
             . ' WHERE userid = :userid AND type = :type AND item = :item';
@@ -241,7 +242,7 @@ class local_mail_message {
         $result = array();
         foreach (array_chunk($ids, 100) as $ids) {
             foreach (self::fetch_many($ids) as $message) {
-                if ($message->match($userid, $query['pattern'])) {
+                if ($message->match($userid, $query['pattern']) && $message->matchfrom($userid, $query['searchfrom'])) {
                     if (!empty($query['attach'])) {
                         if ($message->has_attachment()) {
                             $result[] = $message;
@@ -804,6 +805,24 @@ class local_mail_message {
 
         $html = format_text($this->content(), $this->format());
         return $matchtext(html_to_text($html));
+    }
+
+    private function matchfrom ($userid, $pattern) {
+        $normalize = function($text) {
+            return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
+        };
+
+        $pattern = $normalize($pattern);
+
+        $matchtext = function($text) use ($normalize, $pattern) {
+            return strpos($normalize($text), $pattern) !== false;
+        };
+
+        $sender = $this->sender();
+        if (!$pattern) {
+            return true;
+        }
+        return $matchtext(fullname($sender));;
     }
 
     private function set_references($message) {
