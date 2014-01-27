@@ -45,8 +45,10 @@ $recipients = optional_param('recipients', '', PARAM_SEQUENCE);
 $undo       = optional_param('undo', false, PARAM_BOOL);
 // Search messages
 $searching  = optional_param('searching', false, PARAM_BOOL);
+$searchfrom = optional_param('searchfrom', '', PARAM_RAW);
 $time       = optional_param('time', '', PARAM_SEQUENCE);
 $unread     = optional_param('unread', '', PARAM_TEXT);
+$attach     = optional_param('attach', '', PARAM_TEXT);
 $before     = optional_param('before', 0, PARAM_INT);
 $after      = optional_param('after', 0, PARAM_INT);
 $perpageid  = optional_param('perpageid', 0, PARAM_INT);
@@ -116,8 +118,10 @@ if ($action and in_array($action, $validactions) and !empty($USER->id)) {
     if ($searching) {
         $searchdata = array(
             'pattern' => $search,
+            'searchfrom' => $searchfrom,
             'time' => $time,
             'unread' => $unread,
+            'attach' => $attach,
             'before' => $before,
             'after' => $after,
             'limit' => $mailpagesize,
@@ -855,7 +859,9 @@ function local_mail_searchmessages($type, $itemid, $query, $offset = false, $per
     }
     $data = array(
         'query' => $query['pattern'],
+        'searchfrom' => $query['searchfrom'],
         'unread' => !empty($query['unread']),
+        'atttach' => !empty($query['attach']),
         'date' => $date,
         'prev' => $prev,
         'next' => $next,

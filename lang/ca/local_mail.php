@@ -98,6 +98,7 @@ $string['replyall'] = 'Respon a tots';
 $string['restore'] = 'Restaura';
 $string['search'] = 'Cerca';
 $string['searchbyunread'] = 'Només sense llegir';
+$string['searchbyattach'] = 'Conté un fitxer adjun';
 $string['shortaddbcc'] = 'Cco';
 $string['shortaddcc'] = 'Cc';
 $string['shortaddto'] = 'Per a';

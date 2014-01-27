@@ -339,6 +339,15 @@
     background: transparent url('pix/icons.png') no-repeat -72px 0;
 }
 
+.mail_attached {
+    vertical-align: middle;
+    margin: 0;
+    display:inline-block;
+    width: 18px;
+    height: 18px;
+    background: transparent url('pix/icons.png') no-repeat -90px 0;
+}
+
 /* Toolbar */
 
 .mail_toolbar,
@@ -516,6 +525,24 @@
 
 .mail_menu_search {
     padding: 0 0.5em 0.5em;
+}
+
+.mail_menu_search input[name="textsearch"]{
+    margin: 0.4em 0;
+    border: 1px solid #ccc;
+    padding: 0 1em;
+    border-radius: 0.2em;
+    height: 2.3em;
+    width: 26em!important;
+}
+
+.mail_menu_search input[name="textsearchfrom"]{
+    margin: 0.4em 0;
+    border: 1px solid #ccc;
+    padding: 0 1em;
+    border-radius: 0.2em;
+    height: 2.3em;
+    width: 26em!important;
 }
 
 .mail_menu_search input[name="textsearch"]{

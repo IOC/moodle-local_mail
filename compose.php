@@ -80,10 +80,10 @@ $mform->set_data($data);
 // Process form
 
 if ($data = $mform->get_data()) {
+    $fs = get_file_storage();
 
     // Discard message
     if (!empty($data->discard)) {
-        $fs = get_file_storage();
         $fs->delete_area_files($PAGE->context->id, 'local_mail', 'message', $message->id());
         $message->discard();
         $params = array('t' => 'course', 'c' => $message->course()->id);
@@ -96,7 +96,12 @@ if ($data = $mform->get_data()) {
                                           mail_compose_form::file_options(),
                                           $data->content['text']);
 
-    $message->save(trim($data->subject), $content, $data->content['format']);
+    $attachments = false;
+    if ($fs->get_area_files($PAGE->context->id, 'local_mail', 'message', $message->id(), 'filename', false)) {
+        $attachments = true;
+    }
+
+    $message->save(trim($data->subject), $content, $data->content['format'], '', $attachments);
 
     // Select recipients
     if (!empty($data->recipients)) {

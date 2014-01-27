@@ -557,6 +557,9 @@ class local_mail_message_test extends local_mail_testcase {
         $message4 = local_mail_message::create(201, 101);
         $message4->save('subject', 'content', 301, 1234567891);
         $message4->set_unread(201, true);
+        $message5 = local_mail_message::create(202, 101);
+        $message5->add_recipient('to', 201);
+        $message5->save('subject5', 'content5', 301, 1234567890, true);
 
         // Subject and content
         $query = array('pattern' => ' foo  bar ');
@@ -592,6 +595,19 @@ class local_mail_message_test extends local_mail_testcase {
         $query = array('after' => $message1->id(), 'limit' => 2);
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message3, $message2), $result);
+
+        // Attach
+
+        $query = array('attach' => true);
+        $result = local_mail_message::search_index(202, 'course', 101, $query);
+        $this->assertEquals(array($message5), $result);
+
+        // From
+
+        $query = array('searchfrom' => fullname($this->user2));
+        $result = local_mail_message::search_index(202, 'course', 101, $query);
+        $this->assertEquals(array($message5), $result);
+
     }
 
     public function test_send() {
@@ -758,5 +774,26 @@ class local_mail_message_test extends local_mail_testcase {
 
         $this->assertFalse($message->viewable(203));
         $this->assertTrue($message->viewable(203, true));
+    }
+
+    public function test_fetch_index_attachment() {
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject1', 'content1', 301, false, true);
+        $message->add_recipient('to', 202);
+        $message->send(12345567890);
+
+        $result = local_mail_message::fetch_index(201, 'attachment', true);
+        $this->assertEquals(array($message), $result);
+    }
+
+    public function test_fetch_index_attachment_deleted() {
+        $message = local_mail_message::create(201, 101);
+        $message->save('subject1', 'content1', 301 , false);
+        $message->add_recipient('to', 202);
+        $this->assertTrue($message->draft());
+
+        $result = local_mail_message::fetch_index(201, 'attachment', false);
+        $this->assertEquals(array($message), $result);
+
     }
 }
