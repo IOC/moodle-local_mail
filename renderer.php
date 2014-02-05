@@ -518,7 +518,7 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     public function recipientsform($courseid, $userid) {
-        global $COURSE;
+        global $COURSE, $DB;
 
         $options = array();
 
@@ -534,7 +534,11 @@ class local_mail_renderer extends plugin_renderer_base {
         $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
         $roles = get_roles_used_in_context($context);
         foreach ($roles as $key => $role) {
-            $options[$key] = $role->name;
+            $count = $DB->count_records_select('role_assignments', "contextid = :contextid AND roleid = :roleid AND userid <> :userid",
+                array('contextid' => $context->id, 'roleid' => $role->id, 'userid' => $userid));
+            if ($count) {
+                $options[$key] = $role->name;
+            }
         }
         $text = get_string('role', 'moodle');
         $content .= html_writer::start_tag('span', array('class' => 'roleselector'));
