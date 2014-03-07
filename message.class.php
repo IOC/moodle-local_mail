@@ -370,14 +370,24 @@ class local_mail_message {
 
     public function has_attachment() {
         global $DB;
-        if ($DB->get_record('local_mail_index', array('type' => 'attachment', 'messageid' => $this->id, 'item' => true))) {
+
+        if ($DB->record_exists('local_mail_index', array('type' => 'attachment', 'messageid' => $this->id, 'item' => true))) {
             return true;
         }
-        foreach ($this->references() as $reference) {
-            if ($reference->has_attachment()) {
-                return true;
-            }
+        if (!empty($this->refs)) {
+            list($sqlmessageids, $messageidparams) = $DB->get_in_or_equal($this->refs, SQL_PARAMS_NAMED, 'messageid');
+            $sql = 'SELECT count(*)'
+                . ' FROM mdl_local_mail_index'
+                . ' WHERE type=:type AND item=:item'
+                . ' AND messageid ' . $sqlmessageids;
+            $params = array(
+                    'type' => 'attachment',
+                    'item' => 1,
+            );
+            $count = $DB->count_records_sql($sql, array_merge($params, $messageidparams));
+            return $count > 0;
         }
+
         return false;
     }
 

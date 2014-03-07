@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="blocks/mail/db" VERSION="20120926" COMMENT="-"
+<XMLDB PATH="local/mail/db" VERSION="20120926" COMMENT="-"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -96,6 +96,7 @@
         <INDEX NAME="messageid_userid" UNIQUE="false" FIELDS="messageid, userid" NEXT="userid_type_item_time"/>
         <INDEX NAME="userid_type_item_time" UNIQUE="false" FIELDS="userid, type, item, time" PREVIOUS="messageid_userid" NEXT="userid_type_item_unread"/>
         <INDEX NAME="userid_type_item_unread" UNIQUE="false" FIELDS="userid, type, item, unread" PREVIOUS="userid_type_item_time"/>
+        <INDEX NAME="type_messageid_item" UNIQUE="false" FIELDS="type, messageid, item"/>
       </INDEXES>
     </TABLE>
   </TABLES>

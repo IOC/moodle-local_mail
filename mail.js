@@ -905,6 +905,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                 type: mail_view_type,
                 offset: Y.one('input[name="offset"]').get('value'),
                 action: action,
+                mailview: mail_view
              },
             on: {
                 success:handleSuccess,
