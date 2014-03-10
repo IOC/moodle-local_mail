@@ -25,6 +25,7 @@ $string['addbcc'] = 'Afegeix a Cco';
 $string['addcc'] = 'Afegeix a Cc';
 $string['addrecipients'] = 'Afegeix destinataris';
 $string['addto'] = 'Per a';
+$string['advsearch'] = 'Cerca avançada';
 $string['all'] = 'Tots';
 $string['applychanges'] = 'Aplica';
 $string['assigntonewlabel'] = 'Nova etiqueta';

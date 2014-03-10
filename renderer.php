@@ -430,12 +430,17 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('div');
-         $attributes = array(
+        $url = $this->output->pix_url('t/collapsed', 'moodle');
+        $output .= html_writer::start_tag('div', array('id' => 'mail_toggle_adv_search', 'class' => 'mail_adv_search'));
+        $output .= html_writer::empty_tag('img', array('id' => 'mail_adv_status', 'src' => $url, 'alt' => 'collapsed'));
+        $output .= html_writer::tag('span', get_string('advsearch', 'local_mail'));
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('id' => 'mail_adv_search', 'class' => 'mail_hidden'));
+        $attributes = array(
             'type' => 'text',
             'id' => 'textsearchfrom',
             'name' => 'textsearchfrom',
             'maxlength' => 45
-
         );
         $text = get_string('from', 'local_mail');
         $output .= html_writer::label($text, 'textsearchfrom');
@@ -465,6 +470,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', array('class' => 'mail_search_datepicker'));
         $text = get_string('filterbydate', 'local_mail');
         $output .= html_writer::label($text, null);
+        $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
         $attributes = array(
             'type' => 'button',

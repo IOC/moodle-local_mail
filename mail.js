@@ -222,6 +222,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var mail_toggle_menu_search = function() {
         var button = Y.one('#mail_search');
         var menu = Y.one('#mail_menu_search');
+        var advsearch = Y.one('#mail_adv_search');
         var position = button.getXY();
         var date;
         position[1] += button.get('clientHeight') + 2;
@@ -229,7 +230,9 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         menu.setXY(position);
         if (!menu.hasClass('mail_hidden')) {
             Y.one('#textsearch').focus();
-            mail_position_datepicker();
+            if (!advsearch.hasClass('mail_hidden')) {
+                mail_position_datepicker();
+            }
             if (mail_doing_search) {
                 Y.one('#buttoncancelsearch').removeClass('mail_hidden');
             } else {
@@ -237,6 +240,21 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             }
         } else {
             M.form.dateselector.panel.hide();
+        }
+    };
+
+    var mail_toggle_adv_search = function() {
+        var menu = Y.one('#mail_adv_search');
+        var status = Y.one('#mail_adv_status');
+        menu.toggleClass('mail_hidden');
+        if (menu.hasClass('mail_hidden')) {
+            M.form.dateselector.panel.hide();
+            status.set('src', M.util.image_url('t/collapsed', 'moodle'));
+            status.set('alt', 'collapsed');
+        } else {
+            mail_position_datepicker();
+            status.set('src', M.util.image_url('t/expanded', 'moodle'));
+            status.set('alt' ,'expanded');
         }
     };
 
@@ -1354,6 +1372,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
     }, '#mail_menu_search');
+
+    //Click adv search
+    Y.one("#region-main").delegate('click', function(e) {
+        e.stopPropagation();
+        mail_toggle_adv_search();
+    }, '#mail_toggle_adv_search');
 
     Y.on('contentready', function() {
         if (M.form.dateselector.calendar) {

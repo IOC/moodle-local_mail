@@ -25,6 +25,7 @@ $string['addbcc'] = 'Add Bcc';
 $string['addcc'] = 'Add Cc';
 $string['addrecipients'] = 'Add recipients';
 $string['addto'] = 'Add To';
+$string['advsearch'] = 'Advanced search';
 $string['all'] = 'All';
 $string['applychanges'] = 'Apply';
 $string['assigntonewlabel'] = 'Assign to a new label...';

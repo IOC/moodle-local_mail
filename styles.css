@@ -73,6 +73,10 @@
     opacity: 0.5;
 }
 
+.mail_adv_search {
+    cursor: pointer;
+}
+
 .mail_form_recipient {
     border: 1px solid #AAAAAA;
     margin-bottom: -1px;
