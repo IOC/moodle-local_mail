@@ -99,9 +99,9 @@ while ((!$stoptime || (time() < $stoptime)) && $count < $countrecords) {
             $context = context_course::instance($record->courseid);
 
             if ($fs->is_area_empty($context->id, 'local_mail', 'message', $record->id, 'filename', false)) {
-                $indexrecord->item = 1;
-            } else {
                 $indexrecord->item = 0;
+            } else {
+                $indexrecord->item = 1;
             }
             $DB->insert_record('local_mail_index', $indexrecord);
 
