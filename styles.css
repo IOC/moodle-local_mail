@@ -73,7 +73,7 @@
     opacity: 0.5;
 }
 
-.mail_adv_search {
+.mail_adv_search, .mail_toggle_datepicker {
     cursor: pointer;
 }
 
@@ -558,8 +558,10 @@
     width: 26em!important;
 }
 
-.mail_search_datepicker {
-    height: 250px;
+.mail_search_datepicker .mail_text_search_date {
+    width: 5em;
+    text-align: center;
+    margin: 0 1em;
 }
 
 .mail_button_cancel_search {

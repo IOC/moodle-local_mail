@@ -353,6 +353,7 @@ if ($removelbl) {
     $jslabels = local_mail_js_labels();
     $url->param('m', $message->id());
     // Display page
+    $PAGE->requires->data_for_js('M.local_mail_lang', current_language(), true);
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->strings_for_js(array(
         'starred',
@@ -509,6 +510,7 @@ if ($removelbl) {
 
     $jslabels = local_mail_js_labels();
     // Display page
+    $PAGE->requires->data_for_js('M.local_mail_lang', current_language(), true);
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->strings_for_js(array(
         'delete',

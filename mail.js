@@ -1,4 +1,4 @@
-YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', 'moodle-form-dateselector', function(Y) {
+YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', 'moodle-form-dateselector', 'datatype-date', function(Y) {
 
     var mail_message_view = false;
     var mail_checkbox_labels_default = {};
@@ -1073,15 +1073,21 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         var datepicker = Y.one('#dateselector-calendar-panel');
         var search = Y.one('.mail_search_datepicker');
         var position = menu.getXY();
-        M.form.dateselector.panel.show();
+        //M.form.dateselector.panel.show();
         position[0] += (menu.get('offsetWidth')/2) - (datepicker.get('offsetWidth')/2);
-        position[1] = search.getXY()[1] + 30;
+        position[1] = search.getXY()[1] - datepicker.get('offsetHeight');
         datepicker.setXY(position);
     };
 
     var mail_get_selected_date = function(eventtype, args) {
         var date = args[0][0];
         mail_date_selected = date[0] + ',' + date[1] + ',' + date[2];
+        mail_set_selected_date(mail_date_selected);
+        M.form.dateselector.panel.hide();
+    };
+
+    var mail_set_selected_date = function(date) {
+        Y.one('#searchdate').set('text', Y.Date.format(new Date(date), {format:"%x"}));
     };
 
     var mail_notification_message = function(message) {
@@ -1371,6 +1377,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     //Click menu search
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
+        M.form.dateselector.panel.hide();
     }, '#mail_menu_search');
 
     //Click adv search
@@ -1378,6 +1385,16 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         e.stopPropagation();
         mail_toggle_adv_search();
     }, '#mail_toggle_adv_search');
+
+    //Click datepicker toggle image
+    Y.one("#mail_adv_search").delegate('click', function(e) {
+        e.stopPropagation();
+        if(Y.one('#dateselector-calendar-panel').getStyle('visibility') == 'hidden') {
+            M.form.dateselector.panel.show();
+        } else {
+            M.form.dateselector.panel.hide();
+        }
+    }, '#mail_toggle_datepicker');
 
     Y.on('contentready', function() {
         if (M.form.dateselector.calendar) {
