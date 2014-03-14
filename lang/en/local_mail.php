@@ -60,6 +60,7 @@ $string['labeldeleteconfirm'] = 'You are about to completely delete the label \'
 $string['labelname'] = 'Name';
 $string['labelcolor'] = 'Color';
 $string['labels'] = 'Labels';
+$string['mailupdater'] = 'Mail updater';
 $string['markasread'] = 'Mark as read';
 $string['markasstarred'] = 'Mark as starred';
 $string['markasunread'] = 'Mark as unread';
