@@ -23,6 +23,91 @@
 
 require_once($CFG->dirroot . '/local/mail/locallib.php');
 
+function local_mail_cron() {
+     $settings = get_config('local_mail');
+
+    if (empty($settings->cronenabled)) {
+        return;
+    }
+    mtrace('mailupdater: local_mail_cron() started at '. date('H:i:s'));
+    local_mail_update_process($settings);
+    mtrace('mailupdater: local_mail_cron() finished at ' . date('H:i:s'));
+    set_config('cronenabled', false, 'local_mail');
+    set_config('maxfiles', 10, 'local_mail');
+
+}
+
+function local_mail_update_process($settings) {
+    global $DB;
+
+    $hour = (int) date('H');
+    if ($hour < $settings->cronstart || $hour >= $settings->cronstop) {
+        mtrace('mailupdater: not between starthour and stophour, so doing nothing (hour = ' .
+                $hour . ').');
+        return;
+    }
+
+    // Setup the stop time.
+    if ($settings->cronduration) {
+        $stoptime = time() + $settings->cronduration;
+    } else {
+        $stoptime = false;
+    }
+
+    $countrecords = $DB->count_records('local_mail_messages');
+
+    $limitfrom = 0;
+    $limitnum = 1000;
+    $countrecords;
+
+    $inserts = 0;
+    $fs = get_file_storage();
+    $count = 0;
+    $starttime = time();
+    while ((!$stoptime || (time() < $stoptime)) && $count < $countrecords) {
+
+        $recordset = $DB->get_recordset('local_mail_messages', array(), '',     '*', $limitfrom, $limitnum);
+        try {
+
+            $transaction = $DB->start_delegated_transaction();
+
+            foreach ($recordset as $record) {
+
+                if (!$DB->get_records('local_mail_index', array('messageid' => $record->id, 'type' => 'attachment'))) {
+
+                    $indexrecord = new stdClass;
+                    $userid = $DB->get_field('local_mail_message_users', 'userid', array('messageid' => $record->id, 'role' => 'from'));
+                    $indexrecord->userid = $userid;
+                    $indexrecord->type = 'attachment';
+                    $indexrecord->time = $record->time;
+                    $indexrecord->messageid = $record->id;
+                    $unread = $DB->get_field('local_mail_message_users', 'unread', array('messageid' => $record->id, 'role' => 'from'));
+                    $indexrecord->unread = $unread;
+
+                    $context = context_course::instance($record->courseid);
+
+                    if ($fs->is_area_empty($context->id, 'local_mail', 'message', $record->id, 'filename', false)) {
+                        $indexrecord->item = 1;
+                    } else {
+                            $indexrecord->item = 0;
+                    }
+                        $DB->insert_record('local_mail_index', $indexrecord);
+                        $inserts++;
+                }
+
+            }
+            $recordset->close();
+            $transaction->allow_commit();
+        } catch (Exception $e) {
+            $transaction->rollback($e);
+        }
+
+        $count += 1000;
+        $limitfrom += $limitnum;
+
+    }
+}
+
 function local_mail_course_deleted($course) {
     $fs = get_file_storage();
     $fs->delete_area_files($course->context->id, 'local_mail');

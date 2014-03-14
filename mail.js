@@ -1073,7 +1073,6 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         var datepicker = Y.one('#dateselector-calendar-panel');
         var search = Y.one('.mail_search_datepicker');
         var position = menu.getXY();
-        //M.form.dateselector.panel.show();
         position[0] += (menu.get('offsetWidth')/2) - (datepicker.get('offsetWidth')/2);
         position[1] = search.getXY()[1] - datepicker.get('offsetHeight');
         datepicker.setXY(position);
@@ -1100,6 +1099,12 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             Y.one('#mail_notification_message').setContent('');
             Y.one('#mail_notification_undo').addClass('mail_novisible');
         }
+    };
+
+    var mail_reset_date_selected = function() {
+        date = M.form.dateselector.calendar.today;
+        mail_date_selected = date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate();
+        M.form.dateselector.calendar.clear();
     };
 
     /*** Event listeners***/
@@ -1357,6 +1362,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_doaction('goback');
         mail_before_message_search = false;
         mail_after_message_search = false;
+        mail_reset_date_selected();
     }, '#buttoncancelsearch');
 
 
@@ -1369,9 +1375,9 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_hide_menu_labels();
         mail_toggle_menu_search();
         if (!mail_date_selected) {
-            date = M.form.dateselector.calendar.today;
-            mail_date_selected = date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate();
+            mail_reset_date_selected();
         }
+        mail_set_selected_date(mail_date_selected);
     }, '#mail_search');
 
     //Click menu search
@@ -1387,7 +1393,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     }, '#mail_toggle_adv_search');
 
     //Click datepicker toggle image
-    Y.one("#mail_adv_search").delegate('click', function(e) {
+    Y.one("#local_mail_main_form").delegate('click', function(e) {
         e.stopPropagation();
         if(Y.one('#dateselector-calendar-panel').getStyle('visibility') == 'hidden') {
             M.form.dateselector.panel.show();

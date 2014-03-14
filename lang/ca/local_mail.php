@@ -123,3 +123,4 @@ $string['undodelete'] = 'S\'han mogut a la paperera {$a} missatges';
 $string['undorestore'] = 'S\'han restaurat {$a} missatges';
 $string['unread'] = 'Sense llegir';
 $string['unstarred'] = 'Sense destacar';
+$string['cronenabled'] = 'Cron enabled';
