@@ -24,7 +24,7 @@
 require_once($CFG->dirroot . '/local/mail/locallib.php');
 
 function local_mail_cron() {
-     $settings = get_config('local_mail');
+    $settings = get_config('local_mail');
 
     if (empty($settings->cronenabled)) {
         return;
@@ -68,13 +68,9 @@ function local_mail_update_process($settings) {
 
         $recordset = $DB->get_recordset('local_mail_messages', array(), '',     '*', $limitfrom, $limitnum);
         try {
-
             $transaction = $DB->start_delegated_transaction();
-
             foreach ($recordset as $record) {
-
                 if (!$DB->get_records('local_mail_index', array('messageid' => $record->id, 'type' => 'attachment'))) {
-
                     $indexrecord = new stdClass;
                     $userid = $DB->get_field('local_mail_message_users', 'userid', array('messageid' => $record->id, 'role' => 'from'));
                     $indexrecord->userid = $userid;
@@ -87,14 +83,13 @@ function local_mail_update_process($settings) {
                     $context = context_course::instance($record->courseid);
 
                     if ($fs->is_area_empty($context->id, 'local_mail', 'message', $record->id, 'filename', false)) {
-                        $indexrecord->item = 1;
+                        $indexrecord->item = 0;
                     } else {
-                            $indexrecord->item = 0;
+                        $indexrecord->item = 1;
                     }
-                        $DB->insert_record('local_mail_index', $indexrecord);
-                        $inserts++;
+                    $DB->insert_record('local_mail_index', $indexrecord);
+                    $inserts++;
                 }
-
             }
             $recordset->close();
             $transaction->allow_commit();
@@ -104,7 +99,6 @@ function local_mail_update_process($settings) {
 
         $count += 1000;
         $limitfrom += $limitnum;
-
     }
 }
 
