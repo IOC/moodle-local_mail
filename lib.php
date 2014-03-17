@@ -33,8 +33,6 @@ function local_mail_cron() {
     local_mail_update_process($settings);
     mtrace('mailupdater: local_mail_cron() finished at ' . date('H:i:s'));
     set_config('cronenabled', false, 'local_mail');
-    set_config('maxfiles', 10, 'local_mail');
-
 }
 
 function local_mail_update_process($settings) {
