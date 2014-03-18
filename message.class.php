@@ -824,14 +824,15 @@ class local_mail_message {
 
         $pattern = $normalize($pattern);
 
+        if (!$pattern) {
+            return true;
+        }
+
         $matchtext = function($text) use ($normalize, $pattern) {
             return strpos($normalize($text), $pattern) !== false;
         };
 
         $sender = $this->sender();
-        if (!$pattern) {
-            return true;
-        }
         return $matchtext(fullname($sender));;
     }
 

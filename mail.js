@@ -268,8 +268,14 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_select_none();
         mail_check_selected();
         Y.all('.mail_paging input').set('disabled', 'disabled');
+        mail_show_loading_image();
         mail_doaction('search');
         mail_hide_menu_search();
+    };
+
+    var mail_show_loading_image = function() {
+        Y.one('.mail_list').addClass('mail_hidden');
+        Y.one('.mail_search_loading').removeClass('mail_hidden');
     };
 
     var mail_update_form_search = function() {
@@ -1392,7 +1398,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_toggle_adv_search();
     }, '#mail_toggle_adv_search');
 
-    //Click datepicker toggle image
+    //Click date search
     Y.one("#local_mail_main_form").delegate('click', function(e) {
         e.stopPropagation();
         if(Y.one('#dateselector-calendar-panel').getStyle('visibility') == 'hidden') {
@@ -1400,7 +1406,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         } else {
             M.form.dateselector.panel.hide();
         }
-    }, '#mail_toggle_datepicker');
+    }, '.mail_search_date');
 
     Y.on('contentready', function() {
         if (M.form.dateselector.calendar) {
@@ -1419,7 +1425,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             this.focus();
             mail_do_search();
         }
-    }, '#textsearch');
+    }, '#textsearch, #textsearchfrom');
 
     //Click on button search
     Y.one("#region-main").delegate('click', function(e) {
