@@ -481,9 +481,11 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div', array('class' => 'mail_search_datepicker'));
         $text = get_string('filterbydate', 'local_mail');
         $output .= html_writer::label($text, null);
-        $output .= html_writer::label('', null, true, array('id' => 'searchdate', 'class' => 'mail_text_search_date'));
+        $output .= html_writer::start_tag('span', array('class' => 'mail_search_date'));
+        $output .= html_writer::tag('span', '', array('id' => 'searchdate', ''));
         $url = $this->output->pix_url('i/calendar', 'core');
         $output .= html_writer::empty_tag('img', array('id' => 'mail_toggle_datepicker', 'class' => 'mail_toggle_datepicker', 'src' => $url, 'alt' => 'calendar'));
+        $output .= html_writer::end_tag('span');
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
         $attributes = array(
@@ -672,7 +674,7 @@ class local_mail_renderer extends plugin_renderer_base {
 
         $content .= html_writer::end_tag('div');
         $content .= html_writer::tag('div', '', array('id' => 'local_mail_recipients_list', 'class' => 'mail_form_recipients'));
-        $content .= html_writer::start_tag('div', array('class' => 'mail_search_loading'));
+        $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_loading'));
         $content .= $this->output->pix_icon('i/loading', get_string('actions'), 'moodle', array('class' => 'loading_icon'));
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
@@ -1014,6 +1016,9 @@ class local_mail_renderer extends plugin_renderer_base {
             $content .= html_writer::tag('div', $string.' '.$link, array('class' => 'mail_item'));
             $content .= $this->output->container_end();
         }
+        $content .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_search_loading'));
+        $content .= $this->output->pix_icon('i/loading', get_string('actions'), 'moodle', array('class' => 'loading_icon'));
+        $content .= html_writer::end_tag('div');
         $content .= html_writer::start_tag('div');
         $content .= html_writer::empty_tag('input', array(
                 'type' => 'hidden',

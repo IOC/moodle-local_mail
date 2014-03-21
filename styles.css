@@ -55,7 +55,7 @@
     width: 233px;
 }
 
-.mail_search_loading {
+.mail_recipients_loading {
     background-color: #fff;
     height: 395px;
     top: 120px;
@@ -67,14 +67,31 @@
     text-align: center;
 }
 
-.mail_search_loading .loading_icon {
+.mail_recipients_loading .loading_icon {
     margin: 125px auto auto;
     vertical-align: middle;
     opacity: 0.5;
 }
 
-.mail_adv_search, .mail_toggle_datepicker {
+.mail_search_loading {
+    background-color: #fff;
+    min-height: 50px;
+    min-width: 50px;
+    width: 100%;
+    text-align: center;
+}
+
+.mail_search_loading .loading_icon {
+    vertical-align: middle;
+    opacity: 0.5;
+}
+
+.mail_adv_search {
     cursor: pointer;
+}
+
+.mail_toggle_datepicker {
+    margin-left: 10px;
 }
 
 .mail_form_recipient {
@@ -567,10 +584,20 @@
     width: 26em!important;
 }
 
-.mail_search_datepicker .mail_text_search_date {
-    width: 5em;
-    text-align: center;
-    margin: 0 1em;
+.mail_search_date {
+    display: inline-block;
+    margin: 0.4em 0;
+    border: 1px solid #ccc;
+    padding: 0 1em;
+    border-radius: 0.2em;
+    height: 2.3em;
+    width: 6em;
+    cursor: pointer;
+}
+
+.mail_search_date img,
+.mail_search_date span {
+    vertical-align: middle;
 }
 
 .mail_button_cancel_search {

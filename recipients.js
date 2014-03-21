@@ -61,7 +61,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         if (obj.msgerror) {
             alert(obj.msgerror);
         } else {
-            node = Y.one('.mail_search_loading');
+            node = Y.one('.mail_recipients_loading');
             if (node) {
                 node.hide();
             }
@@ -95,7 +95,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         var roleids = '';
         var node;
 
-        node = Y.one('.mail_search_loading');
+        node = Y.one('.mail_recipients_loading');
         if (node) {
             node.show();
         }
