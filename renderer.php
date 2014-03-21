@@ -448,6 +448,17 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('div');
         $attributes = array(
+            'type' => 'text',
+            'id' => 'textsearchto',
+            'name' => 'textsearchto',
+            'maxlength' => 45
+        );
+        $text = get_string('to', 'local_mail');
+        $output .= html_writer::label($text, 'textsearchto');
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('div');
+        $attributes = array(
             'type' => 'checkbox',
             'id' => 'searchunread',
             'name' => 'searchunread'

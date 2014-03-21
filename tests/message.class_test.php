@@ -608,6 +608,12 @@ class local_mail_message_test extends local_mail_testcase {
         $result = local_mail_message::search_index(202, 'course', 101, $query);
         $this->assertEquals(array($message5), $result);
 
+        // To
+
+        $query = array('searchto' => fullname($this->user1));
+        $result = local_mail_message::search_index(202, 'course', 101, $query);
+        $this->assertEquals(array($message5), $result);
+
     }
 
     public function test_send() {

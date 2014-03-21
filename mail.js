@@ -9,6 +9,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     var mail_undo_ids = '';
     var mail_search_selected = '';
     var mail_searchfrom_selected = '';
+    var mail_searchto_selected = '';
     var mail_unread_selected = false;
     var mail_attach_selected = false;
     var mail_date_selected = '';
@@ -263,6 +264,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_perpageid = 0;
         mail_search_selected = Y.one('#textsearch').get('value');
         mail_searchfrom_selected = Y.one('#textsearchfrom').get('value');
+        mail_searchto_selected = Y.one('#textsearchto').get('value');
         mail_unread_selected = Y.one('#searchunread').get('checked');
         mail_attach_selected = Y.one('#searchattach').get('checked');
         mail_select_none();
@@ -275,6 +277,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     var mail_update_form_search = function() {
         Y.one('#textsearch').set('value', mail_search_selected);
         Y.one('#textsearchfrom').set('value', mail_searchfrom_selected);
+        Y.one('#textsearchto').set('value', mail_searchto_selected);
         if (mail_unread_selected) {
             Y.one('#searchunread').set('checked', 'checked');
         }
@@ -734,6 +737,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 Y.one('.mail_paging > span').addClass('mail_hidden');
                 mail_search_selected = obj.search.query;
                 mail_searchfrom_selected = obj.search.searchfrom;
+                mail_searchto_selected = obj.search.searchto;
                 mail_unread_selected = obj.search.unread;
                 mail_attach_selected = obj.search.attach;
                 mail_date_selected = obj.search.date;
@@ -974,6 +978,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             }
             cfg.data.search =  mail_search_selected;
             cfg.data.searchfrom = mail_searchfrom_selected;
+            cfg.data.searchto = mail_searchto_selected;
             cfg.data.unread = (mail_unread_selected?'1':'');
             cfg.data.attach = (mail_attach_selected?'1':'');
             cfg.data.time = mail_date_selected;

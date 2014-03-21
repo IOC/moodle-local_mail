@@ -46,6 +46,7 @@ $undo       = optional_param('undo', false, PARAM_BOOL);
 // Search messages
 $searching  = optional_param('searching', false, PARAM_BOOL);
 $searchfrom = optional_param('searchfrom', '', PARAM_RAW);
+$searchto   = optional_param('searchto  ', '', PARAM_RAW);
 $time       = optional_param('time', '', PARAM_SEQUENCE);
 $unread     = optional_param('unread', '', PARAM_TEXT);
 $attach     = optional_param('attach', '', PARAM_TEXT);
@@ -119,6 +120,7 @@ if ($action and in_array($action, $validactions) and !empty($USER->id)) {
         $searchdata = array(
             'pattern' => $search,
             'searchfrom' => $searchfrom,
+            'searchto' => $searchto,
             'time' => $time,
             'unread' => $unread,
             'attach' => $attach,
@@ -860,6 +862,7 @@ function local_mail_searchmessages($type, $itemid, $query, $offset = false, $per
     $data = array(
         'query' => $query['pattern'],
         'searchfrom' => $query['searchfrom'],
+        'searchto' => $query['searchto'],
         'unread' => !empty($query['unread']),
         'attach' => !empty($query['attach']),
         'date' => $date,
