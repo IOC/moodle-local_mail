@@ -839,20 +839,22 @@ class local_mail_message {
     }
 
     private function matchto ($userid, $pattern) {
-           $normalize = function($text) {
+        $normalize = function($text) {
             return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
         };
 
         $pattern = $normalize($pattern);
+
+        if (!$pattern) {
+            return true;
+        }
 
         $matchtext = function($text) use ($normalize, $pattern) {
             return strpos($normalize($text), $pattern) !== false;
         };
 
         $recipients = $this->recipients();
-        if (!$pattern) {
-            return true;
-        }
+
         foreach ($recipients as $recipient) {
             if ($matchtext(fullname($recipient))) {
                 return $matchtext(fullname($recipient));;

@@ -46,7 +46,7 @@ $undo       = optional_param('undo', false, PARAM_BOOL);
 // Search messages
 $searching  = optional_param('searching', false, PARAM_BOOL);
 $searchfrom = optional_param('searchfrom', '', PARAM_RAW);
-$searchto   = optional_param('searchto  ', '', PARAM_RAW);
+$searchto   = optional_param('searchto', '', PARAM_RAW);
 $time       = optional_param('time', '', PARAM_SEQUENCE);
 $unread     = optional_param('unread', '', PARAM_TEXT);
 $attach     = optional_param('attach', '', PARAM_TEXT);

@@ -1430,7 +1430,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             this.focus();
             mail_do_search();
         }
-    }, '#textsearch, #textsearchfrom');
+    }, '#textsearch, #textsearchfrom, #textsearchto');
 
     //Click on button search
     Y.one("#region-main").delegate('click', function(e) {
