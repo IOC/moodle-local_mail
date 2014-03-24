@@ -95,8 +95,8 @@
       <INDEXES>
         <INDEX NAME="messageid_userid" UNIQUE="false" FIELDS="messageid, userid" NEXT="userid_type_item_time"/>
         <INDEX NAME="userid_type_item_time" UNIQUE="false" FIELDS="userid, type, item, time" PREVIOUS="messageid_userid" NEXT="userid_type_item_unread"/>
-        <INDEX NAME="userid_type_item_unread" UNIQUE="false" FIELDS="userid, type, item, unread" PREVIOUS="userid_type_item_time"/>
-        <INDEX NAME="type_messageid_item" UNIQUE="false" FIELDS="type, messageid, item"/>
+        <INDEX NAME="userid_type_item_unread" UNIQUE="false" FIELDS="userid, type, item, unread" PREVIOUS="userid_type_item_time" NEXT="type_messageid_item"/>
+        <INDEX NAME="type_messageid_item" UNIQUE="false" FIELDS="type, messageid, item" PREVIOUS="userid_type_item_unread"/>
       </INDEXES>
     </TABLE>
   </TABLES>
