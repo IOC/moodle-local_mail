@@ -40,7 +40,6 @@
     border-top: 1px solid #bbb;
 }
 
-
 .mail_recipients_search{
     min-width: 50%;
     max-width: 100%;
@@ -548,34 +547,9 @@
     padding: 0 0.5em 0.5em;
 }
 
-.mail_menu_search input[name="textsearch"]{
-    margin: 0.4em 0;
-    border: 1px solid #ccc;
-    padding: 0 1em;
-    border-radius: 0.2em;
-    height: 2.3em;
-    width: 26em!important;
-}
-
-.mail_menu_search input[name="textsearchfrom"]{
-    margin: 0.4em 0;
-    border: 1px solid #ccc;
-    padding: 0 1em;
-    border-radius: 0.2em;
-    height: 2.3em;
-    width: 26em!important;
-}
-
-.mail_menu_search input[name="textsearchto"]{
-    margin: 0.4em 0;
-    border: 1px solid #ccc;
-    padding: 0 1em;
-    border-radius: 0.2em;
-    height: 2.3em;
-    width: 26em!important;
-}
-
-.mail_menu_search input[name="textsearch"]{
+.mail_menu_search input[name="textsearch"],
+.mail_menu_search input[name="textsearchfrom"],
+.mail_menu_search input[name="textsearchto"] {
     margin: 0.4em 0;
     border: 1px solid #ccc;
     padding: 0 1em;
