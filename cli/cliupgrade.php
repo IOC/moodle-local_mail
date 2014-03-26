@@ -41,7 +41,7 @@ if ($unrecognized) {
 
 if ($options['help']) {
     $help =
-"Local mail upgrade helper CLI tool.
+        "Local mail upgrade helper CLI tool.
 Will upgrade all remaining mails if no options are specified.
 
 Options:
@@ -68,7 +68,6 @@ $countrecords = $DB->count_records('local_mail_messages');
 
 $limitfrom = 0;
 $limitnum = 1000;
-$countrecords;
 
 $inserts = 0;
 $fs = get_file_storage();
@@ -76,12 +75,12 @@ $count = 0;
 $starttime = time();
 
 mtrace('Mail updater: processing ...');
+
 while ((!$stoptime || (time() < $stoptime)) && $count < $countrecords) {
 
     $recordset = $DB->get_recordset('local_mail_messages', array(), '',     '*', $limitfrom, $limitnum);
 
     $transaction = $DB->start_delegated_transaction();
-
 
     foreach ($recordset as $record) {
 

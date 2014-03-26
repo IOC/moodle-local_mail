@@ -182,8 +182,8 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     public function delete($trash) {
-        $type = ($trash?'restore':'delete');
-        $label = ($trash?get_string('restore', 'local_mail'):get_string('delete'));
+        $type = ($trash ? 'restore' : 'delete');
+        $label = ($trash ? get_string('restore', 'local_mail') : get_string('delete'));
         $attributes = array(
             'type' => 'submit',
             'name' => 'delete',
@@ -917,7 +917,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $left = html_writer::tag('div', $goback . $selectall . $labels . $read . $unread . $delete . $extended . $more . $search, array('class' => 'mail_buttons'));
             $output = $left . $pagingbar . $clearer;
         }
-        return $this->output->container($output, ($toolbardown?'mail_toolbar_down':'mail_toolbar'));
+        return $this->output->container($output, ($toolbardown ? 'mail_toolbar_down' : 'mail_toolbar'));
     }
 
     public function notification_bar() {

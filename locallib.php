@@ -177,7 +177,7 @@ function local_mail_add_recipients($message, $recipients, $role) {
     $groupid = 0;
     $severalseparategroups = false;
     $roles = array('to', 'cc', 'bcc');
-    $role = ($role >= 0 and $role < 3)?$role:0;
+    $role = ($role >= 0 and $role < 3) ? $role : 0;
 
     if ($message->course()->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
         $groups = groups_get_user_groups($message->course()->id, $message->sender()->id);

@@ -56,7 +56,7 @@ $perpageid  = optional_param('perpageid', 0, PARAM_INT);
 
 define('MAIL_MAXUSERS', 100);
 
-$courseid = ($type == 'course'?$itemid:$SITE->id);
+$courseid = ($type == 'course' ? $itemid : $SITE->id);
 require_login($courseid);
 
 $validactions = array(
@@ -336,7 +336,7 @@ function local_mail_setdelete($messages, $bool, $itemid, $type, $offset, $mailpa
         if ($message->viewable($USER->id)) {
             $message->set_deleted($USER->id, $bool);
             array_push($ids, $message->id());
-            $totalcount += ($undo?1:-1);
+            $totalcount += ($undo ? 1 : -1);
         }
     }
     if ($offset > $totalcount - 1) {
@@ -561,7 +561,7 @@ function local_mail_setlabel($type, $labelid, $labelname, $labelcolor) {
             if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {
                 $label->save($labelname, $labelcolor);
             } else {
-                $error = (!$labelname?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
+                $error = (!$labelname ? get_string('erroremptylabelname', 'local_mail') : get_string('errorinvalidcolor', 'local_mail'));
             }
         } else {
             $error = get_string('errorrepeatedlabelname', 'local_mail');
@@ -599,7 +599,7 @@ function local_mail_newlabel($messages, $labelname, $labelcolor, $data) {
                 }
             }
         } else {
-            $error = (empty($labelname)?get_string('erroremptylabelname', 'local_mail'):get_string('errorinvalidcolor', 'local_mail'));
+            $error = (empty($labelname) ? get_string('erroremptylabelname', 'local_mail') : get_string('errorinvalidcolor', 'local_mail'));
         }
     } else {
         $error = get_string('errorrepeatedlabelname', 'local_mail');
@@ -672,7 +672,7 @@ function local_mail_getrecipients($message, $search, $groupid, $roleid) {
 
     $participants = array();
     $recipients = array();
-    $mailmaxusers = (isset($CFG->maxusersperpage)?$CFG->maxusersperpage:MAIL_MAXUSERS);
+    $mailmaxusers = (isset($CFG->maxusersperpage) ? $CFG->maxusersperpage : MAIL_MAXUSERS);
 
     $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
 
@@ -760,7 +760,7 @@ function local_mail_updaterecipients($message, $recipients, $roles) {
     $recipients = clean_param_array($recipients, PARAM_INT);
 
     foreach ($recipients as $key => $recipid) {
-        $roleids[$recipid] = (isset($roles[$key])?clean_param($roles[$key], PARAM_INT):false);
+        $roleids[$recipid] = (isset($roles[$key]) ? clean_param($roles[$key], PARAM_INT) : false);
     }
 
     $participants = array();
@@ -822,12 +822,12 @@ function local_mail_searchmessages($type, $itemid, $query, $offset = false, $per
             $query['time'] = '';
         }
     }
-    $query['before'] = ($query['before'] == 0?'':$query['before']);
-    $query['after'] = ($query['after'] == 0?'':$query['after']);
+    $query['before'] = ($query['before'] == 0 ? '' : $query['before']);
+    $query['after'] = ($query['after'] == 0 ? '' : $query['after']);
     $mailpagesize = $query['limit'];
     $query['limit'] += 1;
     if ($perpage) {
-        $query['before'] = ($query['perpageid'] == 0?'':$query['perpageid']);
+        $query['before'] = ($query['perpageid'] == 0 ? '' : $query['perpageid']);
         $query['after'] = '';
     }
     $messages = local_mail_message::search_index($USER->id, $type, $itemid, $query);
@@ -844,7 +844,7 @@ function local_mail_searchmessages($type, $itemid, $query, $offset = false, $per
     } else if (!empty($query['after']) and $nummsgs < ($query['limit'])) {
         $query['limit'] -= $nummsgs;
         $query['after'] = '';
-        $query['before'] = (isset($messages[$nummsgs - 1])?$messages[$nummsgs - 1]->id():'');
+        $query['before'] = (isset($messages[$nummsgs - 1]) ? $messages[$nummsgs - 1]->id() : '');
         $newmessages = local_mail_message::search_index($USER->id, $type, $itemid, $query);
         if (count($newmessages) == ($query['limit'])) {
             $newmessages = array_slice($newmessages, 0, count($newmessages) - 1);
@@ -868,14 +868,14 @@ function local_mail_searchmessages($type, $itemid, $query, $offset = false, $per
         'date' => $date,
         'prev' => $prev,
         'next' => $next,
-        'idafter' => (!empty($query['after'])?$query['after']:false),
-        'idbefore' => (!empty($query['before'])?$query['before']:false),
+        'idafter' => (!empty($query['after']) ? $query['after'] : false),
+        'idbefore' => (!empty($query['before']) ? $query['before'] : false),
         'perpageid' => $query['perpageid']
     );
     return array(
         'info' => '',
         'html' => $content,
         'search' => $data,
-        'perpage' => ($offset !== false?$mailoutput->perpage($offset, $mailpagesize):'')
+        'perpage' => ($offset !== false ? $mailoutput->perpage($offset, $mailpagesize) : '')
     );
 }

@@ -8,28 +8,18 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* This file keeps track of upgrades to the wiki module
-*
-* Sometimes, changes between versions involve
-* alterations to database structures and other
-* major things that may break installations.
-*
-* The upgrade function in this file will attempt
-* to perform all the necessary actions to upgrade
-* your older installation to the current version.
-*
-* @package    local
-* @subpackage mail
-* @copyright  2014 Marc Català <reskit@gmail.com>
-* @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
-*/
+ * @package    local
+ * @subpackage mail
+ * @copyright  2014 Marc Català <reskit@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 function xmldb_local_mail_upgrade($oldversion) {
     global $CFG, $DB;
