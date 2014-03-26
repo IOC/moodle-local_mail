@@ -29,7 +29,7 @@ require_once('label.class.php');
 class local_mail_message {
 
     private static $indextypes = array(
-        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash', 'attachment', 'searchfrom', 'searchto'
+        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash', 'attachment'
     );
 
     private $id;
