@@ -362,6 +362,10 @@ class local_mail_message {
         return $message;
     }
 
+    public function get_content() {
+        return $this->content;
+    }
+
     public function has_label(local_mail_label $label) {
         return isset($this->labels[$label->id()]);
     }

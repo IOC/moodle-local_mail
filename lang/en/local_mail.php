@@ -87,9 +87,13 @@ $string['noselectedmessages'] = 'No messages selected';
 $string['nosubject'] = '(no subject)';
 $string['notificationbody'] = '- From: {$a->user}
 
-- Subject: {$a->subject}';
+- Subject: {$a->subject}
+
+- Please login to view your message, any attachments, and to respond.';
 $string['notificationbodyhtml'] = '<p>From: {$a->user}</p>
-<p>Subject: <a href="{$a->url}">{$a->subject}</a></p>';
+<p>Subject: <a href="{$a->url}">{$a->subject}</a></p>
+<p>Message:<br>{$a->message}</p>
+<p><strong>Note:</strong> Please login to view attachements and to respond to this message<p>';
 $string['notificationsubject'] = 'New mail message in {$a}';
 $string['notingroup'] = 'You are not part of any group';
 $string['pagingsingle'] = '{$a->index} of {$a->total}';

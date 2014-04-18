@@ -83,6 +83,7 @@ function local_mail_send_notifications($message) {
 
         $htmldata->user = fullname($message->sender());
         $htmldata->subject = $message->subject();
+        $htmldata->message = $message->get_content();
         $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox', 'm' => $message->id()));
         $htmldata->url = $url->out(false);
 
