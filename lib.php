@@ -30,9 +30,12 @@ function local_mail_cron() {
         return;
     }
     mtrace('mailupdater: local_mail_cron() started at '. date('H:i:s'));
-    local_mail_update_process($settings);
+
+    if (local_mail_update_process($settings)) {
+        set_config('cronenabled', false, 'local_mail');
+    }
+
     mtrace('mailupdater: local_mail_cron() finished at ' . date('H:i:s'));
-    set_config('cronenabled', false, 'local_mail');
 }
 
 function local_mail_update_process($settings) {
@@ -42,7 +45,7 @@ function local_mail_update_process($settings) {
     if ($hour < $settings->cronstart || $hour >= $settings->cronstop) {
         mtrace('mailupdater: not between starthour and stophour, so doing nothing (hour = ' .
                 $hour . ').');
-        return;
+        return false;
     }
 
     // Setup the stop time.
@@ -98,6 +101,8 @@ function local_mail_update_process($settings) {
         $count += 1000;
         $limitfrom += $limitnum;
     }
+
+    return true;
 }
 
 function local_mail_course_deleted($course) {
