@@ -17,7 +17,7 @@
 /**
  * @package    local
  * @subpackage mail
- * @copyright  2014 Marc Català <reskit@gmail.com>
+ * @author     Marc Català <reskit@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -40,4 +40,6 @@ function xmldb_local_mail_upgrade($oldversion) {
         // Mail savepoint reached.
         upgrade_plugin_savepoint(true, 2014030600, 'local', 'mail');
     }
+
+    return true;
 }
