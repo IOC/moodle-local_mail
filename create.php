@@ -37,10 +37,10 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 }
 $url = new moodle_url('/local/mail/create.php');
 local_mail_setup_page($course, $url);
-
+$context = context_course::instance($course->id);
 // Create message
 
-if ($course->id != $SITE->id) {
+if ($course->id != $SITE->id and has_capability('local/mail:usemail', $context)) {
     require_sesskey();
     $message = local_mail_message::create($USER->id, $course->id);
     if ($recipients) {

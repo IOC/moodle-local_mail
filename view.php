@@ -16,8 +16,8 @@
 
 /**
  * @package    local-mail
- * @copyright  Albert Gasset <albert.gasset@gmail.com>
- * @copyright  Marc Català <reskit@gmail.com>
+ * @author     Albert Gasset <albert.gasset@gmail.com>
+ * @author     Marc Català <reskit@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -74,6 +74,12 @@ if ($removelbl) {
         print_error('invalidcourse', 'error');
     }
 
+    // Check whether user can use mail in that course
+    if ($course->id != $SITE->id) {
+        $context = context_course::instance($course->id);
+        require_capability('local/mail:usemail', $context);
+    }
+
     local_mail_setup_page($course, $url);
 
     if ($confirmlbl) {
@@ -104,6 +110,12 @@ if ($removelbl) {
 
     if (!$course = $DB->get_record('course', array('id' => $courseid))) {
         print_error('invalidcourse', 'error');
+    }
+
+    // Check whether user can use mail in that course
+    if ($course->id != $SITE->id) {
+        $context = context_course::instance($course->id);
+        require_capability('local/mail:usemail', $context);
     }
 
     $url->param('offset', $offset);
@@ -152,6 +164,12 @@ if ($removelbl) {
 
     if (!$course = $DB->get_record('course', array('id' => $courseid))) {
         print_error('invalidcourse', 'error');
+    }
+
+    // Check whether user can use mail in that course
+    if ($course->id != $SITE->id) {
+        $context = context_course::instance($course->id);
+        require_capability('local/mail:usemail', $context);
     }
 
     $url->param('offset', $offset);
@@ -453,6 +471,12 @@ if ($removelbl) {
 
     if (!$course = $DB->get_record('course', array('id' => $courseid))) {
         print_error('invalidcourse', 'error');
+    }
+
+    // Check whether user can use mail in that course
+    if ($course->id != $SITE->id) {
+        $context = context_course::instance($course->id);
+        require_capability('local/mail:usemail', $context);
     }
 
     local_mail_setup_page($course, $url);

@@ -139,7 +139,15 @@ function local_mail_get_my_courses() {
 
     if ($courses === null) {
         $courses = enrol_get_my_courses();
+
+        foreach ($courses as $course) {
+            $context = context_course::instance($course->id, IGNORE_MISSING);
+            if (!has_capability('local/mail:usemail', $context)) {
+                unset($courses[$course->id]);
+            }
+        }
     }
+
     return $courses;
 }
 

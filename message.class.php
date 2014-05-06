@@ -66,7 +66,9 @@ class local_mail_message {
         $sql = 'SELECT MIN(id), type, item, unread, COUNT(*) AS count'
             . ' FROM {local_mail_index}'
             . ' WHERE userid = :userid'
-            . ' GROUP BY type, item, unread';
+            . ' GROUP BY type, item, unread'
+            . ' ORDER BY type DESC';
+
         $records = $DB->get_records_sql($sql, array('userid' => $userid));
 
         foreach ($records as $record) {
@@ -78,6 +80,10 @@ class local_mail_message {
                 }
                 $result->drafts += (int) $record->count;
             } else if ($record->type == 'course' and $record->unread) {
+                $context = context_course::instance($record->item);
+                if (!has_capability('local/mail:usemail', $context)) {
+                    $result->inbox -= (int) $record->count;
+                }
                 $result->courses[(int) $record->item] = (int) $record->count;
             } else if ($record->type == 'label' and $record->unread) {
                 $result->labels[(int) $record->item] = (int) $record->count;
@@ -162,10 +168,29 @@ class local_mail_message {
             return $messages;
         }
 
+        $sql = 'SELECT courseid'
+            . ' FROM {local_mail_messages}'
+            . ' WHERE id  IN (' . implode(',', $ids) . ')'
+            . ' GROUP BY courseid';
+
+        if ($courses = $DB->get_records_sql_menu($sql)) {
+            foreach (array_keys($courses) as $courseid) {
+                $context = context_course::instance($courseid);
+                if (!has_capability('local/mail:usemail', $context)) {
+                    unset($courses[$courseid]);
+                }
+            }
+        }
+
+        if (!$courses) {
+            return $messages;
+        }
+
         $sql = 'SELECT m.id, m.courseid, m.subject, m.content, m.format,'
             . ' m.draft, m.time, c.shortname, c.fullname, c.groupmode'
             . ' FROM {local_mail_messages} m'
             . ' JOIN {course} c ON c.id = m.courseid'
+            . ' AND m.courseid IN (' . implode(',', array_keys($courses)) . ')'
             . ' WHERE m.id  IN (' . implode(',', $ids) . ')';
         $records = $DB->get_records_sql($sql);
 
@@ -193,7 +218,7 @@ class local_mail_message {
 
         foreach (array_intersect($ids, array_keys($records)) as $id) {
             $messages[] = self::from_records($records[$id], $refrecords,
-                                             $userrecords, $labelrecords);
+                                                 $userrecords, $labelrecords);
         }
 
         return $messages;

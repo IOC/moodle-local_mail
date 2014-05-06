@@ -16,8 +16,8 @@
 
 /**
  * @package    local-mail
- * @copyright  Albert Gasset <albert.gasset@gmail.com>
- * @copyright  Marc Català <reskit@gmail.com>
+ * @author     Albert Gasset <albert.gasset@gmail.com>
+ * @author     Marc Català <reskit@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,6 +58,14 @@ define('MAIL_MAXUSERS', 100);
 
 $courseid = ($type == 'course' ? $itemid : $SITE->id);
 require_login($courseid);
+
+if ($courseid != $SITE->id) {
+    $context = context_course::instance($courseid);
+    if (!has_capability('local/mail:usemail', $context)) {
+        echo json_encode(array('msgerror' => 'Invalid data'));
+        die;
+    }
+}
 
 $validactions = array(
     'starred',
