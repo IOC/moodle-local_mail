@@ -392,7 +392,7 @@ if ($removelbl) {
     echo $OUTPUT->header();
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'id' => 'local_mail_main_form'));
     $mailoutput = $PAGE->get_renderer('local_mail');
-    echo $mailoutput->toolbar('view', $message->course()->id, false, null, ($type === 'trash'));
+    echo $mailoutput->toolbar('view', $message->course()->id, array('trash' => ($type === 'trash')));
     echo $mailoutput->notification_bar();
     echo $OUTPUT->container_start('mail_view');
 

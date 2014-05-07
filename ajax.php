@@ -496,7 +496,7 @@ function local_mail_getmail($message, $type, $reply, $offset, $labelid) {
 
     $message->set_unread($USER->id, false);
     $mailoutput = $PAGE->get_renderer('local_mail');
-    $content = $mailoutput->toolbar('view', $message->course()->id, false, null, ($type === 'trash'));
+    $content = $mailoutput->toolbar('view', $message->course()->id, array('trash' => ($type === 'trash')));
     $content .= $mailoutput->notification_bar();
     $content .= $OUTPUT->container_start('mail_view');
 

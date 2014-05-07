@@ -541,6 +541,11 @@
     padding: 0.1em 2em;
 }
 
+.mail_toolbar_label {
+    display: inline-block;
+    height: 2.4em;
+}
+
 /* Search */
 
 .mail_menu_search {

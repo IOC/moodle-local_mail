@@ -48,8 +48,14 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     public function label($label) {
-        $classes = 'mail_label' . ($label->color() ? 'mail_' . $label->color() : '');
-        return html_writer::tag('span', s($label->name()), array('class' => $classes));
+        $html = '';
+        if ($label) {
+            $classes = 'mail_label mail_label_'. $label->color() . ' mail_label_' . $label->id();
+            $html .= html_writer::start_tag('span', array('class' => 'mail_toolbar_label'));
+            $html .= html_writer::tag('span', s($label->name()), array('class' => $classes));
+            $html .= html_writer::end_tag('span');
+        }
+        return $html;
     }
 
     public function label_course($course) {
@@ -867,7 +873,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= $this->newlabelform();
         if (!$reply) {
             if ($message->sender()->id !== $USER->id) {
-                $output .= $this->toolbar('reply', $message->course()->id, ($totalusers > 1));
+                $output .= $this->toolbar('reply', $message->course()->id, array('replyall' => ($totalusers > 1)));
             } else {
                 $output .= $this->toolbar('forward', $message->course()->id);
             }
@@ -876,7 +882,13 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    public function toolbar($type, $courseid = 0, $replyall = false, $paging = null, $trash = false) {
+    public function toolbar($type, $courseid = 0, $params = null) {
+
+        $replyall = isset($params['replyall']) ? $params['replyall'] : false;
+        $paging = isset($params['paging']) ? $params['paging'] : null;
+        $trash = isset($params['trash']) ? $params['trash'] : false;
+        $labelid = isset($params['labelid']) ? $params['labelid'] : false;
+
         $toolbardown = false;
         if ($type === 'reply') {
             $viewcourse = array_key_exists($courseid, local_mail_get_my_courses());
@@ -892,7 +904,7 @@ class local_mail_renderer extends plugin_renderer_base {
         } else {
             $selectall = $this->selectall();
             $delete = $this->delete($trash);
-            $labels = $extended = $goback = $search = '';
+            $labels = $extended = $goback = $search = $selectedlbl = '';
             if (!$trash and $type !== 'trash') {
                 $labels = $this->labels($type);
             }
@@ -914,10 +926,13 @@ class local_mail_renderer extends plugin_renderer_base {
             }
             if ($type === 'label') {
                 $extended = $this->optlabels();
+                $selectedlbl = $this->label(local_mail_label::fetch($labelid));
             }
             $more = $this->moreactions();
             $clearer = $this->output->container('', 'clearer');
-            $left = html_writer::tag('div', $goback . $selectall . $labels . $read . $unread . $delete . $extended . $more . $search, array('class' => 'mail_buttons'));
+            $left = html_writer::tag('div',
+                $goback . $selectall . $labels . $read . $unread . $delete . $extended . $more . $search . $selectedlbl,
+                array('class' => 'mail_buttons'));
             $output = $left . $pagingbar . $clearer;
         }
         return $this->output->container($output, ($toolbardown ? 'mail_toolbar_down' : 'mail_toolbar'));
@@ -1003,7 +1018,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $paging['offset'] = false;
         }
 
-        $content .= $this->toolbar($type, 0, false, $paging, ($type === 'trash'));
+        $content .= $this->toolbar($type, 0, array('paging' => $paging, 'trash' => ($type === 'trash'), 'labelid' => $itemid));
         $content .= $this->notification_bar();
         if ($messages) {
             $content .= $this->messagelist($messages, $userid, $type, $itemid, $offset);
