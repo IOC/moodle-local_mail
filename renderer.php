@@ -583,7 +583,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_toolbar'));
 
         // Roles
-        $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+        $context = context_course::instance($courseid);
         $roles = get_roles_used_in_context($context);
         foreach ($roles as $key => $role) {
             $count = $DB->count_records_select('role_assignments', "contextid = :contextid AND roleid = :roleid AND userid <> :userid",

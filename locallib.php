@@ -181,7 +181,7 @@ function local_mail_valid_recipient($recipient) {
 function local_mail_add_recipients($message, $recipients, $role) {
     global $DB;
 
-    $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
+    $context = context_course::instance($message->course()->id);
     $groupid = 0;
     $severalseparategroups = false;
     $roles = array('to', 'cc', 'bcc');
@@ -227,7 +227,7 @@ function local_mail_add_recipients($message, $recipients, $role) {
 function local_mail_getsqlrecipients($courseid, $search, $groupid, $roleid, $recipients = false) {
     global $CFG, $USER, $DB;
 
-    $context = get_context_instance(CONTEXT_COURSE, $courseid, MUST_EXIST);
+    $context = context_course::instance($courseid);
 
     list($esql, $params) = get_enrolled_sql($context, null, $groupid, true);
     $joins = array("FROM {user} u");

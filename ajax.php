@@ -682,7 +682,7 @@ function local_mail_getrecipients($message, $search, $groupid, $roleid) {
     $recipients = array();
     $mailmaxusers = (isset($CFG->maxusersperpage) ? $CFG->maxusersperpage : MAIL_MAXUSERS);
 
-    $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
+    $context = context_course::instance($message->course()->id);
 
     if ($message->course()->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
         $groups = groups_get_user_groups($message->course()->id, $message->sender()->id);
@@ -744,7 +744,7 @@ function local_mail_getrecipients($message, $search, $groupid, $roleid) {
 function local_mail_updaterecipients($message, $recipients, $roles) {
     global $DB;
 
-    $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
+    $context = context_course::instance($message->course()->id);
     $groupid = 0;
     $severalseparategroups = false;
 
