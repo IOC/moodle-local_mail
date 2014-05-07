@@ -108,7 +108,10 @@ class local_mail_renderer extends plugin_renderer_base {
                         $this->summary($message, $userid, $type, $itemid) .
                         $this->attachment($message) .
                         $this->date($message));
-            if ($message->editable($userid) and array_key_exists($message->course()->id, local_mail_get_my_courses())) {
+            $context = context_course::instance($message->course()->id);
+            $draftmessage = ($message->editable($userid) and
+                    (array_key_exists($message->course()->id, local_mail_get_my_courses()) or has_capability('moodle/course:view', $context)));
+            if ($draftmessage) {
                 $url = new moodle_url('/local/mail/compose.php', array('m' => $message->id()));
             } else {
                 $params = array('t' => $type, 'm' => $message->id(), 'offset' => $offset);
