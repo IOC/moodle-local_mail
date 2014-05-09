@@ -595,7 +595,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $count = $DB->count_records_select('role_assignments', "contextid = :contextid AND roleid = :roleid AND userid <> :userid",
                 array('contextid' => $context->id, 'roleid' => $role->id, 'userid' => $userid));
             if ($count) {
-                $options[$key] = $role->name;
+                $options[$key] = ($role->name ? $role->name : $role->shortname);
             }
         }
         $text = get_string('role', 'moodle');
