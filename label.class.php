@@ -55,6 +55,8 @@ class local_mail_label {
         if ($record) {
             return self::from_record($record);
         }
+
+        return false;
     }
 
     static public function fetch_user($userid) {

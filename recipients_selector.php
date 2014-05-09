@@ -29,7 +29,7 @@ class mail_recipients_selector extends groups_user_selector_base {
     public function find_users($search) {
         global $DB;
 
-        $context = get_context_instance(CONTEXT_COURSE, $this->courseid);
+        $context = context_course::instance($this->courseid);
 
         list($wherecondition, $params) = $this->search_sql($search, 'u');
         list($enrolledsql, $enrolledparams) = get_enrolled_sql($context, '', $this->groupid, true);

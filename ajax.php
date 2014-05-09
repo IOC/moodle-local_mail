@@ -16,8 +16,8 @@
 
 /**
  * @package    local-mail
- * @copyright  Albert Gasset <albert.gasset@gmail.com>
- * @copyright  Marc Català <reskit@gmail.com>
+ * @author     Albert Gasset <albert.gasset@gmail.com>
+ * @author     Marc Català <reskit@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,6 +58,14 @@ define('MAIL_MAXUSERS', 100);
 
 $courseid = ($type == 'course' ? $itemid : $SITE->id);
 require_login($courseid);
+
+if ($courseid != $SITE->id) {
+    $context = context_course::instance($courseid);
+    if (!has_capability('local/mail:usemail', $context)) {
+        echo json_encode(array('msgerror' => 'Invalid data'));
+        die;
+    }
+}
 
 $validactions = array(
     'starred',
@@ -488,7 +496,7 @@ function local_mail_getmail($message, $type, $reply, $offset, $labelid) {
 
     $message->set_unread($USER->id, false);
     $mailoutput = $PAGE->get_renderer('local_mail');
-    $content = $mailoutput->toolbar('view', $message->course()->id, false, null, ($type === 'trash'));
+    $content = $mailoutput->toolbar('view', $message->course()->id, array('trash' => ($type === 'trash')));
     $content .= $mailoutput->notification_bar();
     $content .= $OUTPUT->container_start('mail_view');
 
@@ -674,7 +682,7 @@ function local_mail_getrecipients($message, $search, $groupid, $roleid) {
     $recipients = array();
     $mailmaxusers = (isset($CFG->maxusersperpage) ? $CFG->maxusersperpage : MAIL_MAXUSERS);
 
-    $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
+    $context = context_course::instance($message->course()->id);
 
     if ($message->course()->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)) {
         $groups = groups_get_user_groups($message->course()->id, $message->sender()->id);
@@ -736,7 +744,7 @@ function local_mail_getrecipients($message, $search, $groupid, $roleid) {
 function local_mail_updaterecipients($message, $recipients, $roles) {
     global $DB;
 
-    $context = get_context_instance(CONTEXT_COURSE, $message->course()->id, MUST_EXIST);
+    $context = context_course::instance($message->course()->id);
     $groupid = 0;
     $severalseparategroups = false;
 
