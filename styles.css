@@ -427,6 +427,9 @@
     border: 1px solid #bbb;
     line-height: 2em;
     min-width: 10em;
+    max-height: 26em;
+    overflow-x: hidden;
+    overflow-y: auto;
     box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
     -webkit-user-select: none;
     -moz-user-select: none;
