@@ -610,10 +610,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     var mail_toggle_checkbox = function(node){
         if (node.hasClass('mail_checkbox0')) {
             mail_set_checkbox(node, 1);
-        } else if (node.hasClass('mail_checkbox1')) {
-            mail_set_checkbox(node, 0);
         } else {
-            mail_set_checkbox(node, 1);
+            mail_set_checkbox(node, 0);
         }
     };
 
