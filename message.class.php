@@ -404,7 +404,7 @@ class local_mail_message {
         if (!empty($this->refs)) {
             list($sqlmessageids, $messageidparams) = $DB->get_in_or_equal($this->refs, SQL_PARAMS_NAMED, 'messageid');
             $sql = 'SELECT count(*)'
-                . ' FROM mdl_local_mail_index'
+                . ' FROM {local_mail_index}'
                 . ' WHERE type=:type AND item=:item'
                 . ' AND messageid ' . $sqlmessageids;
             $params = array(
