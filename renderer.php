@@ -590,12 +590,12 @@ class local_mail_renderer extends plugin_renderer_base {
 
         // Roles
         $context = context_course::instance($courseid);
-        $roles = get_roles_used_in_context($context);
+        $roles = role_get_names($context);
         foreach ($roles as $key => $role) {
             $count = $DB->count_records_select('role_assignments', "contextid = :contextid AND roleid = :roleid AND userid <> :userid",
                 array('contextid' => $context->id, 'roleid' => $role->id, 'userid' => $userid));
             if ($count) {
-                $options[$key] = ($role->name ? $role->name : $role->shortname);
+                $options[$key] = $role->localname;
             }
         }
         $text = get_string('role', 'moodle');
