@@ -200,9 +200,10 @@ class local_mail_message {
             . ' ORDER BY mr.id ASC';
         $refrecords = $DB->get_records_sql($sql);
 
+        $mainuserfields = user_picture::fields('u', array('username', 'maildisplay'), 'usermoodleid');
         $sql = 'SELECT mu.id AS recordid, mu.messageid, mu.userid, mu.role,'
             . ' mu.unread, mu.starred, mu.deleted,'
-            . ' u.username, u.firstname, u.lastname, u.email, u.picture, u.imagealt, u.maildisplay'
+            . $mainuserfields
             . ' FROM {local_mail_message_users} mu'
             . ' JOIN {user} u ON u.id = mu.userid'
             . ' WHERE mu.messageid  IN (' . implode(',', $ids) . ')'
@@ -755,16 +756,16 @@ class local_mail_message {
                 $message->unread[$r->userid] = (bool) $r->unread;
                 $message->starred[$r->userid] = (bool) $r->starred;
                 $message->deleted[$r->userid] = (bool) $r->deleted;
-                $message->users[$r->userid] = (object) array(
-                    'id' => $r->userid,
-                    'username' => $r->username,
-                    'firstname' => $r->firstname,
-                    'lastname' => $r->lastname,
-                    'email' => $r->email,
-                    'picture' => $r->picture,
-                    'imagealt' => $r->imagealt,
-                    'maildisplay' => $r->maildisplay,
-                );
+                $fields = user_picture::fields('', array('username', 'maildisplay'));
+                $userfields = array();
+                foreach (explode(',', $fields) as $value) {
+                    if ($value === 'id') {
+                        continue;
+                    }
+                    $userfields[$value] = isset($r->$value) ? $r->$value : '';
+                }
+                $userfields['id'] = $r->userid;
+                $message->users[$r->userid] = (object) $userfields;
             }
         }
 
@@ -787,7 +788,7 @@ class local_mail_message {
     private static function fetch_user($userid) {
         global $DB;
         $conditions = array('id' => $userid);
-        $fields = 'id, username, firstname, lastname, email, picture, imagealt, maildisplay';
+        $fields = user_picture::fields('', array('username', 'maildisplay'));
         return $DB->get_record('user', $conditions, $fields, MUST_EXIST);
     }
 

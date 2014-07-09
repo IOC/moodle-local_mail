@@ -233,18 +233,27 @@ function local_mail_getsqlrecipients($courseid, $search, $groupid, $roleid, $rec
     $joins = array("FROM {user} u");
     $wheres = array();
 
+    $mainuserfields = user_picture::fields('u', array('username', 'email', 'city', 'country', 'lang', 'timezone', 'maildisplay'));
+
     $extrasql = get_extra_user_fields_sql($context, 'u', '', array(
             'id', 'firstname', 'lastname'));
-    $select = "SELECT u.id, u.firstname, u.lastname, u.picture, u.imagealt, u.email, ra.roleid$extrasql";
+    $select = "SELECT $mainuserfields$extrasql";
     $joins[] = "JOIN ($esql) e ON e.id = u.id";
-    $joins[] = 'LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid '
-            . get_related_contexts_string($context) . ')'
-            . ' LEFT JOIN {role} r ON r.id = ra.roleid';
 
-    // performance hacks - we preload user contexts together with accounts
-    list($ccselect, $ccjoin) = context_instance_preload_sql('u.id', CONTEXT_USER, 'ctx');
+    // Performance hacks - we preload user contexts together with accounts.
+    $ccselect = ', ' . context_helper::get_preload_record_columns_sql('ctx');
+    $ccjoin = "LEFT JOIN {context} ctx ON (ctx.instanceid = u.id AND ctx.contextlevel = :contextlevel)";
+    $params['contextlevel'] = CONTEXT_USER;
     $select .= $ccselect;
     $joins[] = $ccjoin;
+
+    // We want to query both the current context and parent contexts.
+    list($relatedctxsql, $relatedctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relatedctx');
+
+    if ($roleid) {
+        $wheres[] = "u.id IN (SELECT userid FROM {role_assignments} WHERE roleid = :roleid AND contextid $relatedctxsql)";
+        $params = array_merge($params, array('roleid' => $roleid), $relatedctxparams);
+    }
 
     $from = implode("\n", $joins);
 
@@ -255,18 +264,15 @@ function local_mail_getsqlrecipients($courseid, $search, $groupid, $roleid, $rec
     }
 
     $from = implode("\n", $joins);
+
     $wheres[] = 'u.id <> :guestid AND u.deleted = 0 AND u.confirmed = 1 AND u.id <> :userid';
-    if ($roleid != 0) {
-        $wheres[] = 'r.id = :roleid';
-        $params['roleid'] = $roleid;
-    }
+    $params['userid'] = $USER->id;
+    $params['guestid'] = $CFG->siteguest;
 
     if ($recipients) {
         $wheres[] = 'u.id IN ('.preg_replace('/^,|,$/', '', $recipients).')';
     }
 
-    $params['userid'] = $USER->id;
-    $params['guestid'] = $CFG->siteguest;
     $where = "WHERE " . implode(" AND ", $wheres);
 
     $sort = 'ORDER BY u.lastname ASC, u.firstname ASC';
