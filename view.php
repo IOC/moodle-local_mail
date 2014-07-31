@@ -26,27 +26,28 @@ require_once('locallib.php');
 require_once('labels_form.php');
 require_once('label_form.php');
 
-$type       = required_param('t', PARAM_ALPHA);
-$messageid  = optional_param('m', 0, PARAM_INT);
-$courseid   = optional_param('c', 0, PARAM_INT);
-$labelid    = optional_param('l', 0, PARAM_INT);
-$delete     = optional_param('delete', false, PARAM_ALPHA);
-$forward    = optional_param('forward', false, PARAM_BOOL);
-$offset     = optional_param('offset', 0, PARAM_INT);
-$nextpage   = optional_param('nextpage', false, PARAM_BOOL);
-$prevpage   = optional_param('prevpage', false, PARAM_BOOL);
-$reply      = optional_param('reply', false, PARAM_BOOL);
-$replyall   = optional_param('replyall', false, PARAM_BOOL);
-$starred    = optional_param('starred', false, PARAM_INT);
-$msgs       = optional_param_array('msgs', array(), PARAM_INT);
-$read       = optional_param('read', false, PARAM_ALPHA);
-$unread     = optional_param('unread', false, PARAM_ALPHA);
-$perpage    = optional_param('perpage', false, PARAM_INT);
-$assignlbl  = optional_param('assignlbl', false, PARAM_BOOL);
-$editlbl    = optional_param('editlbl', false, PARAM_BOOL);
-$removelbl  = optional_param('removelbl', false, PARAM_BOOL);
-$confirmlbl = optional_param('confirmlbl', false, PARAM_BOOL);
-$goback     = optional_param('goback', false, PARAM_BOOL);
+$type        = required_param('t', PARAM_ALPHA);
+$messageid   = optional_param('m', 0, PARAM_INT);
+$courseid    = optional_param('c', 0, PARAM_INT);
+$labelid     = optional_param('l', 0, PARAM_INT);
+$delete      = optional_param('delete', false, PARAM_ALPHA);
+$forward     = optional_param('forward', false, PARAM_BOOL);
+$offset      = optional_param('offset', 0, PARAM_INT);
+$nextpage    = optional_param('nextpage', false, PARAM_BOOL);
+$prevpage    = optional_param('prevpage', false, PARAM_BOOL);
+$reply       = optional_param('reply', false, PARAM_BOOL);
+$replyall    = optional_param('replyall', false, PARAM_BOOL);
+$starred     = optional_param('starred', false, PARAM_INT);
+$msgs        = optional_param_array('msgs', array(), PARAM_INT);
+$read        = optional_param('read', false, PARAM_ALPHA);
+$unread      = optional_param('unread', false, PARAM_ALPHA);
+$perpage     = optional_param('perpage', false, PARAM_INT);
+$assignlbl   = optional_param('assignlbl', false, PARAM_BOOL);
+$editlbl     = optional_param('editlbl', false, PARAM_BOOL);
+$removelbl   = optional_param('removelbl', false, PARAM_BOOL);
+$confirmlbl  = optional_param('confirmlbl', false, PARAM_BOOL);
+$goback      = optional_param('goback', false, PARAM_BOOL);
+$downloadall = optional_param('downloadall', false, PARAM_BOOL);
 
 $url = new moodle_url('/local/mail/view.php', array('t' => $type));
 $offset = max(0, $offset);
@@ -366,6 +367,11 @@ if ($removelbl) {
         require_sesskey();
         $message->set_unread($USER->id, true);
         redirect($url);
+    }
+
+    // Downloadall
+    if ($downloadall) {
+        local_mail_downloadall($message);
     }
 
     $jslabels = local_mail_js_labels();

@@ -717,6 +717,14 @@
     font-weight: bold;
 }
 
+.mail_attachment_downloadall {
+    float: right;
+}
+
+.mail_downloadall_text {
+    vertical-align: middle;
+}
+
 /* Mail reply */
 
 .mail_reply .mail_header {

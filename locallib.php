@@ -37,6 +37,32 @@ function local_mail_attachments($message) {
                                $message->id(), 'filename', false);
 }
 
+function local_mail_downloadall($message) {
+    $attachments = local_mail_attachments($message);
+    if (count($attachments) > 1) {
+        foreach ($attachments as $attach) {
+            $filename = clean_filename($attach->get_filename());
+            $filesforzipping[$filename] = $attach;
+        }
+        $filename = clean_filename(fullname($message->sender()) . '-' .
+                                   $message->subject() . '.zip');
+        if ($zipfile = pack_files($filesforzipping)) {
+            send_temp_file($zipfile, $filename);
+        }
+    }
+}
+
+function pack_files($filesforzipping) {
+    global $CFG;
+
+    $tempzip = tempnam($CFG->tempdir . '/', 'local_mail_');
+    $zipper = new zip_packer();
+    if ($zipper->archive_to_pathname($filesforzipping, $tempzip)) {
+        return $tempzip;
+    }
+    return false;
+}
+
 function local_mail_format_content($message) {
     $context = context_course::instance($message->course()->id);
     $content = file_rewrite_pluginfile_urls($message->content(), 'pluginfile.php', $context->id,

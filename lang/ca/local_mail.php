@@ -45,6 +45,7 @@ $string['cronstart'] = 'Inici del cron';
 $string['cronstop'] = 'Fi del cron';
 $string['delete'] = 'Suprimeix';
 $string['discard'] = 'Descarta';
+$string['downloadall'] = 'Baixa tots';
 $string['draft'] = 'Esborrany';
 $string['drafts'] = 'Esborranys';
 $string['editlabel'] = 'Edita l\'etiqueta';
