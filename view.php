@@ -313,6 +313,8 @@ if ($removelbl) {
     echo $OUTPUT->footer();
 
 } else if ($messageid) {
+    local_mail_setup_page($SITE, new moodle_url($url, array('m' => $messageid)));
+
     // Fetch message
 
     $message = local_mail_message::fetch($messageid);
@@ -320,7 +322,6 @@ if ($removelbl) {
         print_error('invalidmessage', 'local_mail');
     }
 
-    local_mail_setup_page($SITE, new moodle_url($url, array('m' => $messageid)));
     navigation_node::override_active_url($url);
 
     $message->set_unread($USER->id, false);
