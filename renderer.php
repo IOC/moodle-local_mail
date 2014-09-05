@@ -23,14 +23,18 @@
 
 class local_mail_renderer extends plugin_renderer_base {
 
-    public function date($message) {
+    public function date($message, $viewmail = false) {
         $offset = get_user_timezone_offset();
         $time = ($offset < 13) ? $message->time() + $offset : $message->time();
         $now = ($offset < 13) ? time() + $offset : time();
         $daysago = floor($now / 86400) - floor($time / 86400);
         $yearsago = (int) date('Y', $now) - (int) date('Y', $time);
+        $tooltip = userdate($time, get_string('strftimedatetime'));
 
-        if ($daysago == 0) {
+        if ($viewmail) {
+            $content = userdate($time, get_string('strftimedatetime'));
+            $tooltip = '';
+        } else if ($daysago == 0) {
             $content = userdate($time, get_string('strftimetime'));
         } else if ($yearsago == 0) {
             $content = userdate($time, get_string('strftimedateshort'));
@@ -38,7 +42,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $content = userdate($time, get_string('strftimedate'));
         }
 
-        return html_writer::tag('span', s($content), array('class' => 'mail_date'));
+        return html_writer::tag('span', s($content), array('class' => 'mail_date', 'title' => $tooltip));
     }
 
     public function attachment($message) {
@@ -807,7 +811,7 @@ class local_mail_renderer extends plugin_renderer_base {
                                             )),
                                     fullname($message->sender()),
                                     array('class' => 'user_from'));
-        $output .= $this->date($message);
+        $output .= $this->date($message, true);
         if (!$reply) {
             $output .= $this->output->container_start('mail_recipients');
             foreach (array('to', 'cc', 'bcc') as $role) {
