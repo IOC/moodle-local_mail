@@ -1029,6 +1029,9 @@ class local_mail_renderer extends plugin_renderer_base {
         }
 
         $content .= $this->toolbar($type, 0, array('paging' => $paging, 'trash' => ($type === 'trash'), 'labelid' => $itemid));
+        $content .= html_writer::start_tag('div', array('id' => 'mail_loading_small', 'class' => 'mail_hidden mail_loading_small'));
+        $content .= $this->output->pix_icon('i/loading_small', '', 'moodle');
+        $content .= html_writer::end_tag('div');
         $content .= $this->notification_bar();
         if ($messages) {
             $content .= $this->messagelist($messages, $userid, $type, $itemid, $offset);

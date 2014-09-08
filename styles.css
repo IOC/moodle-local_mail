@@ -85,6 +85,14 @@
     opacity: 0.5;
 }
 
+.mail_loading_small {
+    position: absolute;
+    background: #f1f1f1;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+}
+
 .mail_adv_search {
     cursor: pointer;
 }

@@ -971,6 +971,15 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             }
             cfg.data.labelcolor = obj.get('options').item(obj.get('selectedIndex')).get('value');
         }
+        if (action == 'nextpage' || action == 'prevpage' ) {
+            obj = Y.one('#mail_loading_small');
+            var btn = Y.one('.mail_paging input[name="'+action+'"]');
+            var position = btn.getXY();
+            obj.removeClass('mail_hidden');
+            position[0] += (btn.get('offsetWidth')/2) - (obj.one('img').get('offsetWidth')/2);
+            position[1] = btn.getXY()[1] + (obj.one('img').get('offsetHeight')/2);
+            obj.setXY(position);
+        }
         if (mail_doing_search) {
             //Go back when searching keeps current page
             if (action == 'goback') {
