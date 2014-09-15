@@ -212,6 +212,24 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    public function discard() {
+        $type = 'discard';
+        $label = get_string('discard', 'local_mail');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => 'discard',
+            'value' => $label,
+            'class' => 'mail_button singlebutton'
+        );
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        $output .= html_writer::start_tag('span', array('id' => 'mail_'. $type, 'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'));
+        $output .= html_writer::tag('span', $label);
+        $output .= html_writer::end_tag('span');
+        return $output;
+    }
+
     public function reply($enabled = true) {
         $label = get_string('reply', 'local_mail');
         $attributes = array(
@@ -913,7 +931,6 @@ class local_mail_renderer extends plugin_renderer_base {
             $toolbardown = true;
         } else {
             $selectall = $this->selectall();
-            $delete = $this->delete($trash);
             $labels = $extended = $goback = $search = $selectedlbl = '';
             if (!$trash and $type !== 'trash') {
                 $labels = $this->labels($type);
@@ -921,6 +938,9 @@ class local_mail_renderer extends plugin_renderer_base {
             $read = $unread = '';
             if ($type !== 'drafts') {
                 $unread = $this->unread($type);
+                $delete = $this->delete($trash);
+            } else {
+                $delete = $this->discard();
             }
             $pagingbar = '';
             if ($type !== 'view') {

@@ -31,6 +31,7 @@ $messageid   = optional_param('m', 0, PARAM_INT);
 $courseid    = optional_param('c', 0, PARAM_INT);
 $labelid     = optional_param('l', 0, PARAM_INT);
 $delete      = optional_param('delete', false, PARAM_ALPHA);
+$discard     = optional_param('discard', false, PARAM_ALPHA);
 $forward     = optional_param('forward', false, PARAM_BOOL);
 $offset      = optional_param('offset', 0, PARAM_INT);
 $nextpage    = optional_param('nextpage', false, PARAM_BOOL);
@@ -496,6 +497,25 @@ if ($removelbl) {
             if (in_array($message->id(), $msgs)) {
                 if ($message->viewable($USER->id)) {
                     $message->set_deleted($USER->id, !$message->deleted($USER->id));
+                }
+                $totalcount -= 1;
+            }
+        }
+        if ($offset > $totalcount - 1) {
+            $url->offset = min(0, $offset - $mailpagesize);
+        } else {
+            $url->offset = $offset;
+        }
+        redirect($url);
+    }
+
+    // Remove
+    if ($discard) {
+        require_sesskey();
+        foreach ($messages as $message) {
+            if (in_array($message->id(), $msgs)) {
+                if ($message->viewable($USER->id) and $message->draft()) {
+                    $message->discard();
                 }
                 $totalcount -= 1;
             }
