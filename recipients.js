@@ -8,6 +8,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var init = function () {
         mail_create_recipients_panel();
         mail_reset_recipients();
+        mail_show_recipipients_button_ajax();
+    };
+
+    var mail_show_recipipients_button_ajax = function () {
+        Y.one('#fitem_id_recipients').hide();
+        Y.one('#id_recipients_ajax').removeClass('mail_hidden');
     };
 
     var mail_create_recipients_panel = function () {
@@ -372,7 +378,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         } else {
             alert(M.util.get_string('notingroup', 'local_mail'));
         }
-    }, '#id_recipients');
+    }, '#id_recipients_ajax');
 
     //Change on group select
     Y.one("#region-main").delegate('change', function(e) {

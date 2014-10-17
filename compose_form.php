@@ -63,6 +63,7 @@ class mail_compose_form extends moodleform {
 
         $label = get_string('addrecipients', 'local_mail');
         $mform->addElement('submit', 'recipients', $label);
+        $mform->addElement('button', 'recipients_ajax', $label, array('class' => 'mail_hidden'));
 
         // Subject
 
