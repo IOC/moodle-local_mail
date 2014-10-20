@@ -33,8 +33,9 @@ class mail_recipients_selector extends groups_user_selector_base {
 
         list($wherecondition, $params) = $this->search_sql($search, 'u');
         list($enrolledsql, $enrolledparams) = get_enrolled_sql($context, '', $this->groupid, true);
+        list($parentsql, $parentparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED);
 
-        $params = array_merge($params, $enrolledparams);
+        $params = array_merge($params, $enrolledparams, $parentparams);
         $params['courseid'] = $this->courseid;
 
         $fields = 'SELECT r.id AS roleid, '
@@ -47,7 +48,7 @@ class mail_recipients_selector extends groups_user_selector_base {
 
         $sql = ' FROM {user} u JOIN (' . $enrolledsql . ') e ON e.id = u.id'
             . ' LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid '
-            . get_related_contexts_string($context) . ')'
+            . $parentsql . ')'
             . ' LEFT JOIN {role} r ON r.id = ra.roleid'
             . ' WHERE ' . $wherecondition;
 
