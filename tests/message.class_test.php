@@ -85,6 +85,8 @@ class local_mail_message_test extends local_mail_testcase {
     }
 
     public function setUp() {
+        global $DB;
+
         parent::setUp();
 
         $course = array(
@@ -95,20 +97,16 @@ class local_mail_message_test extends local_mail_testcase {
         $user = array(
             array(
                 'id', 'username', 'firstname', 'lastname', 'email',
-                'picture', 'imagealt', 'maildisplay', 'firstnamephonetic',
-                'lastnamephonetic', 'middlename', 'alternatename'),
+                'picture', 'imagealt', 'maildisplay'),
             array(
                 201, 'user1', 'User1', 'Name', 'user1@ex.org',
-                1, 'User 1', 1, '', '',
-                '', '', ''),
+                1, 'User 1', 1),
             array(
                 202, 'user2', 'User2', 'Name', 'user2@ex.org',
-                1, 'User 2', 1, '', '',
-                '', '', ''),
+                1, 'User 2', 1),
             array(
                 203, 'user3', 'User3', 'Name', 'user3@ex.org',
-                1, 'User 3', 1, '', '',
-                '', '', ''),
+                1, 'User 3', 1),
         );
 
         $this->loadRecords('course', $course);
@@ -116,9 +114,16 @@ class local_mail_message_test extends local_mail_testcase {
 
         $this->course1 = (object) array_combine($course[0], $course[1]);
         $this->course2 = (object) array_combine($course[0], $course[2]);
-        $this->user1 = (object) array_combine($user[0], $user[1]);
-        $this->user2 = (object) array_combine($user[0], $user[2]);
-        $this->user3 = (object) array_combine($user[0], $user[3]);
+
+        // When adding users, we need them to have all the fields that Moodle gets for the user.
+        $fields = user_picture::fields('', array('username', 'maildisplay'));
+        $this->user1 = $DB->get_record('user', array('id' => $user[1][0]), $fields, MUST_EXIST);
+        $this->user2 = $DB->get_record('user', array('id' => $user[2][0]), $fields, MUST_EXIST);
+        $this->user3 = $DB->get_record('user', array('id' => $user[3][0]), $fields, MUST_EXIST);
+
+        // User need to be logged in to be able to have the local/mail:usemail, so we make ourselves
+        // the admin to ensure we behave as a logged in user rather than a guest.
+        $this->setAdminUser();
     }
 
     public function test_add_label() {
