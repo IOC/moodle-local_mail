@@ -28,8 +28,8 @@ global $CFG;
 abstract class local_mail_testcase extends advanced_testcase {
 
     static public function assertContains($needle, $haystack, $message = '',
-                                   $ignoreCase = false, $checkForObjectIdentity = false) {
-        parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+                                   $ignoreCase = false, $checkForObjectIdentity = false, $checkForNonObjectIdentity = false) {
+        parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
     }
 
     static public function assertIndex($userid, $type, $item, $time, $messageid, $unread) {
@@ -44,8 +44,8 @@ abstract class local_mail_testcase extends advanced_testcase {
     }
 
     static public function assertNotContains($needle, $haystack, $message = '',
-                                      $ignoreCase = false, $checkForObjectIdentity = false) {
-        parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity);
+                                      $ignoreCase = false, $checkForObjectIdentity = false, $checkForNonObjectIdentity = false) {
+        parent::assertNotContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
     }
 
     static public function assertNotIndex($userid, $type, $item, $message) {
