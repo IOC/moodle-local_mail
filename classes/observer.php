@@ -15,15 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Event observers used in local mail.
+ *
  * @package    local-mail
- * @author     Albert Gasset <albert.gasset@gmail.com>
+ * @copyright  2014 Institut Obert de Catalunya
  * @author     Marc Català <reskit@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2014110500;
-$plugin->requires = 2013111800;
-$plugin->cron = 0;
-$plugin->component = 'local_mail';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.5.3';
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/local/mail/message.class.php');
+
+/**
+ * Event observer for local_mail.
+ */
+class local_mail_observer {
+
+    /**
+     * Triggered via course_deleted event.
+     *
+     * @param \core\event\course_deleted $event
+     */
+    public static function course_deleted(\core\event\course_deleted $event) {
+        $fs = get_file_storage();
+        $fs->delete_area_files($event->contextid, 'local_mail');
+        local_mail_message::delete_course($event->objectid);
+    }
+}

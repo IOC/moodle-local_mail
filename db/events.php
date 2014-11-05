@@ -21,10 +21,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$handlers = array(
-    'course_deleted' => array(
-        'handlerfile' => '/local/mail/lib.php',
-        'handlerfunction' => 'local_mail_course_deleted',
-        'schedule' => 'instant',
-    )
+$observers = array(
+    array(
+        'eventname' => 'core\event\course_deleted',
+        'callback'  => 'local_mail_observer::course_deleted',
+    ),
 );

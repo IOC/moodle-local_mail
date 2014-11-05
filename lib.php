@@ -105,12 +105,6 @@ function local_mail_update_process($settings) {
     return true;
 }
 
-function local_mail_course_deleted($course) {
-    $fs = get_file_storage();
-    $fs->delete_area_files($course->context->id, 'local_mail');
-    local_mail_message::delete_course($course->id);
-}
-
 function local_mail_extends_navigation($root) {
     global $CFG, $COURSE, $PAGE, $SESSION, $SITE, $USER;
 
