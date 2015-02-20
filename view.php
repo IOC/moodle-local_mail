@@ -190,20 +190,20 @@ if ($removelbl) {
 
     // Set up form
     $customdata = array();
-    $customdata["assignlbl"] = $assignlbl;
-    $customdata["t"] = $type;
-    $customdata["c"] = $courseid;
-    $customdata["offset"] = $offset;
-    $customdata["colors"] = array();
+    $customdata['assignlbl'] = $assignlbl;
+    $customdata['t'] = $type;
+    $customdata['c'] = $courseid;
+    $customdata['offset'] = $offset;
+    $customdata['colors'] = array();
     $colors = local_mail_label::valid_colors();
     if ($messageid) {
-        $customdata["m"] = $messageid;
+        $customdata['m'] = $messageid;
     } else {
-        $customdata["msgs"] = $msgs;
+        $customdata['msgs'] = $msgs;
     }
-    $customdata["colors"][""] = get_string('nocolor', 'local_mail');
+    $customdata['colors'][''] = get_string('nocolor', 'local_mail');
     foreach ($colors as $color) {
-        $customdata["colors"][$color] = $color;
+        $customdata['colors'][$color] = $color;
     }
 
     $labels = local_mail_label::fetch_user($USER->id);
@@ -220,10 +220,10 @@ if ($removelbl) {
             }
         }
     }
-    $customdata["labelids"] = array();
+    $customdata['labelids'] = array();
     if ($labels) {
-        $ids = array_keys($labels);
         foreach ($labels as $label) {
+            array_push($customdata['labelids'], $label->id());
             $customdata['labelname'.$label->id()] = $label->name();
             $customdata['color'.$label->id()] = $label->color();
             if (!isset($messages)) {
@@ -236,7 +236,6 @@ if ($removelbl) {
                 }
             }
         }
-        $customdata["labelids"] = $ids;
     }
 
     // Create form

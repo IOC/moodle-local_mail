@@ -37,25 +37,27 @@ class mail_labels_form extends moodleform {
         $courseid = $this->_customdata['c'];
 
         $mform->addElement('hidden', 't', $type);
+        $mform->setType('t', PARAM_ALPHA);
 
         $mform->addElement('hidden', 'offset', $offset);
+        $mform->setType('offset', PARAM_INT);
 
         $mform->addElement('hidden', 'c', $courseid);
-
-        if ($this->_customdata['t'] == 'course') {
-            $mform->addElement('hidden', 'c', $this->_customdata['c']);
-        }
+        $mform->setType('c', PARAM_INT);
 
         if (isset($this->_customdata['msgs'])) {
             $msgs = $this->_customdata['msgs'];
             foreach ($msgs as $key => $msg) {
                 $mform->addElement('hidden', 'msgs['.$key.']', $msg);
+                $mform->setType('msgs['.$key.']', PARAM_INT);
             }
         }
 
         $mform->addElement('hidden', 'assignlbl', $this->_customdata['assignlbl']);
+        $mform->setType('assignlbl', PARAM_INT);
         if (isset($this->_customdata['m'])) {
             $mform->addElement('hidden', 'm', $this->_customdata['m']);
+            $mform->setType('m', PARAM_INT);
         }
 
         // List labels
@@ -75,6 +77,7 @@ class mail_labels_form extends moodleform {
         // New label
 
         $mform->addElement('text', 'newlabelname', get_string('labelname', 'local_mail'));
+        $mform->setType('newlabelname', PARAM_TEXT);
         $mform->addElement('select', 'newlabelcolor', get_string('labelcolor', 'local_mail'), $colors, array('class' => 'mail_label_colors'));
 
         // Buttons
