@@ -129,6 +129,7 @@ if ($removelbl) {
     $customdata["editlbl"] = $editlbl;
     $customdata["offset"] = $offset;
     $customdata["colors"] = array();
+    $customdata["colors"][''] = get_string('nocolor', 'local_mail');
     foreach ($colors as $color) {
         $customdata["colors"][$color] = $color;
     }
@@ -145,10 +146,10 @@ if ($removelbl) {
             $data->labelname = trim(clean_param($data->labelname, PARAM_TEXT));
             $labels = local_mail_label::fetch_user($USER->id);
             $repeatedname = false;
-            foreach ($labels as $label) {
-                $repeatedname = $repeatedname || ($label->name() === $data->labelname);
+            foreach ($labels as $lbl) {
+                $repeatedname = $repeatedname || (($lbl->name() === $data->labelname) and ($lbl->id() != $labelid));
             }
-            if (!$repeatedname and $data->labelname and in_array($data->labelcolor, $colors)) {
+            if (!$repeatedname and $data->labelname and (!$data->labelcolor or in_array($data->labelcolor, $colors))) {
                 $label->save($data->labelname, $data->labelcolor);
             }
         }
