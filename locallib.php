@@ -136,8 +136,6 @@ function local_mail_send_notifications($message) {
         if (!$mailresult) {
             mtrace("Error: local/mail/locallib.php local_mail_send_mail(): Could not send out mail for id {$message->id()} to user {$message->sender()->id}".
                     " ($userto->email) .. not trying again.");
-            add_to_log($message->course()->id, 'local_mail', 'mail error', "view_inbox.php?m={$message->id()}",
-                    substr(format_string($message->subject(), true), 0, 30), 0, $message->sender()->id);
         }
     }
 }
