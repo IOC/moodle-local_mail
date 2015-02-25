@@ -16,8 +16,7 @@
 
 /**
  * @package    local-mail
- * @author  Albert Gasset <albert.gasset@gmail.com>
- * @author  Marc Català <reskit@gmail.com>
+ * @author     Hervé Saraïs
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -89,9 +88,10 @@ $string['noselectedmessages'] = 'Aucun message sélectionné';
 $string['nosubject'] = '(pas d\'objet)';
 $string['notificationbody'] = '- De: {$a->user}
 
-- Objet: {$a->subject}';
-$string['notificationbodyhtml'] = '<p>De: {$a->user}</p>
-<p>Sujet: <a href="{$a->url}">{$a->subject}</a></p>';
+- Objet: {$a->subject}
+
+{$a->content}';
+$string['notificationbodyhtml'] = '<p>De: {$a->user}</p><p>Sujet: <a href="{$a->url}">{$a->subject}</a></p><p>{$a->content}</p>';
 $string['notificationsubject'] = 'Nouveau message dans {$a}';
 $string['notingroup'] = 'Vous n\êtes inscrit à aucun groupe';
 $string['pagingsingle'] = '{$a->index} de {$a->total}';

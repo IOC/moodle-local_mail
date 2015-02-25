@@ -106,11 +106,20 @@ function local_mail_send_notifications($message) {
 
         $plaindata->user = fullname($message->sender());
         $plaindata->subject = $message->subject();
+        $plaindata->content = '';
 
         $htmldata->user = fullname($message->sender());
         $htmldata->subject = $message->subject();
         $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox', 'm' => $message->id()));
         $htmldata->url = $url->out(false);
+        $htmldata->content = '';
+
+        if (get_user_preferences('local_mail_fullmessage', false, $userto->id)) {
+            $plaindata->content = $message->content();
+            $htmldata->content = $message->content();
+        }
+
+        $fullplainmessage = format_text_email(get_string('notificationbody', 'local_mail', $plaindata), $message->format());
 
         $eventdata = new stdClass();
         $eventdata->component         = 'local_mail';
@@ -118,7 +127,7 @@ function local_mail_send_notifications($message) {
         $eventdata->userfrom          = $message->sender();
         $eventdata->userto            = $userto;
         $eventdata->subject           = get_string('notificationsubject', 'local_mail', $SITE->shortname);
-        $eventdata->fullmessage       = get_string('notificationbody', 'local_mail', $plaindata);
+        $eventdata->fullmessage       = $fullplainmessage;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
         $eventdata->fullmessagehtml   = get_string('notificationbodyhtml', 'local_mail', $htmldata);
         $eventdata->notification      = 1;
@@ -136,6 +145,8 @@ function local_mail_send_notifications($message) {
         if (!$mailresult) {
             mtrace("Error: local/mail/locallib.php local_mail_send_mail(): Could not send out mail for id {$message->id()} to user {$message->sender()->id}".
                     " ($userto->email) .. not trying again.");
+        } else if (get_user_preferences('local_mail_markasread', false, $userto)) { // Set message as read depending on user preferences
+            $message->set_unread($userto->id, false);
         }
     }
 }

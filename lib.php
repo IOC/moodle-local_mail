@@ -222,6 +222,12 @@ function local_mail_extends_navigation($root) {
     $url = new moodle_url('/local/mail/view.php', array('t' => 'trash'));
     $node->add(s($text), $url);
 
+    // Preferences
+
+    $text = get_string('preferences');
+    $url = new moodle_url('/local/mail/preferences.php');
+    $node->add(s($text), $url);
+
     // User profile
 
     if (empty($CFG->messaging) and

@@ -16,8 +16,8 @@
 
 /**
  * @package    local-mail
- * @copyright  Albert Gasset <albert.gasset@gmail.com>
- * @copyright  Marc Català <reskit@gmail.com>
+ * @author     Albert Gasset <albert.gasset@gmail.com>
+ * @author     Marc Català <reskit@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -58,6 +58,8 @@ $string['errorrepeatedlabelname'] = 'El nom d\'etiqueta ja existeix';
 $string['errorinvalidcolor'] = 'Color no vàlid';
 $string['filterbydate'] = 'Data (fins el dia):';
 $string['from'] = 'De';
+$string['fullmessage'] = 'Missatge complert';
+$string['fullmessage_help'] = 'Si està activat, quan s\'envia una notificació de correu aquesta inclou el cos del missatge';
 $string['inbox'] = 'Safata d\'entrada';
 $string['invalidlabel'] = 'Etiqueta no vàlida';
 $string['invalidmessage'] = 'Missatge no vàlid';
@@ -69,6 +71,7 @@ $string['mail:addinstance'] = 'Afegeix un nou Correu';
 $string['mail:usemail'] = 'Utilitzar el Correu';
 $string['mailupdater'] = 'Actualizació correu';
 $string['markasread'] = 'Marca com a llegit';
+$string['markasread_help'] = 'Si està activat, i les notificacions també estan activades, els missatges es marcaran com a llegits';
 $string['markasstarred'] = 'Marca com a destacat';
 $string['markasunread'] = 'Marca com a no llegit';
 $string['markasunstarred'] = 'Marca com a no destacat';
@@ -90,9 +93,11 @@ $string['noselectedmessages'] = 'Cap missatge seleccionat';
 $string['nosubject'] = '(sense assumpte)';
 $string['notificationbody'] = '- De: {$a->user}
 
-- Assumpte: {$a->subject}';
-$string['notificationbodyhtml'] = '<p>De: {$a->user}</p>
-<p>Assumpte:<a href="{$a->url}">{$a->subject}</a></p>';
+- Assumpte: {$a->subject}
+
+{$a->content}';
+$string['notificationbodyhtml'] = '<p>De: {$a->user}</p><p>Assumpte: <a href="{$a->url}">{$a->subject}</a></p><p>{$a->content}</p>';
+$string['notificationpref'] = 'Notificacions d\'enviament';
 $string['notificationsubject'] = 'Nou missatge de correu a {$a}';
 $string['notingroup'] = 'No esteu a cap grup';
 $string['pagingsingle'] = '{$a->index} de {$a->total}';

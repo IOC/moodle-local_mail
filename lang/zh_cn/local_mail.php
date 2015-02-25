@@ -15,10 +15,9 @@
 // along with Moodle. If not, see .
 
 /**
-* @package local-mail
-* @author Albert Gasset
-* @author Marc Català
-* @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+* @package    local-mail
+* @author     平钟
+* @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
 $string['addbcc'] = '添加 密送';
@@ -89,13 +88,10 @@ $string['noselectedmessages'] = '没有选择邮件';
 $string['nosubject'] = '(没有主题)';
 $string['notificationbody'] = '- 从: {$a->user}
 
-- 主题: {$a->subject}';
-$string['notificationbodyhtml'] = '
-从: {$a->user}
+- 主题: {$a->subject}
 
-主题: {$a->subject}
-
-';
+{$a->content}';
+$string['notificationbodyhtml'] = '<p>从: {$a->user}</p><p>主题: <a href="{$a->url}">{$a->subject}</a></p><p>{$a->content}</p>';
 $string['notificationsubject'] = '新邮件在 {$a}';
 $string['notingroup'] = '你不是任何组的成员';
 $string['pagingsingle'] = '{$a->index} 的 {$a->total}';
