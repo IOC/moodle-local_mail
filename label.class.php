@@ -82,7 +82,9 @@ class local_mail_label {
     }
 
     static public function valid_colors() {
-        return array('red', 'orange', 'yellow', 'green', 'blue', 'purple', 'black');
+        return array('lightred', 'lightorange', 'lightyellow', 'lightgreen', 'lightblue', 'lightpurple', 'lightgray',
+                     'red', 'orange', 'yellow', 'green', 'blue', 'purple', 'gray',
+                     'darkred', 'darkorange', 'darkyellow', 'darkgreen', 'darkblue', 'darkpurple', 'black');
     }
 
     public function color() {

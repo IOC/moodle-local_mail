@@ -559,9 +559,13 @@ class local_mail_renderer extends plugin_renderer_base {
         }
         $text = get_string('labelcolor', 'local_mail');
         $content .= html_writer::label($text, 'local_mail_edit_label_color');
-        $text = get_string('nocolor', 'local_mail');
-        $content .= html_writer::select($options, 'local_mail_edit_label_color', '', array('' => $text),
-            array('id' => 'local_mail_edit_label_color', 'class' => 'mail_label_colors'));
+        $content .= $this->htmllabelcolors(7);
+        $content .= html_writer::empty_tag('input', array(
+                'type' => 'hidden',
+                'id' => 'local_mail_edit_label_color',
+                'name' => 'local_mail_edit_label_color',
+                'value' => '',
+        ));
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
@@ -588,12 +592,48 @@ class local_mail_renderer extends plugin_renderer_base {
         }
         $text = get_string('labelcolor', 'local_mail');
         $content .= html_writer::label($text, 'local_mail_new_label_color');
-        $text = get_string('nocolor', 'local_mail');
-        $content .= html_writer::select($options, 'local_mail_new_label_color', '', array('' => $text),
-            array('id' => 'local_mail_new_label_color', 'class' => 'mail_label_colors'));
+        $content .= $this->htmllabelcolors(7, true);
+        $content .= html_writer::empty_tag('input', array(
+                'type' => 'hidden',
+                'id' => 'local_mail_new_label_color',
+                'name' => 'local_mail_new_label_color',
+                'value' => '',
+        ));
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
+        return $content;
+    }
+
+    private function htmllabelcolors($cols = 0, $default = false) {
+        $content = '';
+        if ($cols) {
+            $count = 0;
+            $colors = local_mail_label::valid_colors();
+            $total = count($colors);
+            $content .= html_writer::start_tag('div', array('class' => 'mail_label_colors'));
+            $attributes = array(
+                'data-color' => '',
+                'class' => 'mail_label_color mail_label_nocolor'
+            );
+            if ($default) {
+                $attributes['class'] = $attributes['class'] . ' mail_label_color_selected';
+            }
+            $content .= html_writer::start_tag('div', $attributes);
+            $content .= html_writer::tag('div', '', array('class' => 'mail_label_diagonal_line'));
+            $content .= html_writer::end_tag('div');
+            $content .= html_writer::start_tag('div', array('class' => 'mail_label_colors_row'));
+            foreach ($colors as $color) {
+                $count += 1;
+                $content .= html_writer::tag('div', 'a', array('data-color' => $color, 'class' => 'mail_label_color  mail_label_' . $color));
+                if (($count % $cols == 0) and $count < $total) {
+                    $content .= html_writer::end_tag('div');
+                    $content .= html_writer::start_tag('div', array('class' => 'mail_label_colors_row'));
+                }
+            }
+            $content .= html_writer::end_tag('div');
+            $content .= html_writer::end_tag('div');
+        }
         return $content;
     }
 

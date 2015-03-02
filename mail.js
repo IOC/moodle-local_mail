@@ -35,6 +35,25 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_update_menu_actions();
         mail_create_edit_label_panel();
         mail_create_new_label_panel();
+        mail_define_label_handlers();
+    };
+
+    var mail_define_label_handlers = function () {
+        if (Y.one('#local_mail_form_new_label')) {
+            //Click on new label color div
+            Y.one('#local_mail_form_new_label').delegate('click', function(e) {
+                e.stopPropagation();
+                mail_label_set_selected(this, 'new');
+            }, '.mail_label_color');
+        }
+
+        if (Y.one('#local_mail_form_edit_label')) {
+            //Click on edit label color div
+            Y.one('#local_mail_form_edit_label').delegate('click', function(e) {
+                e.stopPropagation();
+                mail_label_set_selected(this, 'edit');
+            }, '.mail_label_color');
+        }
     };
 
     var mail_create_edit_label_panel = function () {
@@ -961,7 +980,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 mail_label_edit();
                 return false;
             }
-            cfg.data.labelcolor = obj.get('options').item(obj.get('selectedIndex')).get('value');
+            cfg.data.labelcolor = obj.get('value');
         }
         if (action == 'newlabel') {
             obj = Y.one('#local_mail_new_label_color');
@@ -971,7 +990,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 mail_label_new();
                 return false;
             }
-            cfg.data.labelcolor = obj.get('options').item(obj.get('selectedIndex')).get('value');
+            cfg.data.labelcolor = obj.get('value');
         }
         if (action == 'nextpage' || action == 'prevpage' ) {
             obj = Y.one('#mail_loading_small');
@@ -1054,12 +1073,23 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         var labelname = M.local_mail.mail_labels[labelid].name;
         var labelcolor = M.local_mail.mail_labels[labelid].color;
         Y.one('#local_mail_edit_label_name').set('value', labelname);
-        if (labelcolor != 'nocolor') {
-            Y.one('#local_mail_edit_label_color option[value="'+labelcolor+'"]').set('selected', 'selected');
+        Y.all('.mail_label_color').removeClass('mail_label_color_selected');
+        if (!labelcolor) {
+            Y.one('.mail_label_color.mail_label_nocolor').addClass('mail_label_color_selected');
+            labelcolor = '';
+        } else {
+            Y.one('.mail_label_color.mail_label_' + labelcolor).addClass('mail_label_color_selected');
         }
+        Y.one('#local_mail_edit_label_color').set('value', labelcolor);
         mail_edit_label_panel.show();
         Y.one('#local_mail_form_edit_label').removeClass('mail_hidden');
         Y.one('#local_mail_edit_label_name').focus();
+    };
+
+    var mail_label_set_selected = function(obj, action) {
+        Y.all('.mail_label_color').removeClass('mail_label_color_selected');
+        obj.addClass('mail_label_color_selected');
+        Y.one('#local_mail_' + action + '_label_color').set('value', obj.getAttribute('data-color'));
     };
 
     var mail_update_url = function() {

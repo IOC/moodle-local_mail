@@ -768,13 +768,88 @@
     border-radius: 0.4em;
 }
 
-.mail_label_black, .mail_label_colors option[value="black"] {
-    background-color: #2e3436;
+.mail_label_colors_row {
+    clear: left;
+    width: 100%;
+    text-align: center;
+}
+
+.mail_label_color {
+    float: left;
+    width: 20px;
+    height: 20px;
+}
+
+.mail_label_color_selected {
+    text-transform: uppercase;
+    -ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+}
+
+.mail_label_colors .mail_label_color:hover {
+    cursor: pointer;
+    -ms-transform: scale(1.2, 1.2);
+    -webkit-transform: scale(1.2, 1.2);
+    transform: scale(1.2, 1.2);
+}
+
+.mail_label_nocolor {
+    background-color: #fefefe;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.mail_label_diagonal_line {
+    width: 25px;
+    border-bottom: 1px solid red;
+    -ms-transform: rotate(-45deg) translate(-9px, 4px);
+    -webkit-transform: rotate(-45deg) translate(-9px, 4px);
+    transform: rotate(-45deg) translate(-9px, 4px);
+}
+
+.mail_label_lightgray, .mail_label_colors option[value="lightgray"] {
+    background-color: #999;
+    color: #fff;
+}
+
+.mail_label_lightred, .mail_label_colors option[value="lightred"] {
+    background-color: #e66550;
+    color: #fff;
+}
+
+.mail_label_lightorange, .mail_label_colors option[value="lightorange"] {
+    background-color: #ffbc6b;
+}
+
+.mail_label_lighbrown, .mail_label_colors option[value="lightbrown"] {
+    background-color: #e9b96e;
+}
+
+.mail_label_lightyellow, .mail_label_colors option[value="lightyellow"] {
+    background-color: #fdee7c;
+}
+
+.mail_label_lightgreen, .mail_label_colors option[value="lightgreen"] {
+    background-color: #b3e622;
+}
+
+.mail_label_lightblue, .mail_label_colors option[value="lightblue"]{
+    background-color: #6d9eeb;
+}
+
+.mail_label_lightpurple, .mail_label_colors option[value="lightpurple"] {
+    background-color: #b694e8;
+    color: #fff;
+}
+
+.mail_label_gray, .mail_label_colors option[value="gray"] {
+    background-color: #555;
     color: #fff;
 }
 
 .mail_label_red, .mail_label_colors option[value="red"] {
-    background-color: #a40000;
+    background-color: #cc0000;
     color: #fff;
 }
 
@@ -783,22 +858,65 @@
     color: #fff;
 }
 
+.mail_label_brown, .mail_label_colors option[value="brown"] {
+    background-color: #c17d11;
+}
+
 .mail_label_yellow, .mail_label_colors option[value="yellow"] {
-    background-color: #fce94f;
+    background-color: #edd400;
 }
 
 .mail_label_green, .mail_label_colors option[value="green"] {
-    background-color: #4e9a06;
-    color: #fff;
+    background-color: #73d216;
 }
 
 .mail_label_blue, .mail_label_colors option[value="blue"]{
-    background-color: #204a87;
+    background-color: #005dd6;
     color: #fff;
 }
 
 .mail_label_purple, .mail_label_colors option[value="purple"] {
-    background-color: #5c3566;
+    background-color: #b100cc;
+    color: #fff;
+}
+
+.mail_label_black, .mail_label_colors option[value="black"] {
+    background-color: #05181e;
+    color: #fff;
+}
+
+.mail_label_darkred, .mail_label_colors option[value="darkred"] {
+    background-color: #8b1818;
+    color: #fff;
+}
+
+.mail_label_darkorange, .mail_label_colors option[value="darkorange"] {
+    background-color: #ad5f1f;
+    color: #fff;
+}
+
+.mail_label_darkbrown, .mail_label_colors option[value="darkbrown"] {
+    background-color: #8f5902;
+    color: #fff;
+}
+
+.mail_label_darkyellow, .mail_label_colors option[value="darkyellow"] {
+    background-color: #a58c1d;
+    color: #fff;
+}
+
+.mail_label_darkgreen, .mail_label_colors option[value="darkgreen"] {
+    background-color: #4d8618;
+    color: #fff;
+}
+
+.mail_label_darkblue, .mail_label_colors option[value="darkblue"]{
+    background-color: #19488f;
+    color: #fff;
+}
+
+.mail_label_darkpurple, .mail_label_colors option[value="darkpurple"] {
+    background-color: #6d1782;
     color: #fff;
 }
 
@@ -830,7 +948,7 @@
 .local_mail_form .label_form  {
     text-align: center;
     padding: 1em 2em;
-    margin: 0 auto 1em auto;
+    margin: 0 auto 5em auto;
     width: 50%;
 }
 
@@ -848,10 +966,15 @@
 }
 
 .local_mail_form .label_name input,
-.local_mail_form .label_color select{
+.local_mail_form .label_color select,
+.local_mail_form .label_color .mail_label_colors {
     clear: right;
     float: left;
     margin-left: 1em;
+}
+
+.local_mail_form .label_name input,
+.local_mail_form .label_color select {
     width: 10em;
 }
 
