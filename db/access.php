@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    'loca/mail:addinstance' => array(
+    'local/mail:addinstance' => array(
         'riskbitmask' => RISK_XSS,
 
         'captype' => 'write',
