@@ -1,4 +1,4 @@
-YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', 'moodle-form-dateselector', 'datatype-date', function(Y) {
+YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', 'moodle-form-dateselector', 'datatype-date', 'calendar-base', function(Y) {
 
     var mail_message_view = false;
     var mail_checkbox_labels_default = {};
@@ -1128,9 +1128,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         datepicker.setXY(position);
     };
 
-    var mail_get_selected_date = function(eventtype, args) {
-        var date = args[0][0];
-        mail_date_selected = date[0] + ',' + date[1] + ',' + date[2];
+    var mail_get_selected_date = function(cell, date) {
+        mail_date_selected = cell.date.getFullYear() + ',' + (cell.date.getMonth()+1) + ',' + cell.date.getDate();
         mail_set_selected_date(mail_date_selected);
         M.form.dateselector.panel.hide();
     };
@@ -1152,9 +1151,9 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     };
 
     var mail_reset_date_selected = function() {
-        date = M.form.dateselector.calendar.today;
+        date = new Date();
         mail_date_selected = date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate();
-        M.form.dateselector.calendar.clear();
+        M.form.dateselector.calendar.deselectDates(date);
     };
 
     /*** Event listeners***/
@@ -1452,7 +1451,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     //Click date search
     Y.one("#local_mail_main_form").delegate('click', function(e) {
         e.stopPropagation();
-        if(Y.one('#dateselector-calendar-panel').getStyle('visibility') == 'hidden') {
+        if(Y.one('#dateselector-calendar-panel').hasClass('yui3-overlay-hidden')) {
             M.form.dateselector.panel.show();
         } else {
             M.form.dateselector.panel.hide();
@@ -1461,8 +1460,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     Y.on('contentready', function() {
         if (M.form.dateselector.calendar) {
-            M.form.dateselector.calendar.selectEvent.subscribe(mail_get_selected_date);
-            M.form.dateselector.calendar.cfg.setProperty('maxdate', new Date());
+            M.form.dateselector.calendar.on('dateClick', mail_get_selected_date);
+            M.form.dateselector.calendar.set('maximumDate', new Date());
             M.form.dateselector.panel.set('zIndex', 1);
             Y.one('#dateselector-calendar-panel').setStyle('border', 0);
             M.form.dateselector.calendar.render();
