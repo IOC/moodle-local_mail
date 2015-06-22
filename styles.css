@@ -999,3 +999,76 @@
     text-align: center;
     margin: 1em;
 }
+
+/* RTL Languages */
+
+.dir-rtl .mail_list .mail_item {
+    clear: left;
+}
+
+.dir-rtl .mail_list .mail_date {
+    float: left;
+    margin-left: 0;
+    margin-right: -15%;
+}
+
+.dir-rtl .mail_paging .singlebutton:nth-child(2) {
+    margin-left: 0;
+    border-radius: 0px 0.2em 0.2em 0px;
+}
+
+.dir-rtl .mail_paging .singlebutton:last-child {
+    border-radius: 0.2em 0px 0px 0.2em;
+    margin-right: 0;
+}
+
+.dir-rtl .mail_search_date {
+    width: 7em;
+    margin: 0.4em 0.5em 0 0;
+}
+
+.dir-rtl .mail_toggle_datepicker {
+    float: left;
+    margin-left: 0;
+    margin-right: 10px;
+    margin-top: -20px;
+}
+
+.dir-rtl .mail_label_diagonal_line {
+    transform: rotate(-45deg) translate(-4px, 9px);
+}
+
+.dir-rtl .mail_header .left {
+    float: right;
+}
+
+.dir-rtl .mail_info {
+    margin-left: 0;
+    margin-right: 43px;
+}
+
+.dir-rtl .mail_content {
+    margin: 1em 0px 0.2em;
+}
+
+.dir-rtl .mail_body {
+    margin-left: 0;
+    margin-right: 43px;
+}
+
+.dir-rtl .mail_references {
+    margin: 1em 43px 0 0;
+}
+
+.dir-rtl .mail_subject .mail_flags {
+    margin-left: 0;
+    margin-right: 0.5em;
+}
+
+.dir-rtl .mail_info .mail_date {
+    float: left;
+}
+
+.dir-rtl .mail_references .mail_info .mail_date {
+    float: none;
+}
