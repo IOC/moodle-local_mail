@@ -60,6 +60,7 @@ $string['filterbydate'] = 'Fecha (hasta el dia):';
 $string['from'] = 'De';
 $string['fullmessage'] = 'Mensaje completo';
 $string['fullmessage_help'] = 'Si se activa, las notificacions de correu incluyen el contenido del mensaje';
+$string['hasattachments'] = '(Mensaje con adjuntos)';
 $string['inbox'] = 'Bandeja de entrada';
 $string['invalidlabel'] = 'Etiqueta no válida';
 $string['invalidmessage'] = 'Mensaje no válido';

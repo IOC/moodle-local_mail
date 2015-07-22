@@ -60,6 +60,7 @@ $string['filterbydate'] = 'Date (up to the day):';
 $string['from'] = 'From';
 $string['fullmessage'] = 'Full message';
 $string['fullmessage_help'] = 'If enabled, notifications include mail content';
+$string['hasattachments'] = '(Message with attachments)';
 $string['inbox'] = 'Inbox';
 $string['invalidlabel'] = 'Invalid label';
 $string['invalidmessage'] = 'Invalid message';

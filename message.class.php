@@ -396,13 +396,13 @@ class local_mail_message {
         return $this->has_user($userid) and $this->role[$userid] != 'from';
     }
 
-    public function has_attachment() {
+    public function has_attachment($refs = true) {
         global $DB;
 
         if ($DB->record_exists('local_mail_index', array('type' => 'attachment', 'messageid' => $this->id, 'item' => true))) {
             return true;
         }
-        if (!empty($this->refs)) {
+        if ($refs and !empty($this->refs)) {
             list($sqlmessageids, $messageidparams) = $DB->get_in_or_equal($this->refs, SQL_PARAMS_NAMED, 'messageid');
             $sql = 'SELECT count(*)'
                 . ' FROM {local_mail_index}'

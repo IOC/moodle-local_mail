@@ -60,6 +60,7 @@ $string['filterbydate'] = 'Data (fins el dia):';
 $string['from'] = 'De';
 $string['fullmessage'] = 'Missatge complet';
 $string['fullmessage_help'] = 'Si està activat, quan s\'envia una notificació de correu aquesta inclou el cos del missatge';
+$string['hasattachments'] = '(Missatge amb adjunts)';
 $string['inbox'] = 'Safata d\'entrada';
 $string['invalidlabel'] = 'Etiqueta no vàlida';
 $string['invalidmessage'] = 'Missatge no vàlid';

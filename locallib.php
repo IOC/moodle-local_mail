@@ -104,12 +104,17 @@ function local_mail_send_notifications($message) {
     // Send the mail now!
     foreach ($message->recipients() as $userto) {
 
+        $attachment = '';
+
+        if ($message->has_attachment(false)) {
+            $attachment = get_string('hasattachments', 'local_mail');
+        }
         $plaindata->user = fullname($message->sender());
-        $plaindata->subject = $message->subject();
+        $plaindata->subject = $message->subject() . ' ' . $attachment;
         $plaindata->content = '';
 
         $htmldata->user = fullname($message->sender());
-        $htmldata->subject = $message->subject();
+        $htmldata->subject = $message->subject() . ' ' . $attachment;
         $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox', 'm' => $message->id()));
         $htmldata->url = $url->out(false);
         $htmldata->content = '';
