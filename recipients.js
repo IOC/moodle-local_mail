@@ -6,10 +6,20 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     var mail_existing_recipients = [];
 
     var init = function () {
+        mail_update_compose_url();
         mail_create_recipients_panel();
         mail_reset_recipients();
         mail_show_recipipients_button_ajax();
     };
+
+    var mail_update_compose_url = function() {
+         if (history.pushState) {
+            var node = Y.one('input[name="m"]');
+            if (node) {
+                history.pushState({}, document.title, M.cfg.wwwroot + '/local/mail/compose.php?m=' + node.get('value'));
+            }
+         }
+    }
 
     var mail_show_recipipients_button_ajax = function () {
         Y.one('#fitem_id_recipients').hide();
