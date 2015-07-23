@@ -1,4 +1,4 @@
-YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', function(Y) {
+YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', 'node-event-simulate', function(Y) {
 
     var mail_recipients_panel;
     var timeout;
@@ -61,8 +61,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
         clearInterval(timeout);
         if(obj.redirect) {
-            M.core_formchangechecker.set_form_submitted();
-            Y.one('#mform1').submit();
+            Y.one('#id_recipientshidden').simulate('click');
+            return;
         }
         if (obj.msgerror) {
             alert(obj.msgerror);

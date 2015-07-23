@@ -97,6 +97,8 @@ class mail_compose_form extends moodleform {
         $label = get_string('discard', 'local_mail');
         $buttonarray[] = $mform->createElement('submit', 'discard', $label);
 
+        $buttonarray[] = $mform->createElement('submit', 'recipientshidden', '', array('class' => 'mail_hidden'));
+
         $mform->addGroup($buttonarray, 'buttonar', '', array(' '), false);
         $mform->closeHeaderBefore('buttonar');
     }
