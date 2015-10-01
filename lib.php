@@ -257,6 +257,22 @@ function local_mail_extends_navigation($root) {
         $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
         $PAGE->requires->js('/local/mail/users.js');
     }
+
+    // Block progress
+
+    if ($PAGE->url->compare(new moodle_url('/blocks/progress/overview.php'), URL_MATCH_BASE)) {
+        $userid = optional_param('id', false, PARAM_INT);
+        $vars = array('course' => $COURSE->id);
+        $PAGE->requires->string_for_js('choosedots', 'moodle');
+        $PAGE->requires->strings_for_js(array(
+                'bulkmessage',
+                'to',
+                'cc',
+                'bcc',
+                ), 'local_mail');
+        $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
+        $PAGE->requires->js('/local/mail/users.js');
+    }
 }
 
 function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
