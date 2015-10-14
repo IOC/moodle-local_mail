@@ -979,6 +979,10 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 alert(M.util.get_string('erroremptylabelname', 'local_mail'));
                 mail_label_edit();
                 return false;
+            } else if (cfg.data.labelname.length > 100) {
+                alert(M.util.get_string('maximumchars', 'moodle', 100));
+                mail_label_edit();
+                return false;
             }
             cfg.data.labelcolor = obj.get('value');
         }
@@ -987,6 +991,10 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             cfg.data.labelname = Y.one('#local_mail_new_label_name').get('value');
             if (!cfg.data.labelname) {
                 alert(M.util.get_string('erroremptylabelname', 'local_mail'));
+                mail_label_new();
+                return false;
+            } else if (cfg.data.labelname.length > 100) {
+                alert(M.util.get_string('maximumchars', 'moodle', 100));
                 mail_label_new();
                 return false;
             }
@@ -1042,8 +1050,13 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     var mail_label_confirm_delete = function(e) {
         var labelid;
         var message;
+        var labelname = '';
         labelid = Y.one('input[name="itemid"]').get('value');
-        message = M.util.get_string('labeldeleteconfirm', 'local_mail', M.local_mail.mail_labels[labelid].name);
+        labelname = M.local_mail.mail_labels[labelid].name;
+        if (labelname.length > 25) {
+            labelname = labelname.substring(0, 25) + '...';
+        }
+        message = M.util.get_string('labeldeleteconfirm', 'local_mail', labelname);
         M.util.show_confirm_dialog(e, {
                                         'callback' : mail_label_remove,
                                         'message' : message,

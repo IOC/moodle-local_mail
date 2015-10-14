@@ -48,6 +48,8 @@ class mail_label_form extends moodleform {
         $mform->addElement('header', 'editlabel', get_string('editlabel', 'local_mail'));
         $mform->addElement('text', 'labelname', get_string('labelname', 'local_mail'));
         $mform->setType('labelname', PARAM_TEXT);
+        $text = get_string('maximumchars', '', 100);
+        $mform->addRule('labelname', $text, 'maxlength', 100, 'client');
         $mform->addElement('select', 'labelcolor', get_string('labelcolor', 'local_mail'), $colors, array('class' => 'mail_label_colors'));
 
         // Buttons
