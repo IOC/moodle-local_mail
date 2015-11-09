@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,27 +16,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    local-mail
+ * @package    local_mail
  * @author     Albert Gasset <albert.gasset@gmail.com>
  * @author     Marc Català <reskit@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['addbcc'] = 'Afegeix a Cco';
-$string['addcc'] = 'Afegeix a Cc';
+defined('MOODLE_INTERNAL') || die();
+
+$string['addbcc'] = 'Afegeix a c/o';
+$string['addcc'] = 'Afegeix a a/c';
 $string['addrecipients'] = 'Afegeix destinataris';
 $string['addto'] = 'Per a';
 $string['advsearch'] = 'Cerca avançada';
 $string['all'] = 'Tots';
 $string['applychanges'] = 'Aplica';
-$string['assigntonewlabel'] = 'Nova etiqueta';
-$string['attachments'] = 'Adjunts';
+$string['assigntonewlabel'] = 'Etiqueta nova';
+$string['attachments'] = 'Fitxers adjunts';
 $string['attachnumber'] = '{$a} fitxers adjunts';
-$string['bcc'] = 'Cco';
-$string['bulkmessage'] = 'Amb els usuaris seleccionats envía un correu intern...';
+$string['bcc'] = 'C/o';
+$string['bulkmessage'] = 'Amb els usuaris seleccionats envia un correu intern...';
 $string['cancel'] = 'Cancel·la';
 $string['cannotcompose'] = 'No podeu redactar missatges perquè no esteu inscrit a cap curs.';
-$string['cc'] = 'Cc';
+$string['cc'] = 'A/c';
 $string['compose'] = 'Redacta';
 $string['continue'] = 'Continua';
 $string['courses'] = 'Cursos';
@@ -45,32 +48,33 @@ $string['cronstart'] = 'Inici del cron';
 $string['cronstop'] = 'Fi del cron';
 $string['delete'] = 'Suprimeix';
 $string['discard'] = 'Descarta';
-$string['downloadall'] = 'Baixa tots';
+$string['downloadall'] = 'Baixa\'ls tots';
 $string['draft'] = 'Esborrany';
 $string['drafts'] = 'Esborranys';
 $string['editlabel'] = 'Edita l\'etiqueta';
 $string['emptyrecipients'] = 'No hi ha destinataris.';
-$string['erroremptycourse'] = 'Si us plau indiqueu un curs.';
-$string['erroremptylabelname'] = 'Si us plau indiqueu un nom d\'etiqueta.';
+$string['erroremptycourse'] = 'Indiqueu un curs.';
+$string['erroremptylabelname'] = 'Indiqueu un nom d\'etiqueta.';
 $string['erroremptyrecipients'] = 'Indiqueu un destinatari com a mínim.';
 $string['erroremptysubject'] = 'Indiqueu l\'assumpte.';
-$string['errorrepeatedlabelname'] = 'El nom d\'etiqueta ja existeix';
 $string['errorinvalidcolor'] = 'Color no vàlid';
-$string['filterbydate'] = 'Data (fins el dia):';
+$string['errorrepeatedlabelname'] = 'El nom d\'etiqueta ja existeix';
+$string['filterbydate'] = 'Data (fins al dia):';
+$string['forward'] = 'Reenvia';
 $string['from'] = 'De';
 $string['fullmessage'] = 'Missatge complet';
 $string['fullmessage_help'] = 'Si està activat, quan s\'envia una notificació de correu aquesta inclou el cos del missatge';
-$string['hasattachments'] = '(Missatge amb adjunts)';
+$string['hasattachments'] = '(Missatge amb fitxers adjunts)';
 $string['inbox'] = 'Safata d\'entrada';
 $string['invalidlabel'] = 'Etiqueta no vàlida';
 $string['invalidmessage'] = 'Missatge no vàlid';
-$string['labeldeleteconfirm'] = 'Esteu segur que voleu suprimir l\'etiqueta \'{$a}\'';
-$string['labelname'] = 'Nom';
 $string['labelcolor'] = 'Color';
+$string['labeldeleteconfirm'] = 'Esteu segur que voleu suprimir l\'etiqueta «{$a}»';
+$string['labelname'] = 'Nom';
 $string['labels'] = 'Etiquetes';
-$string['mail:addinstance'] = 'Afegeix un nou Correu';
-$string['mail:usemail'] = 'Utilitzar el Correu';
-$string['mailupdater'] = 'Actualizació correu';
+$string['mail:addinstance'] = 'Afegeix un correu nou';
+$string['mailupdater'] = 'Actualització de correu';
+$string['mail:usemail'] = 'Utilitza el correu';
 $string['markasread'] = 'Marca com a llegit';
 $string['markasread_help'] = 'Si està activat, i les notificacions també estan activades, els missatges es marcaran com a llegits';
 $string['markasstarred'] = 'Marca com a destacat';
@@ -82,7 +86,7 @@ $string['message'] = 'Missatge';
 $string['messageprovider:mail'] = 'Notificació de correu';
 $string['moreactions'] = 'Més';
 $string['mymail'] = 'El meu correu';
-$string['newlabel'] = 'Nova etiqueta';
+$string['newlabel'] = 'Etiqueta nova';
 $string['nocolor'] = 'Sense color';
 $string['nolabels'] = 'No hi ha cap etiqueta.';
 $string['nomessages'] = 'No hi ha cap missatge.';
@@ -99,38 +103,37 @@ $string['notificationbody'] = '- De: {$a->user}
 {$a->content}';
 $string['notificationbodyhtml'] = '<p>De: {$a->user}</p><p>Assumpte: <a href="{$a->url}">{$a->subject}</a></p><p>{$a->content}</p>';
 $string['notificationpref'] = 'Notificacions d\'enviament';
-$string['notificationsubject'] = 'Nou missatge de correu a {$a}';
+$string['notificationsubject'] = 'Missatge de correu electrònic nou a {$a}';
 $string['notingroup'] = 'No esteu a cap grup';
-$string['pagingsingle'] = '{$a->index} de {$a->total}';
 $string['pagingmultiple'] = '{$a->first}-{$a->last} de {$a->total}';
+$string['pagingsingle'] = '{$a->index} de {$a->total}';
 $string['perpage'] = 'Mostra {$a} missatges';
 $string['pluginname'] = 'Correu';
 $string['read'] = 'Llegits';
 $string['references'] = 'Referències';
 $string['removelabel'] = 'Elimina l\'etiqueta';
 $string['reply'] = 'Respon';
-$string['replyall'] = 'Respon a tots';
+$string['replyall'] = 'Respon a tothom';
 $string['restore'] = 'Restaura';
-$string['search'] = 'Cerca';
-$string['searchbyunread'] = 'Només sense llegir';
-$string['searchbyattach'] = 'Conté un fitxer adjunt';
-$string['shortaddbcc'] = 'Cco';
-$string['shortaddcc'] = 'Cc';
-$string['shortaddto'] = 'Per a';
-$string['showlabelmessages'] = 'Mostra els missatges amb l\'etiqueta "{$a}"';
-$string['showrecentmessages'] = 'Mostra els missatges més nous';
-$string['smallmessage'] = '{$a->user} us ha enviat un missatge de correu';
-$string['toomanyrecipients'] = 'La cerca conté massa resultats';
-$string['forward'] = 'Reenvia';
 $string['save'] = 'Desa';
+$string['search'] = 'Cerca';
+$string['searchbyattach'] = 'Conté un fitxer adjunt';
+$string['searchbyunread'] = 'Només sense llegir';
 $string['send'] = 'Envia';
 $string['sendmessage'] = 'Envia un missatge';
 $string['sentmail'] = 'Enviats';
 $string['setlabels'] = 'Etiquetes';
+$string['shortaddbcc'] = 'C/o';
+$string['shortaddcc'] = 'A/c';
+$string['shortaddto'] = 'Per a';
+$string['showlabelmessages'] = 'Mostra els missatges amb l\'etiqueta «{$a}»';
+$string['showrecentmessages'] = 'Mostra els missatges més nous';
+$string['smallmessage'] = '{$a->user} us ha enviat un missatge de correu';
 $string['starred'] = 'Destacat';
 $string['starredmail'] = 'Destacats';
 $string['subject'] = 'Assumpte';
 $string['to'] = 'Per a';
+$string['toomanyrecipients'] = 'La cerca conté massa resultats';
 $string['trash'] = 'Paperera';
 $string['undo'] = 'Desfés';
 $string['undodelete'] = 'S\'han mogut a la paperera {$a} missatges';
