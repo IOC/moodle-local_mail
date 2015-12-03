@@ -143,7 +143,7 @@ class mail_compose_form extends moodleform {
     public static function file_options() {
         global $COURSE, $PAGE, $CFG;
 
-        $configmaxbytes = get_config('local_mail', 'maxbytes') ?: LOCAL_MAIL_MAXBYTES;
+        $configmaxbytes = get_config('local_mail', 'maxbytes') ?: $CFG->maxbytes;
         $configmaxfiles = get_config('local_mail', 'maxfiles');
         $maxbytes = get_user_max_upload_file_size($PAGE->context, $CFG->maxbytes,
                                                   $COURSE->maxbytes, $configmaxbytes);
