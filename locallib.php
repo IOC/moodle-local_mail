@@ -130,7 +130,7 @@ function local_mail_send_notifications($message) {
         $eventdata->component         = 'local_mail';
         $eventdata->name              = 'mail';
         $eventdata->userfrom          = $message->sender();
-        $eventdata->userto            = $userto;
+        $eventdata->userto            = core_user::get_user($userto->id);
         $eventdata->subject           = get_string('notificationsubject', 'local_mail', $SITE->shortname);
         $eventdata->fullmessage       = $fullplainmessage;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
