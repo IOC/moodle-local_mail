@@ -31,7 +31,6 @@ local_mail_setup_page($SITE, new moodle_url($url));
 $title = get_string('preferences');
 
 $prefs = new stdClass;
-$prefs->fullmessage = get_user_preferences('local_mail_fullmessage', 0);
 $prefs->markasread  = get_user_preferences('local_mail_markasread', 0);
 
 $form = new local_mail_preferences_form($url);
@@ -41,12 +40,6 @@ if ($form->is_cancelled()) {
     redirect($viewurl);
 } else if ($form->is_submitted() && $form->is_validated() && confirm_sesskey()) {
     $data = $form->get_data();
-
-    if (!isset($data->fullmessage)) {
-        $data->fullmessage = '0';
-        $data->markasread = '0';
-    }
-    set_user_preference('local_mail_fullmessage', $data->fullmessage);
 
     if (!isset($data->markasread)) {
         $data->markasread = '0';

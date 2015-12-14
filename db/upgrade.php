@@ -40,5 +40,13 @@ function xmldb_local_mail_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2014030600, 'local', 'mail');
     }
 
+    if ($oldversion < 2015121400) {
+
+        // Clean obsolete local_mail_fullmessage preference
+        $DB->execute('DELETE FROM {user_preferences} WHERE name="local_mail_fullmessage"');
+
+        upgrade_plugin_savepoint(true, 2015121400, 'local', 'mail');
+    }
+
     return true;
 }

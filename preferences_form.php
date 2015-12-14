@@ -29,11 +29,7 @@ class local_mail_preferences_form extends moodleform {
 
         $mform->addElement('header', 'general', get_string('notificationpref', 'local_mail'));
 
-        $mform->addElement('checkbox', 'fullmessage', get_string('fullmessage', 'local_mail'));
-        $mform->addHelpButton('fullmessage', 'fullmessage', 'local_mail');
-
         $mform->addElement('checkbox', 'markasread', get_string('markasread', 'local_mail'));
-        $mform->disabledIf('markasread', 'fullmessage', 'notchecked');
         $mform->addHelpButton('markasread', 'markasread', 'local_mail');
 
         $this->add_action_buttons(true, get_string('savechanges'));

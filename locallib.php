@@ -111,18 +111,13 @@ function local_mail_send_notifications($message) {
         }
         $plaindata->user = fullname($message->sender());
         $plaindata->subject = $message->subject() . ' ' . $attachment;
-        $plaindata->content = '';
+        $plaindata->content = $message->content();
 
         $htmldata->user = fullname($message->sender());
         $htmldata->subject = $message->subject() . ' ' . $attachment;
         $url = new moodle_url('/local/mail/view.php', array('t' => 'inbox', 'm' => $message->id()));
         $htmldata->url = $url->out(false);
-        $htmldata->content = '';
-
-        if (get_user_preferences('local_mail_fullmessage', false, $userto->id)) {
-            $plaindata->content = $message->content();
-            $htmldata->content = $message->content();
-        }
+        $htmldata->content = $message->content();
 
         $fullplainmessage = format_text_email(get_string('notificationbody', 'local_mail', $plaindata), $message->format());
 
