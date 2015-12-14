@@ -269,6 +269,8 @@ function local_mail_getsqlrecipients($courseid, $search, $groupid, $roleid, $rec
 
     $context = context_course::instance($courseid);
 
+    $mailsamerole = has_capability('local/mail:mailsamerole', $context);
+
     list($esql, $params) = get_enrolled_sql($context, null, $groupid, true);
     $joins = array("FROM {user} u");
     $wheres = array();
@@ -287,10 +289,17 @@ function local_mail_getsqlrecipients($courseid, $search, $groupid, $roleid, $rec
     $select .= $ccselect;
     $joins[] = $ccjoin;
 
-    // We want to query both the current context and parent contexts.
-    list($relatedctxsql, $relatedctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relatedctx');
+    if (!$mailsamerole) {
+        $userroleids = local_mail_get_user_roleids($USER->id, $context);
+        list($relctxsql, $reldctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relctx');
+        list($samerolesql, $sameroleparams) = $DB->get_in_or_equal($userroleids, SQL_PARAMS_NAMED, 'samerole' , false);
+        $wheres[] = "u.id IN (SELECT userid FROM {role_assignments} WHERE roleid $samerolesql AND contextid $relctxsql)";
+        $params = array_merge($params, array('roleid' => $roleid), $sameroleparams, $reldctxparams);
+    }
 
     if ($roleid) {
+        // We want to query both the current context and parent contexts.
+        list($relatedctxsql, $relatedctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relatedctx');
         $wheres[] = "u.id IN (SELECT userid FROM {role_assignments} WHERE roleid = :roleid AND contextid $relatedctxsql)";
         $params = array_merge($params, array('roleid' => $roleid), $relatedctxparams);
     }
@@ -318,4 +327,13 @@ function local_mail_getsqlrecipients($courseid, $search, $groupid, $roleid, $rec
     $sort = 'ORDER BY u.lastname ASC, u.firstname ASC';
 
     return array($select, $from, $where, $sort, $params);
+}
+
+function local_mail_get_user_roleids($userid, $context) {
+    $roles = get_user_roles($context, $userid);
+
+    return array_map(
+        function ($role) {
+            return $role->roleid;
+        }, $roles);
 }

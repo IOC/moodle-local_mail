@@ -69,6 +69,7 @@ $string['labelname'] = 'Name';
 $string['labelcolor'] = 'Color';
 $string['labels'] = 'Labels';
 $string['mail:addinstance'] = 'Add a new mail';
+$string['mail:mailsamerole'] = 'Send mails to users with same role';
 $string['mail:usemail'] = 'Use mail';
 $string['mailupdater'] = 'Mail updater';
 $string['markasread'] = 'Mark as read';

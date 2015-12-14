@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -73,6 +72,7 @@ $string['labeldeleteconfirm'] = 'Esteu segur que voleu suprimir l\'etiqueta «{$
 $string['labelname'] = 'Nom';
 $string['labels'] = 'Etiquetes';
 $string['mail:addinstance'] = 'Afegeix un correu nou';
+$string['mail:mailsamerole'] = 'Envia correus als usuaris amb el mateix rol';
 $string['mailupdater'] = 'Actualització de correu';
 $string['mail:usemail'] = 'Utilitza el correu';
 $string['markasread'] = 'Marca com a llegit';

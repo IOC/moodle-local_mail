@@ -27,9 +27,14 @@ require_once("{$CFG->dirroot}/local/mail/lib.php");
 class mail_recipients_selector extends groups_user_selector_base {
 
     public function find_users($search) {
-        global $DB;
+        global $DB, $USER;
+
+        $mailmaxusers = (isset($CFG->maxusersperpage) ? $CFG->maxusersperpage : $this->maxusersperpage);
 
         $context = context_course::instance($this->courseid);
+
+        $mailsamerole = has_capability('local/mail:mailsamerole', $context);
+        $userroleids = local_mail_get_user_roleids($USER->id, $context);
 
         list($wherecondition, $params) = $this->search_sql($search, 'u');
         list($enrolledsql, $enrolledparams) = get_enrolled_sql($context, '', $this->groupid, true);
@@ -37,6 +42,13 @@ class mail_recipients_selector extends groups_user_selector_base {
 
         $params = array_merge($params, $enrolledparams, $parentparams);
         $params['courseid'] = $this->courseid;
+
+        if (!$mailsamerole) {
+            list($relctxsql, $reldctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relctx');
+            list($samerolesql, $sameroleparams) = $DB->get_in_or_equal($userroleids, SQL_PARAMS_NAMED, 'samerole' , false);
+            $wherecondition .= " AND u.id IN (SELECT userid FROM {role_assignments} WHERE roleid $samerolesql AND contextid $relctxsql)";
+            $params = array_merge($params, $sameroleparams, $reldctxparams);
+        }
 
         $fields = 'SELECT r.id AS roleid, '
             . 'r.shortname AS roleshortname, '
@@ -56,7 +68,7 @@ class mail_recipients_selector extends groups_user_selector_base {
 
         if (!$this->is_validating()) {
             $count = $DB->count_records_sql($countfields . $sql, $params);
-            if ($count > 100) {
+            if ($count > $mailmaxusers) {
                 return $this->too_many_results($search, $count);
             }
         }

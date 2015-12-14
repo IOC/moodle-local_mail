@@ -653,10 +653,13 @@ class local_mail_renderer extends plugin_renderer_base {
         // Roles
         $context = context_course::instance($courseid);
         $roles = role_get_names($context);
+        $userroles = local_mail_get_user_roleids($userid, $context);
+        $mailsamerole = has_capability('local/mail:mailsamerole', $context);
         foreach ($roles as $key => $role) {
             $count = $DB->count_records_select('role_assignments', "contextid = :contextid AND roleid = :roleid AND userid <> :userid",
                 array('contextid' => $context->id, 'roleid' => $role->id, 'userid' => $userid));
-            if ($count) {
+            if (($count && $mailsamerole)
+                || ($count && !$mailsamerole && !in_array($role->id, $userroles))) {
                 $options[$key] = $role->localname;
             }
         }

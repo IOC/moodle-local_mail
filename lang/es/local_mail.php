@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -73,6 +72,7 @@ $string['labelname'] = 'Nombre';
 $string['labelcolor'] = 'Color';
 $string['labels'] = 'Etiquetas';
 $string['mail:addinstance'] = 'Añade un nuevo Correo';
+$string['mail:mailsamerole'] = 'Envía correos a los usuarios con el mismo rol';
 $string['mailupdater'] = 'Actualización correo';
 $string['mail:usemail'] = 'Utilizar el Correo';
 $string['markasread'] = 'Marca como leído';
