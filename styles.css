@@ -30,9 +30,16 @@
     text-align: right;
 }
 
+.mail_recipients_toolbar .groupselector label,
+.mail_recipients_toolbar .roleselector label {
+    display: inline-block;
+    margin-right: 1em;
+}
+
 .mail_recipients_toolbar .groupselector select,
 .mail_recipients_toolbar .roleselector select {
     width: 75%;
+    margin-bottom: 0;
 }
 
 .mail_recipients_toolbar .mail_separator {
@@ -40,9 +47,18 @@
     border-top: 1px solid #bbb;
 }
 
-.mail_recipients_search{
+.mail_recipients_search {
     min-width: 50%;
     max-width: 100%;
+}
+
+.mail_recipients_search label {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.mail_recipients_search input {
+    margin-bottom: 0;
 }
 
 .mail_recipients_search,
@@ -50,19 +66,19 @@
     padding: 10px 10px;
 }
 
-.mail_recipients_search .mail_search{
+.mail_recipients_search .mail_search {
     width: 233px;
 }
 
 .mail_recipients_loading {
     background-color: #fff;
-    height: 395px;
-    top: 120px;
+    height: 67%;
+    top: 137px;
     left: 1px;
     min-height: 50px;
     min-width: 50px;
     position: absolute;
-    width: 99%;
+    width: 99.5%;
     text-align: center;
 }
 
@@ -142,15 +158,18 @@
     float: right;
 }
 
-.mail_all_recipients_actions {
-    margin-top: -8px;
+.mail_recipient_actions input {
+    margin: 3px 5px 0 0;
+}
+
+.mail_all_recipients_actions input {
+    margin: 1px 5px 0 0;
 }
 
 .mail_recipient_actions input,
 .mail_all_recipients_actions input {
     display: inline-block;
     background-color: #f1f1f1;
-    margin: 4px 5px 0 0;
     padding: 0 0.4em;
     border: 1px solid #ccc;
     border-radius: 0.2em;
