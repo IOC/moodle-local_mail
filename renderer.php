@@ -24,7 +24,9 @@
 class local_mail_renderer extends plugin_renderer_base {
 
     public function date($message, $viewmail = false) {
-        $offset = get_user_timezone_offset();
+        $tz = core_date::get_user_timezone();
+        $date = new DateTime('now', new DateTimeZone($tz));
+        $offset = ($date->getOffset() - dst_offset_on(time(), $tz)) / (3600.0);
         $time = ($offset < 13) ? $message->time() + $offset : $message->time();
         $now = ($offset < 13) ? time() + $offset : time();
         $daysago = floor($now / 86400) - floor($time / 86400);

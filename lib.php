@@ -105,7 +105,7 @@ function local_mail_update_process($settings) {
     return true;
 }
 
-function local_mail_extends_navigation($root) {
+function local_mail_extend_navigation($root) {
     global $CFG, $COURSE, $PAGE, $SESSION, $SITE, $USER;
 
     if (!get_config('local_mail', 'version')) {
