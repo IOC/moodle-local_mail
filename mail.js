@@ -1142,13 +1142,19 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     };
 
     var mail_get_selected_date = function(cell, date) {
-        mail_date_selected = cell.date.getFullYear() + ',' + (cell.date.getMonth()+1) + ',' + cell.date.getDate();
+        mail_date_selected = cell.date.getFullYear() + ',' + cell.date.getMonth() + ',' + cell.date.getDate();
         mail_set_selected_date(mail_date_selected);
         M.form.dateselector.panel.hide();
     };
 
     var mail_set_selected_date = function(date) {
-        Y.one('#searchdate').set('text', Y.Date.format(new Date(date), {format:"%x"}));
+        if (date) {
+            var elems = date.split(',');
+            date = Y.Date.format(new Date(elems[0], elems[1], elems[2]), {format:"%x"})
+        } else {
+            date = Y.Date.format(new Date(), {format:"%x"})
+        }
+        Y.one('#searchdate').set('text', date);
     };
 
     var mail_notification_message = function(message) {
@@ -1165,7 +1171,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_reset_date_selected = function() {
         date = new Date();
-        mail_date_selected = date.getFullYear() + ',' + (date.getMonth()+1) + ',' + date.getDate();
+        mail_date_selected = date.getFullYear() + ',' + date.getMonth() + ',' + date.getDate();
         M.form.dateselector.calendar.deselectDates(date);
     };
 
