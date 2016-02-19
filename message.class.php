@@ -840,8 +840,10 @@ class local_mail_message {
             array_filter(array_map('fullname', $users), $matchtext)) {
             return true;
         }
-
-        $html = format_text($this->content(), $this->format());
+        $context = context_course::instance($this->course->id);
+        $content = file_rewrite_pluginfile_urls($this->content, 'pluginfile.php', $context->id,
+                                            'local_mail', 'message', $this->id);
+        $html = format_text($content, $this->format());
         return $matchtext(html_to_text($html));
     }
 
