@@ -868,7 +868,7 @@ function local_mail_searchmessages($type, $itemid, $query, $offset = false, $per
         $date = $query['time'];
         $time = explode(',', $query['time']);
         if (count($time) == 3) {
-            $query['time'] = make_timestamp($time[0], $time[1], $time[2], 23, 59, 59);
+            $query['time'] = make_timestamp($time[0], ($time[1] + 1), $time[2], 23, 59, 59);
         } else {
             $query['time'] = '';
         }
