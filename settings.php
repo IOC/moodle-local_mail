@@ -39,17 +39,5 @@ if ($hassiteconfig) {
                                                       LOCAL_MAIL_MAXBYTES, $sizes));
     }
 
-
-    $settings->add(new admin_setting_heading('mailupdater', get_string('mailupdater', 'local_mail'), get_string('mailupdater', 'local_mail')));
-
-    $settings->add(new admin_setting_configselect('local_mail/cronenabled', new lang_string('cronenabled', 'local_mail'), '',
-                                                      0, array(0 => get_string('no'), 1 => get_string('yes'))));
-
-    $settings->add(new admin_setting_configselect('local_mail/cronstart', new lang_string('cronstart', 'local_mail'), '',
-                                                   0, range(0, 23)));
-    $settings->add(new admin_setting_configselect('local_mail/cronstop', new lang_string('cronstop', 'local_mail'), '',
-                                                   24, array_combine(range(1, 24), range(1, 24))));
-    $settings->add(new admin_setting_configduration('local_mail/cronduration', new lang_string('cronduration', 'local_mail'), '', 1800, 60));
-
     $ADMIN->add('localplugins', $settings);
 }

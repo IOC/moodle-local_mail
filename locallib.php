@@ -106,7 +106,7 @@ function local_mail_send_notifications($message) {
 
         $attachment = '';
 
-        if ($message->has_attachment(false)) {
+        if ($message->attachments()) {
             $attachment = get_string('hasattachments', 'local_mail');
         }
         $plaindata->user = fullname($message->sender());

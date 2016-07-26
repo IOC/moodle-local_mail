@@ -29,7 +29,7 @@ require_once('label.class.php');
 class local_mail_message {
 
     private static $indextypes = array(
-        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash', 'attachment'
+        'inbox', 'drafts', 'sent', 'starred', 'course', 'label', 'trash'
     );
 
     private $id;
@@ -37,6 +37,7 @@ class local_mail_message {
     private $subject;
     private $content;
     private $format;
+    private $attachments = 0;
     private $draft;
     private $time;
     private $refs = array();
@@ -122,7 +123,6 @@ class local_mail_message {
 
         $message->create_index($userid, 'drafts');
         $message->create_index($userid, 'course', $courseid);
-        $message->create_index($userid, 'attachment', false);
 
         $transaction->allow_commit();
 
@@ -186,7 +186,7 @@ class local_mail_message {
             return $messages;
         }
 
-        $sql = 'SELECT m.id, m.courseid, m.subject, m.content, m.format,'
+        $sql = 'SELECT m.id, m.courseid, m.subject, m.content, m.format, m.attachments, '
             . ' m.draft, m.time, c.shortname, c.fullname, c.groupmode'
             . ' FROM {local_mail_messages} m'
             . ' JOIN {course} c ON c.id = m.courseid'
@@ -272,7 +272,7 @@ class local_mail_message {
                 if ($message->match($userid, $query['pattern']) && $message->matchfrom($userid, $query['searchfrom'])
                     && $message->matchto($userid, $query['searchto'])) {
                     if (!empty($query['attach'])) {
-                        if ($message->has_attachment()) {
+                        if ($message->attachments(true)) {
                             $result[] = $message;
                         }
                     } else {
@@ -327,6 +327,19 @@ class local_mail_message {
         $DB->insert_record('local_mail_message_users', $record);
     }
 
+    public function attachments($includerefs=false) {
+        global $DB;
+
+        $attachments = $this->attachments;
+
+        if ($includerefs and !empty($this->refs)) {
+            list($sqlid, $params) = $DB->get_in_or_equal($this->refs, SQL_PARAMS_NAMED, 'messageid');
+            $attachments += $DB->get_field_select('local_mail_messages', 'SUM(attachments)', "id $sqlid", $params);
+        }
+
+        return $attachments;
+    }
+
     public function content() {
         return $this->content;
     }
@@ -376,7 +389,7 @@ class local_mail_message {
         $transaction = $DB->start_delegated_transaction();
 
         $message = self::create($userid, $this->course->id, $time);
-        $message->save('FW: ' . $this->subject, '', -1, $time);
+        $message->save('FW: ' . $this->subject, '', -1, 0, $time);
         $message->set_references($this);
 
         foreach ($this->labels($userid) as $label) {
@@ -394,29 +407,6 @@ class local_mail_message {
 
     public function has_recipient($userid) {
         return $this->has_user($userid) and $this->role[$userid] != 'from';
-    }
-
-    public function has_attachment($refs = true) {
-        global $DB;
-
-        if ($DB->record_exists('local_mail_index', array('type' => 'attachment', 'messageid' => $this->id, 'item' => true))) {
-            return true;
-        }
-        if ($refs and !empty($this->refs)) {
-            list($sqlmessageids, $messageidparams) = $DB->get_in_or_equal($this->refs, SQL_PARAMS_NAMED, 'messageid');
-            $sql = 'SELECT count(*)'
-                . ' FROM {local_mail_index}'
-                . ' WHERE type=:type AND item=:item'
-                . ' AND messageid ' . $sqlmessageids;
-            $params = array(
-                    'type' => 'attachment',
-                    'item' => 1,
-            );
-            $count = $DB->count_records_sql($sql, array_merge($params, $messageidparams));
-            return $count > 0;
-        }
-
-        return false;
     }
 
     public function id() {
@@ -505,7 +495,7 @@ class local_mail_message {
         $transaction = $DB->start_delegated_transaction();
 
         $message = self::create($userid, $this->course->id, $time);
-        $message->save($subject, '', -1, $time, false);
+        $message->save($subject, '', -1, 0, $time);
         $sender = $this->sender();
         $message->add_recipient('to', $sender->id);
         $message->set_references($this);
@@ -527,7 +517,7 @@ class local_mail_message {
         return $message;
     }
 
-    public function save($subject, $content, $format, $time=false, $attachment=false) {
+    public function save($subject, $content, $format, $attachments=0, $time=false) {
         global $DB;
 
         assert($this->draft);
@@ -537,6 +527,7 @@ class local_mail_message {
         $record->subject = $this->subject = $subject;
         $record->content = $this->content = $content;
         $record->format = $this->format = $format;
+        $record->attachments = $this->attachments = $attachments;
         $record->time = $this->time = $time ?: time();
 
         $transaction = $DB->start_delegated_transaction();
@@ -544,9 +535,6 @@ class local_mail_message {
         $DB->set_field('local_mail_index', 'time', $this->time, array(
             'messageid' => $this->id,
         ));
-
-        $DB->set_field('local_mail_index', 'item', $attachment, array(
-            'messageid' => $this->id, 'type' => 'attachment'));
 
         $transaction->allow_commit();
     }
@@ -741,6 +729,7 @@ class local_mail_message {
         $message->subject = $record->subject;
         $message->content = $record->content;
         $message->format = (int) $record->format;
+        $message->attachments = (int) $record->attachments;
         $message->draft = (bool) $record->draft;
         $message->time = (int) $record->time;
 

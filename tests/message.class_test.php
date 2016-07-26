@@ -48,6 +48,7 @@ class local_mail_message_test extends local_mail_testcase {
         self::assertEquals($message->subject(), $record->subject);
         self::assertEquals($message->content(), $record->content);
         self::assertEquals($message->format(), $record->format);
+        self::assertEquals($message->attachments(), $record->attachments);
         self::assertEquals($message->draft(), (bool) $record->draft);
         self::assertEquals($message->time(), $record->time);
 
@@ -170,6 +171,27 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
+    public function test_attachments() {
+        $message1 = local_mail_message::create(201, 101);
+        $message1->save('subject', 'content', 301, 3);
+        $message1->add_recipient('to', 202);
+        $message1->send();
+
+        $message2 = $message1->reply(202);
+        $message2->save('subject', 'content', 301, 0);
+        $message2->send();
+
+        $message3 = $message2->reply(201);
+        $message3->save('subject', 'content', 301, 2);
+
+        $this->assertEquals(3, $message1->attachments());
+        $this->assertEquals(3, $message1->attachments(true));
+        $this->assertEquals(0, $message2->attachments());
+        $this->assertEquals(3, $message2->attachments(true));
+        $this->assertEquals(2, $message3->attachments());
+        $this->assertEquals(5, $message3->attachments(true));
+    }
+
     public function test_count_index() {
         $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
@@ -192,6 +214,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals('', $result->subject());
         $this->assertEquals('', $result->content());
         $this->assertEquals(-1, $result->format());
+        $this->assertEquals(0, $result->attachments());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
         $this->assertEquals(array(), $result->references());
@@ -276,11 +299,11 @@ class local_mail_message_test extends local_mail_testcase {
         $label2 = local_mail_label::create(201, 'label2');
         $label3 = local_mail_label::create(202, 'label3');
         $this->loadRecords('local_mail_messages', array(
-            array('id', 'courseid', 'subject',  'content', 'format', 'draft', 'time'),
-            array( 501,  101,       'subject1', 'content1', 301,      0,       1234567890 ),
-            array( 502,  101,       'subject2', 'content2', 301,      1,       1234567891 ),
-            array( 503,  101,       'subject3', 'content3', 301,      0,       1234567892 ),
-            array( 504,  101,       'subject4', 'content4', 301,      0,       1234567893 ),
+            array('id', 'courseid', 'subject',  'content', 'format', 'attachments', 'draft', 'time'),
+            array( 501,  101,       'subject1', 'content1', 301,      3,             0,       1234567890 ),
+            array( 502,  101,       'subject2', 'content2', 301,      0,             1,       1234567891 ),
+            array( 503,  101,       'subject3', 'content3', 301,      0,             0,       1234567892 ),
+            array( 504,  101,       'subject4', 'content4', 301,      0,             0,       1234567893 ),
         ));
         $this->loadRecords('local_mail_message_refs', array(
             array('messageid', 'reference'),
@@ -314,6 +337,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals('subject1', $result->subject());
         $this->assertEquals('content1', $result->content());
         $this->assertEquals(301, $result->format());
+        $this->assertEquals(3, $result->attachments());
         $this->assertFalse($result->draft());
         $this->assertEquals(1234567890, $result->time());
         $references = array(local_mail_message::fetch(504), local_mail_message::fetch(503));
@@ -424,6 +448,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals('FW: subject', $result->subject());
         $this->assertEquals('', $result->content());
         $this->assertEquals(-1, $result->format());
+        $this->assertEquals(0, $result->attachments());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
         $this->assertEquals(array($message), $result->references());
@@ -501,6 +526,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals('RE: subject', $result->subject());
         $this->assertEquals('', $result->content());
         $this->assertEquals(-1, $result->format());
+        $this->assertEquals(0, $result->attachments());
         $this->assertTrue($result->draft());
         $this->assertEquals(1234567890, $result->time());
         $this->assertEquals(array($message), $result->references());
@@ -549,12 +575,13 @@ class local_mail_message_test extends local_mail_testcase {
 
     public function test_save() {
         $message = local_mail_message::create(201, 101);
-        $message->save('subject', 'content', 301, 1234567890);
+        $message->save('subject', 'content', 301, 7, 1234567890);
 
         $this->assertEquals($this->course1, $message->course());
         $this->assertEquals('subject', $message->subject());
         $this->assertEquals('content', $message->content());
         $this->assertEquals(301, $message->format());
+        $this->assertEquals(7, $message->attachments());
         $this->assertTrue($message->draft());
         $this->assertEquals(1234567890, $message->time());
         $this->assertMessage($message);
@@ -565,18 +592,18 @@ class local_mail_message_test extends local_mail_testcase {
     public function test_search_index() {
         $message1 = local_mail_message::create(201, 101);
         $message1->add_recipient('to', 202);
-        $message1->save('subject', 'content', 301, 1234567890);
+        $message1->save('subject', 'content', 301, 0, 1234567890);
         $message2 = local_mail_message::create(201, 101);
         $message2->add_recipient('to', 202);
-        $message2->save('subject foo bar', 'content', 301, 1234567890);
+        $message2->save('subject foo bar', 'content', 301, 0, 1234567890);
         $message3 = local_mail_message::create(201, 101);
-        $message3->save('subject', 'content <p>foo</p> <p>bar</p>', 301, 1234567891);
+        $message3->save('subject', 'content <p>foo</p> <p>bar</p>', 301, 0, 1234567891);
         $message4 = local_mail_message::create(201, 101);
-        $message4->save('subject', 'content', 301, 1234567891);
+        $message4->save('subject', 'content', 301, 0, 1234567891);
         $message4->set_unread(201, true);
         $message5 = local_mail_message::create(202, 101);
         $message5->add_recipient('to', 201);
-        $message5->save('subject5', 'content5', 301, 1234567890, true);
+        $message5->save('subject5', 'content5', 301, 1, 1234567890);
 
         // Subject and content
         $query = array('pattern' => ' foo  bar ');
@@ -797,26 +824,5 @@ class local_mail_message_test extends local_mail_testcase {
 
         $this->assertFalse($message->viewable(203));
         $this->assertTrue($message->viewable(203, true));
-    }
-
-    public function test_fetch_index_attachment() {
-        $message = local_mail_message::create(201, 101);
-        $message->save('subject1', 'content1', 301, false, true);
-        $message->add_recipient('to', 202);
-        $message->send(12345567890);
-
-        $result = local_mail_message::fetch_index(201, 'attachment', true);
-        $this->assertEquals(array($message), $result);
-    }
-
-    public function test_fetch_index_attachment_deleted() {
-        $message = local_mail_message::create(201, 101);
-        $message->save('subject1', 'content1', 301 , false);
-        $message->add_recipient('to', 202);
-        $this->assertTrue($message->draft());
-
-        $result = local_mail_message::fetch_index(201, 'attachment', false);
-        $this->assertEquals(array($message), $result);
-
     }
 }

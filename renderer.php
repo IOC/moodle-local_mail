@@ -48,7 +48,7 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     public function attachment($message) {
-        if ($message->has_attachment()) {
+        if ($message->attachments(true)) {
             return html_writer::tag('span' , '' , array('class' => 'mail_attached'));
         }
     }

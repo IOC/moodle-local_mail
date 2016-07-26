@@ -96,12 +96,9 @@ if ($data = $mform->get_data()) {
                                           mail_compose_form::file_options(),
                                           $data->content['text']);
 
-    $attachments = false;
-    if ($fs->get_area_files($PAGE->context->id, 'local_mail', 'message', $message->id(), 'filename', false)) {
-        $attachments = true;
-    }
+    $files = $fs->get_area_files($PAGE->context->id, 'local_mail', 'message', $message->id(), 'filename', false);
 
-    $message->save(trim($data->subject), $content, $data->content['format'], '', $attachments);
+    $message->save(trim($data->subject), $content, $data->content['format'], count($files));
 
     // Select recipients
     if (!empty($data->recipients)) {
