@@ -134,3 +134,5 @@ $string['undodelete'] = 'Se han movido a la papelera {$a} mensajes';
 $string['undorestore'] = 'Se han restaurado {$a} mensajes';
 $string['unread'] = 'Sin leer';
 $string['unstarred'] = 'Sin destacar';
+$string['configenablebackup'] = 'Copia de seguridad / restauración';
+$string['configenablebackupdesc'] = 'Activa las copias de seguridad y la restauración de mensajes de correo y etiquetas.';

@@ -134,3 +134,5 @@ $string['undodelete'] = 'S\'han mogut a la paperera {$a} missatges';
 $string['undorestore'] = 'S\'han restaurat {$a} missatges';
 $string['unread'] = 'Sense llegir';
 $string['unstarred'] = 'Sense destacar';
+$string['configenablebackup'] = 'Còpia de seguretat / restauració';
+$string['configenablebackupdesc'] = 'Habilita les còpies de seguretat i la restauració de missatges de correu i etiquetes.';

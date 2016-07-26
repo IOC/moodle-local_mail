@@ -132,3 +132,5 @@ $string['undodelete'] = '{$a} messages have been moved to trash';
 $string['undorestore'] = '{$a} messages have been restored';
 $string['unread'] = 'Unread';
 $string['unstarred'] = 'Unstarred';
+$string['configenablebackup'] = 'Backup / restore';
+$string['configenablebackupdesc'] = 'Enable backup and restore of mail messages and labels.';
