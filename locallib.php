@@ -121,7 +121,8 @@ function local_mail_send_notifications($message) {
 
         $fullplainmessage = format_text_email(get_string('notificationbody', 'local_mail', $plaindata), $message->format());
 
-        $eventdata = new stdClass();
+        $eventdata = new \core\message\message();
+        $eventdata->courseid          = $message->course()->id;
         $eventdata->component         = 'local_mail';
         $eventdata->name              = 'mail';
         $eventdata->userfrom          = $message->sender();
