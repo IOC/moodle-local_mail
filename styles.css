@@ -187,10 +187,11 @@
 
 .mail_recipient_actions input[type="image"],
 .mail_recipients_search input[type="image"] {
-    width: 0.7em;
-    height: 0.7em;
-    padding: 0.57em;
-    margin-bottom: 1px;
+    min-width: 0.7em;
+    height: 28px;
+    padding: 6px;
+    margin-right: 5px;
+    box-sizing: border-box;
 }
 
 .mail_recipient_actions input[disabled],
@@ -454,7 +455,7 @@
     border: 1px solid #bbb;
     line-height: 2em;
     min-width: 10em;
-    max-height: 27em;
+    max-height: 28em;
     overflow-x: hidden;
     overflow-y: auto;
     box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
@@ -599,8 +600,9 @@
     padding: 0 1em;
     border-radius: 0.2em;
     height: 2.3em;
-    width: 6em;
+    width: 8.5em;
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 .mail_search_date img,
@@ -969,7 +971,7 @@
 /* Edit label form */
 .local_mail_form .label_form  {
     text-align: center;
-    padding: 1em 2em;
+    padding: 1em 0;
     margin: 0 auto 5em auto;
     width: 50%;
 }

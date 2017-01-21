@@ -526,7 +526,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'id' => 'buttoncancelsearch',
             'name' => 'buttoncancelsearch',
             'value' => get_string('cancel', 'local_mail'),
-            'class' => 'mail_button_cancel_search mail_button mail_hidden'
+            'class' => 'btn btn-secondary mail_button_cancel_search mail_hidden'
         );
         $output .= html_writer::empty_tag('input', $attributes);
         $attributes = array(
@@ -534,7 +534,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'id' => 'buttonsearch',
             'name' => 'buttonsearch',
             'value' => get_string('search', 'local_mail'),
-            'class' => 'mail_button_search mail_button'
+            'class' => 'btn btn-secondary mail_button_search'
         );
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('div');
