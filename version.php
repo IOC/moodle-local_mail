@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version = 2016070104;
+$plugin->version = 2017012100;
 $plugin->requires = 2015051100;
 $plugin->component = 'local_mail';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.8.2';
+$plugin->release = '1.9';
