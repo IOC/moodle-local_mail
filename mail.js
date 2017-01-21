@@ -104,7 +104,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             headerContent: title,
             width        : width,
             zIndex       : 5,
-            centered     : false,
+            centered     : true,
             modal        : true,
             visible      : false,
             render       : true,
@@ -779,31 +779,60 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             if (obj.info) {
                 if (obj.info.root) {
                     node = Y.one('.mail_root span');
-                    node.setContent(obj.info.root);
-                    if(obj.info.root.match(/\(\d+\)/)) {
-                        Y.one('.mail_root').addClass('local_mail_new_messages');
-                    } else {
-                        Y.one('.mail_root').removeClass('local_mail_new_messages');
+                    if (node) {
+                        node.setContent(obj.info.root);
+                    }
+                    node = Y.one('.mail_root');
+                    if (node) {
+                        if(obj.info.root.match(/\(\d+\)/)) {
+                            node.addClass('local_mail_new_messages');
+                        } else {
+                            node.removeClass('local_mail_new_messages');
+                        }
                     }
                 }
                 if (obj.info.inbox) {
-                    img = Y.one('.mail_inbox a img').get('outerHTML');
-                    Y.one('.mail_inbox a').setContent(img+obj.info.inbox);
+                    node = Y.one('.mail_inbox a img');
+                    if (node) {
+                        img = node.get('outerHTML');
+                        node = Y.one('.mail_inbox a');
+                        if (node) {
+                            node.setContent(img+obj.info.inbox);
+                        }
+                    }
                 }
                 if (obj.info.drafts) {
-                    img = Y.one('.mail_drafts a img').get('outerHTML');
-                    Y.one('.mail_drafts a').setContent(img+obj.info.drafts);
+                    node = Y.one('.mail_drafts a img');
+                    if (node) {
+                        img = node.get('outerHTML');
+                        node = Y.one('.mail_drafts a');
+                        if (node) {
+                            node.setContent(img+obj.info.drafts);
+                        }
+                    }
                 }
                 if (obj.info.courses) {
                     Y.each(obj.info.courses, (function(value, index) {
-                        img = Y.one('.mail_course_'+index+' a img').get('outerHTML');
-                        Y.one('.mail_course_'+index+' a').setContent(img+value);
+                        node = Y.one('.mail_course_'+index+' a img');
+                        if (node) {
+                            img = node.get('outerHTML');
+                            node = Y.one('.mail_course_'+index+' a');
+                            if (node) {
+                                Y.one('.mail_course_'+index+' a').setContent(img+value);
+                            }
+                        }
                     }));
                 }
                 if (obj.info.labels) {
                     Y.each(obj.info.labels, (function(value, index) {
-                        img = Y.one('.mail_label_'+index+' a img').get('outerHTML');
-                        Y.one('.mail_label_'+index+' a').setContent(img+value);
+                        node = Y.one('.mail_label_'+index+' a img');
+                        if (node) {
+                            img = node.get('outerHTML');
+                            node = Y.one('.mail_label_'+index+' a');
+                            if (node) {
+                                node.setContent(img+value);
+                            }
+                        }
                     }));
                 }
             }

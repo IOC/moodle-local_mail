@@ -22,11 +22,14 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     }
 
     var mail_show_recipipients_button_ajax = function () {
-        var node = Y.one('#fitem_id_recipients_ajax');
-        Y.one('#fitem_id_recipients').hide();
-        Y.one('#id_recipients_ajax').removeClass('mail_hidden');
-        if (node) {
-            node.removeClass('mail_hidden');
+        var ajaxbutton = Y.one('input[id$="id_recipients_ajax"]') || Y.one('button[id$="id_recipients_ajax"]');
+        var noajaxbutton = Y.one('input[id$="id_recipients"]');
+
+        if (noajaxbutton) {
+            noajaxbutton.hide();
+        }
+        if (ajaxbutton) {
+            ajaxbutton.removeClass('mail_hidden').ancestor('div').ancestor('div').removeClass('mail_hidden');
         }
     };
 
