@@ -39,7 +39,7 @@ if ($hassiteconfig) {
                                                       LOCAL_MAIL_MAXBYTES, $sizes));
     }
 
-    // Backup / restore checkbox
+    // Backup / restore checkbox.
     $title = get_string('configenablebackup', 'local_mail');
     $description = get_string('configenablebackupdesc', 'local_mail');
     $settings->add(new admin_setting_configcheckbox('local_mail/enablebackup', $title, $description, 1));

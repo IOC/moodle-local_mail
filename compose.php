@@ -29,31 +29,31 @@ require_once('recipients_selector.php');
 $messageid = required_param('m', PARAM_INT);
 $remove = optional_param_array('remove', false, PARAM_INT);
 
-// Fetch message
+// Fetch message.
 
 $message = local_mail_message::fetch($messageid);
 if (!$message or !$message->editable($USER->id)) {
     print_error('local_mail', 'invalidmessage');
 }
 
-// Fetch references
+// Fetch references.
 
 $references = $message->references();
 
-// Set up page
+// Set up page.
 
 $url = new moodle_url('/local/mail/compose.php');
 $url->param('m', $message->id());
 local_mail_setup_page($message->course(), $url);
 
-// Remove recipients
+// Remove recipients.
 
 if ($remove) {
     require_sesskey();
     $message->remove_recipient(key($remove));
 }
 
-// Set up form
+// Set up form.
 
 $data = array();
 $customdata = array();
@@ -77,12 +77,12 @@ $data['content']['itemid'] = $draftareaid;
 $data['attachments'] = $draftareaid;
 $mform->set_data($data);
 
-// Process form
+// Process form.
 
 if ($data = $mform->get_data()) {
     $fs = get_file_storage();
 
-    // Discard message
+    // Discard message.
     if (!empty($data->discard)) {
         $fs->delete_area_files($PAGE->context->id, 'local_mail', 'message', $message->id());
         $message->discard();
@@ -100,19 +100,19 @@ if ($data = $mform->get_data()) {
 
     $message->save(trim($data->subject), $content, $data->content['format'], count($files));
 
-    // Select recipients
+    // Select recipients.
     if (!empty($data->recipients)) {
         $url = new moodle_url('/local/mail/recipients.php', array('m' => $message->id()));
         redirect($url);
     }
 
-    // Save message
+    // Save message.
     if (!empty($data->save)) {
         $url = new moodle_url('/local/mail/view.php', array('t' => 'drafts'));
         redirect($url);
     }
 
-    // Send message
+    // Send message.
     if (!empty($data->send)) {
         $message->send();
         $params = array('t' => 'course', 'c' => $message->course()->id);
@@ -122,13 +122,13 @@ if ($data = $mform->get_data()) {
     }
 }
 
-// Display page
+// Display page.
 
 echo $OUTPUT->header();
 $mform->display();
 $mailoutput = $PAGE->get_renderer('local_mail');
 
-// Recipients form ajax
+// Recipients form ajax.
 echo $mailoutput->recipientsform($message->course()->id, $message->sender()->id);
 $PAGE->requires->js('/local/mail/recipients.js');
 $PAGE->requires->strings_for_js(array(

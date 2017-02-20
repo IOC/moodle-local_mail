@@ -61,7 +61,7 @@ class restore_local_mail_plugin extends restore_local_plugin {
         $data = (object) $data;
 
         $data->messageid = $this->get_new_parentid('local_mail_message');
-        $data->reference =  $this->get_mappingid('local_mail_message', $data->reference);
+        $data->reference = $this->get_mappingid('local_mail_message', $data->reference);
 
         $DB->insert_record('local_mail_message_refs', $data);
     }
@@ -73,7 +73,7 @@ class restore_local_mail_plugin extends restore_local_plugin {
 
         $data = (object) $data;
         $data->messageid = $this->get_new_parentid('local_mail_message');
-        $data->userid =  $this->get_mappingid('user', $data->userid);
+        $data->userid = $this->get_mappingid('user', $data->userid);
         $DB->insert_record('local_mail_message_users', $data);
 
         $message = $DB->get_record('local_mail_messages', array('id' => $data->messageid), '*', MUST_EXIST);

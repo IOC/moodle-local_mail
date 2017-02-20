@@ -76,7 +76,7 @@ if ($removelbl) {
         print_error('invalidcourse', 'error');
     }
 
-    // Check whether user can use mail in that course
+    // Check whether user can use mail in that course.
     if ($course->id != $SITE->id) {
         $context = context_course::instance($course->id);
         require_capability('local/mail:usemail', $context);
@@ -114,7 +114,7 @@ if ($removelbl) {
         print_error('invalidcourse', 'error');
     }
 
-    // Check whether user can use mail in that course
+    // Check whether user can use mail in that course.
     if ($course->id != $SITE->id) {
         $context = context_course::instance($course->id);
         require_capability('local/mail:usemail', $context);
@@ -123,7 +123,7 @@ if ($removelbl) {
     $url->param('offset', $offset);
     local_mail_setup_page($course, $url);
 
-    // Set up form
+    // Set up form.
     $customdata = array();
     $colors = local_mail_label::valid_colors();
     $customdata["editlbl"] = $editlbl;
@@ -137,7 +137,7 @@ if ($removelbl) {
     $customdata['labelname'] = $label->name();
     $customdata['labelcolor'] = $label->color();
 
-    // Create form
+    // Create form.
     $mform = new mail_label_form($url, $customdata);
     $mform->set_data($customdata);
 
@@ -156,7 +156,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Display page
+    // Display page.
 
     echo $OUTPUT->header();
     $mform->display();
@@ -169,7 +169,7 @@ if ($removelbl) {
         print_error('invalidcourse', 'error');
     }
 
-    // Check whether user can use mail in that course
+    // Check whether user can use mail in that course.
     if ($course->id != $SITE->id) {
         $context = context_course::instance($course->id);
         require_capability('local/mail:usemail', $context);
@@ -178,7 +178,7 @@ if ($removelbl) {
     $url->param('offset', $offset);
     local_mail_setup_page($course, $url);
 
-    // Check whether there are messages to assign or not
+    // Check whether there are messages to assign or not.
     if (!$messageid and empty($msgs)) {
         echo $OUTPUT->header();
         echo html_writer::tag('p', get_string('noselectedmessages', 'local_mail'), array('class' => 'box errorbox'));
@@ -189,7 +189,7 @@ if ($removelbl) {
         die;
     }
 
-    // Set up form
+    // Set up form.
     $customdata = array();
     $customdata['assignlbl'] = $assignlbl;
     $customdata['t'] = $type;
@@ -239,7 +239,7 @@ if ($removelbl) {
         }
     }
 
-    // Create form
+    // Create form.
     $mform = new mail_labels_form($url, $customdata);
 
     $mform->set_data($customdata);
@@ -307,7 +307,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Display page
+    // Display page.
 
     echo $OUTPUT->header();
     $mform->display();
@@ -316,7 +316,7 @@ if ($removelbl) {
 } else if ($messageid) {
     local_mail_setup_page($SITE, new moodle_url($url, array('m' => $messageid)));
 
-    // Fetch message
+    // Fetch message.
 
     $message = local_mail_message::fetch($messageid);
     if (!$message or !$message->viewable($USER->id)) {
@@ -327,7 +327,7 @@ if ($removelbl) {
 
     $message->set_unread($USER->id, false);
 
-    // Remove message
+    // Remove message.
 
     if ($delete) {
         require_sesskey();
@@ -346,7 +346,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Reply message
+    // Reply message.
 
     if ($reply || $replyall) {
         require_sesskey();
@@ -355,7 +355,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Forward message
+    // Forward message.
 
     if ($forward) {
         require_sesskey();
@@ -364,21 +364,21 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Unread
+    // Unread.
     if ($unread) {
         require_sesskey();
         $message->set_unread($USER->id, true);
         redirect($url);
     }
 
-    // Downloadall
+    // Downloadall.
     if ($downloadall) {
         local_mail_downloadall($message);
     }
 
     $jslabels = local_mail_js_labels();
     $url->param('m', $message->id());
-    // Display page
+    // Display page.
     $PAGE->requires->data_for_js('M.local_mail_lang', current_language(), true);
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->strings_for_js(array(
@@ -466,7 +466,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Set up messages
+    // Set up messages.
 
     $itemid = ($labelid?:$courseid);
 
@@ -474,7 +474,7 @@ if ($removelbl) {
     $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
 
 
-    // Display page
+    // Display page.
 
     $courseid = $courseid ?: $SITE->id;
 
@@ -482,7 +482,7 @@ if ($removelbl) {
         print_error('invalidcourse', 'error');
     }
 
-    // Check whether user can use mail in that course
+    // Check whether user can use mail in that course.
     if ($course->id != $SITE->id) {
         $context = context_course::instance($course->id);
         require_capability('local/mail:usemail', $context);
@@ -491,7 +491,7 @@ if ($removelbl) {
     local_mail_setup_page($course, $url);
     $url->param('offset', $offset);
 
-    // Remove
+    // Remove.
     if ($delete) {
         require_sesskey();
         foreach ($messages as $message) {
@@ -510,7 +510,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Remove
+    // Remove.
     if ($discard) {
         require_sesskey();
         foreach ($messages as $message) {
@@ -529,7 +529,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Starred
+    // Starred.
     if ($starred) {
         require_sesskey();
         $message = local_mail_message::fetch($starred);
@@ -540,7 +540,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Read or Unread
+    // Read or Unread.
     if ($read || $unread) {
         require_sesskey();
         foreach ($messages as $message) {
@@ -551,7 +551,7 @@ if ($removelbl) {
         redirect($url);
     }
 
-    // Perpage
+    // Perpage.
     if ($perpage) {
         require_sesskey();
         if (in_array($perpage, array (5, 10, 20, 50, 100))) {
@@ -561,7 +561,7 @@ if ($removelbl) {
     }
 
     $jslabels = local_mail_js_labels();
-    // Display page
+    // Display page.
     $PAGE->requires->data_for_js('M.local_mail_lang', current_language(), true);
     $PAGE->requires->js('/local/mail/mail.js');
     $PAGE->requires->strings_for_js(array(

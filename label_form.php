@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/formslib.php');
 
@@ -43,16 +44,17 @@ class mail_label_form extends moodleform {
         $mform->addElement('hidden', 'editlbl', $this->_customdata['editlbl']);
         $mform->setType('editlbl', PARAM_BOOL);
 
-        // List labels
+        // List labels.
 
         $mform->addElement('header', 'editlabel', get_string('editlabel', 'local_mail'));
         $mform->addElement('text', 'labelname', get_string('labelname', 'local_mail'));
         $mform->setType('labelname', PARAM_TEXT);
         $text = get_string('maximumchars', '', 100);
         $mform->addRule('labelname', $text, 'maxlength', 100, 'client');
-        $mform->addElement('select', 'labelcolor', get_string('labelcolor', 'local_mail'), $colors, array('class' => 'mail_label_colors'));
+        $mform->addElement('select', 'labelcolor', get_string('labelcolor', 'local_mail'),
+                        $colors, array('class' => 'mail_label_colors'));
 
-        // Buttons
+        // Buttons.
 
         $buttonarray = array();
 

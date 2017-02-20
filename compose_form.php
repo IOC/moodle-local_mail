@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->libdir . '/formslib.php');
 require_once($CFG->dirroot . '/repository/lib.php');
 
@@ -30,18 +32,18 @@ class mail_compose_form extends moodleform {
         $mform = $this->_form;
         $message = $this->_customdata['message'];
 
-        // Header
+        // Header.
 
         $label = get_string('compose', 'local_mail');
         $mform->addElement('header', 'general', $label);
 
-        // Course
+        // Course.
 
         $label = get_string('course');
         $text = $message->course()->fullname;
         $mform->addElement('static', 'coursefullname', $label, $text);
 
-        // Recipients
+        // Recipients.
 
         if ($message and $message->recipients('to')) {
             $text = $this->format_recipients($message->recipients('to'));
@@ -65,7 +67,7 @@ class mail_compose_form extends moodleform {
         $mform->addElement('submit', 'recipients', $label);
         $mform->addElement('button', 'recipients_ajax', $label, array('class' => 'mail_hidden'));
 
-        // Subject
+        // Subject.
 
         $label = get_string('subject', 'local_mail');
         $mform->addElement('text', 'subject', $label, 'size="48"');
@@ -73,18 +75,18 @@ class mail_compose_form extends moodleform {
         $text = get_string('maximumchars', '', 100);
         $mform->addRule('subject', $text, 'maxlength', 100, 'client');
 
-        // Content
+        // Content.
 
         $label = get_string('message', 'local_mail');
         $mform->addElement('editor', 'content', $label, null, self::file_options());
         $mform->setType('content', PARAM_RAW);
 
-        // Attachments
+        // Attachments.
         if (get_config('local_mail', 'maxfiles') > 0) {
             $label = get_string('attachments', 'local_mail');
             $mform->addElement('filemanager', 'attachments', $label, null, self::file_options());
         }
-        // Buttons
+        // Buttons.
 
         $buttonarray = array();
 
@@ -108,12 +110,12 @@ class mail_compose_form extends moodleform {
 
         $errors = array();
 
-        // Skip on discard
+        // Skip on discard.
         if (!empty($data['discard'])) {
             return array();
         }
 
-        // Course selected
+        // Course selected.
         if (isset($data['course']) and $data['course'] == SITEID) {
             $errors['course'] = get_string('erroremptycourse', 'local_mail');
         }
@@ -123,12 +125,12 @@ class mail_compose_form extends moodleform {
             $errors['subject'] = get_string('erroremptysubject', 'local_mail');
         }
 
-        // At least one recipient
+        // At least one recipient.
         if (!empty($data['send']) and (!$message or !$message->recipients())) {
             $errors['recipients'] = get_string('erroremptyrecipients', 'local_mail');
         }
 
-        // Maximum number of attachmnents
+        // Maximum number of attachmnents.
         if (get_config('local_mail', 'maxfiles') > 0) {
             $options = self::file_options();
             $info = file_get_draft_area_info($data['attachments']);

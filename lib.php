@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->dirroot . '/local/mail/locallib.php');
 
 
@@ -35,7 +37,7 @@ function local_mail_extend_navigation($root) {
 
     $count = local_mail_message::count_menu($USER->id);
 
-    // My mail
+    // My mail.
 
     $text = get_string('mymail', 'local_mail');
     if (!empty($count->inbox)) {
@@ -48,7 +50,7 @@ function local_mail_extend_navigation($root) {
     $child = $root->add_node($node, 'mycourses');
     $child->add_class('mail_root');
 
-    // Compose
+    // Compose.
 
     $text = get_string('compose', 'local_mail');
     $url = new moodle_url('/local/mail/compose.php');
@@ -67,7 +69,7 @@ function local_mail_extend_navigation($root) {
 
     $node->add(s($text), $url);
 
-    // Inbox
+    // Inbox.
 
     $text = get_string('inbox', 'local_mail');
     if (!empty($count->inbox)) {
@@ -77,13 +79,13 @@ function local_mail_extend_navigation($root) {
     $child = $node->add(s($text), $url);
     $child->add_class('mail_inbox');
 
-    // Starred
+    // Starred.
 
     $text = get_string('starredmail', 'local_mail');
     $url = new moodle_url('/local/mail/view.php', array('t' => 'starred'));
     $node->add(s($text), $url);
 
-    // Drafts
+    // Drafts.
 
     $text = get_string('drafts', 'local_mail');
     if (!empty($count->drafts)) {
@@ -93,13 +95,13 @@ function local_mail_extend_navigation($root) {
     $child = $node->add(s($text), $url);
     $child->add_class('mail_drafts');
 
-    // Sent
+    // Sent.
 
     $text = get_string('sentmail', 'local_mail');
     $url = new moodle_url('/local/mail/view.php', array('t' => 'sent'));
     $node->add(s($text), $url);
 
-    // Courses
+    // Courses.
 
     if ($courses) {
         $text = get_string('courses', 'local_mail');
@@ -117,7 +119,7 @@ function local_mail_extend_navigation($root) {
         }
     }
 
-    // Labels
+    // Labels.
 
     $labels = local_mail_label::fetch_user($USER->id);
     if ($labels) {
@@ -135,19 +137,19 @@ function local_mail_extend_navigation($root) {
         }
     }
 
-    // Trash
+    // Trash.
 
     $text = get_string('trash', 'local_mail');
     $url = new moodle_url('/local/mail/view.php', array('t' => 'trash'));
     $node->add(s($text), $url);
 
-    // Preferences
+    // Preferences.
 
     $text = get_string('preferences');
     $url = new moodle_url('/local/mail/preferences.php');
     $node->add(s($text), $url);
 
-    // User profile
+    // User profile.
 
     if (empty($CFG->messaging) and
         $PAGE->url->compare(new moodle_url('/user/view.php'), URL_MATCH_BASE)) {
@@ -160,7 +162,7 @@ function local_mail_extend_navigation($root) {
         }
     }
 
-    // Users list
+    // Users list.
 
     if (empty($CFG->messaging) and
         $PAGE->url->compare(new moodle_url('/user/index.php'), URL_MATCH_BASE)) {
@@ -177,7 +179,7 @@ function local_mail_extend_navigation($root) {
         $PAGE->requires->js('/local/mail/users.js');
     }
 
-    // Block progress
+    // Block progress.
 
     if ($PAGE->url->compare(new moodle_url('/blocks/progress/overview.php'), URL_MATCH_BASE)) {
         $userid = optional_param('id', false, PARAM_INT);
@@ -200,7 +202,7 @@ function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
 
     require_login($SITE, false);
 
-    // Check message
+    // Check message.
 
     $messageid = (int) array_shift($args);
     $message = local_mail_message::fetch($messageid);
@@ -208,7 +210,7 @@ function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
         return false;
     }
 
-    // Fetch file info
+    // Fetch file info.
 
     $fs = get_file_storage();
     $relativepath = implode('/', $args);

@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once("{$CFG->dirroot}/user/selector/lib.php");
 require_once("{$CFG->dirroot}/local/mail/lib.php");
 
@@ -44,25 +46,28 @@ class mail_recipients_selector extends groups_user_selector_base {
         $params['courseid'] = $this->courseid;
 
         if (!$mailsamerole) {
-            list($relctxsql, $reldctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relctx');
-            list($samerolesql, $sameroleparams) = $DB->get_in_or_equal($userroleids, SQL_PARAMS_NAMED, 'samerole' , false);
-            $wherecondition .= " AND u.id IN (SELECT userid FROM {role_assignments} WHERE roleid $samerolesql AND contextid $relctxsql)";
+            list($relctxsql, $reldctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true),
+                                                                    SQL_PARAMS_NAMED, 'relctx');
+            list($samerolesql, $sameroleparams) = $DB->get_in_or_equal($userroleids, SQL_PARAMS_NAMED,
+                                                                       'samerole' , false);
+            $wherecondition .= " AND u.id IN (SELECT userid FROM {role_assignments}" .
+                               " WHERE roleid $samerolesql AND contextid $relctxsql)";
             $params = array_merge($params, $sameroleparams, $reldctxparams);
         }
 
-        $fields = 'SELECT r.id AS roleid, '
-            . 'r.shortname AS roleshortname, '
-            . 'r.name AS rolename, '
-            . 'u.id AS userid, '
-            . $this->required_fields_sql('u');
+        $fields = 'SELECT r.id AS roleid, ' .
+            'r.shortname AS roleshortname, ' .
+            'r.name AS rolename, ' .
+            'u.id AS userid, ' .
+            $this->required_fields_sql('u');
 
         $countfields = 'SELECT COUNT(1)';
 
-        $sql = ' FROM {user} u JOIN (' . $enrolledsql . ') e ON e.id = u.id'
-            . ' LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid '
-            . $parentsql . ')'
-            . ' LEFT JOIN {role} r ON r.id = ra.roleid'
-            . ' WHERE ' . $wherecondition;
+        $sql = ' FROM {user} u JOIN (' . $enrolledsql . ') e ON e.id = u.id' .
+            ' LEFT JOIN {role_assignments} ra ON (ra.userid = u.id AND ra.contextid ' .
+            $parentsql . ')' .
+            ' LEFT JOIN {role} r ON r.id = ra.roleid' .
+            ' WHERE ' . $wherecondition;
 
         $order = ' ORDER BY r.sortorder, u.lastname ASC, u.firstname ASC';
 
