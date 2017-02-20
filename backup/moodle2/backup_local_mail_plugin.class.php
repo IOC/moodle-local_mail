@@ -29,7 +29,7 @@ class backup_local_mail_plugin extends backup_local_plugin {
 
         $plugin = $this->get_plugin_element(null);
 
-        // Elements
+        // Elements.
         $pluginwrapper = new backup_nested_element($this->get_recommended_name());
         $messages = new backup_nested_element('messages');
         $elements = array('courseid', 'subject', 'content', 'format', 'attachments', 'draft', 'time');
@@ -41,7 +41,7 @@ class backup_local_mail_plugin extends backup_local_plugin {
         $labels = new backup_nested_element('labels');
         $label = new backup_nested_element('label', array('id'), array('userid', 'name', 'color'));
 
-        // Tree
+        // Tree.
         $plugin->add_child($pluginwrapper);
         $pluginwrapper->add_child($messages);
         $messages->add_child($message);
@@ -52,7 +52,7 @@ class backup_local_mail_plugin extends backup_local_plugin {
         $message->add_child($labels);
         $labels->add_child($label);
 
-        // Sources
+        // Sources.
         $message->set_source_table('local_mail_messages', array('courseid' => backup::VAR_COURSEID), 'id');
         $ref->set_source_table('local_mail_message_refs', array('messageid' => '../../id'));
         $user->set_source_table('local_mail_message_users', array('messageid' => '../../id'));
@@ -62,11 +62,11 @@ class backup_local_mail_plugin extends backup_local_plugin {
                 WHERE ml.messageid = ?';
         $label->set_source_sql($sql, array('messageid' => '../../id'));
 
-        // ID annotations
+        // ID annotations.
         $user->annotate_ids('user', 'userid');
         $label->annotate_ids('user', 'userid');
 
-        // File annotations
+        // File annotations.
         $message->annotate_files('local_mail', 'message', 'id');
 
         return $plugin;

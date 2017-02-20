@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->libdir . '/filelib.php');
 require_once('label.class.php');
 require_once('message.class.php');
@@ -146,9 +148,10 @@ function local_mail_send_notifications($message) {
 
         $mailresult = message_send($eventdata);
         if (!$mailresult) {
-            mtrace("Error: local/mail/locallib.php local_mail_send_mail(): Could not send out mail for id {$message->id()} to user {$message->sender()->id}".
-                    " ($userto->email) .. not trying again.");
-        } else if (get_user_preferences('local_mail_markasread', false, $userto)) { // Set message as read depending on user preferences
+            mtrace("Error: local/mail/locallib.php local_mail_send_mail(): Could not send out mail for id {$message->id()} " .
+                    "to user {$message->sender()->id} ($userto->email) .. not trying again.");
+        } else if (get_user_preferences('local_mail_markasread', false, $userto)) {
+            // Set message as read depending on user preferences.
             $message->set_unread($userto->id, false);
         }
     }
@@ -162,7 +165,8 @@ function local_mail_js_labels() {
     $cont = 0;
     $total = count($labels);
     foreach ($labels as $label) {
-        $js .= '"'.$label->id().'":{"id": "' . $label->id() . '", "name": "' . s($label->name()) . '", "color": "' . $label->color() . '"}';
+        $js .= '"' . $label->id() . '":{"id": "' . $label->id() . '", "name": "' .
+               s($label->name()) . '", "color": "' . $label->color() . '"}';
         $cont++;
         if ($cont < $total) {
             $js .= ',';
@@ -229,22 +233,23 @@ function local_mail_add_recipients($message, $recipients, $role) {
         $groups = groups_get_user_groups($message->course()->id, $message->sender()->id);
         if (count($groups[0]) == 0) {
             return;
-        } else if (count($groups[0]) == 1) {// Only one group
+        } else if (count($groups[0]) == 1) {// Only one group.
             $groupid = $groups[0][0];
         } else {
-            $severalseparategroups = true;// Several groups
+            $severalseparategroups = true;// Several groups.
         }
     }
 
-    // Make sure recipients ids are integers
+    // Make sure recipients ids are integers.
     $recipients = clean_param_array($recipients, PARAM_INT);
 
     $participants = array();
-    list($select, $from, $where, $sort, $params) = local_mail_getsqlrecipients($message->course()->id, '', $groupid, 0, implode(',', $recipients));
+    list($select, $from, $where, $sort, $params) = local_mail_getsqlrecipients($message->course()->id, '',
+                                                                               $groupid, 0, implode(',', $recipients));
     $rs = $DB->get_recordset_sql("$select $from $where $sort", $params);
 
     foreach ($rs as $rec) {
-        if (!array_key_exists($rec->id, $participants)) {// Avoid duplicated users
+        if (!array_key_exists($rec->id, $participants)) {// Avoid duplicated users.
             if ($severalseparategroups) {
                 $valid = false;
                 foreach ($groups[0] as $group) {
@@ -297,7 +302,8 @@ function local_mail_getsqlrecipients($courseid, $search, $groupid, $roleid, $rec
 
     if ($roleid) {
         // We want to query both the current context and parent contexts.
-        list($relatedctxsql, $relatedctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true), SQL_PARAMS_NAMED, 'relatedctx');
+        list($relatedctxsql, $relatedctxparams) = $DB->get_in_or_equal($context->get_parent_context_ids(true),
+                                                                       SQL_PARAMS_NAMED, 'relatedctx');
         $wheres[] = "u.id IN (SELECT userid FROM {role_assignments} WHERE roleid = :roleid AND contextid $relatedctxsql)";
         $params = array_merge($params, array('roleid' => $roleid), $relatedctxparams);
     }

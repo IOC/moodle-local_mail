@@ -118,7 +118,7 @@
 }
 
 .mail_form_recipient {
-    border: 1px solid #AAAAAA;
+    border: 1px solid #aaa;
     margin-bottom: -1px;
     padding: 0.5em 0;
 }
@@ -295,7 +295,7 @@
 .mail_list .mail_users,
 .mail_list .mail_summary,
 .mail_list .mail_date,
-.mail_list .mail_checkbox{
+.mail_list .mail_checkbox {
     display: inline-block;
     white-space: nowrap;
     overflow: hidden;
@@ -374,14 +374,14 @@
 /* Mail starred */
 
 .mail_unstarred {
-    display:inline-block;
+    display: inline-block;
     width: 18px;
     height: 18px;
     background: transparent url('pix/icons.png') no-repeat -54px 0;
 }
 
 .mail_starred {
-    display:inline-block;
+    display: inline-block;
     width: 18px;
     height: 18px;
     background: transparent url('pix/icons.png') no-repeat -72px 0;
@@ -390,7 +390,7 @@
 .mail_attached {
     vertical-align: middle;
     margin: 0;
-    display:inline-block;
+    display: inline-block;
     width: 18px;
     height: 18px;
     background: transparent url('pix/icons.png') no-repeat -90px 0;
@@ -399,19 +399,19 @@
 /* Toolbar */
 
 .mail_toolbar,
-.mail_toolbar_down{
+.mail_toolbar_down {
     font-size: 1em;
     vertical-align: middle;
 }
 
 .mail_toolbar .mail_paging {
-  float: right;
+    float: right;
 }
 
 .mail_toolbar .singlebutton,
 .mail_toolbar_down .singlebutton {
     display: inline-block;
-    margin-top:0.4em;
+    margin-top: 0.4em;
     margin-right: 0.5em;
     min-width: 4em;
 }
@@ -427,7 +427,7 @@
 .mail_toolbar .singlebutton,
 .mail_toolbar_down .singlebutton,
 .mail_toolbar .mail_button.mail_button_disabled:hover,
-.mail_toolbar_down .mail_button.mail_button_disabled:hover{
+.mail_toolbar_down .mail_button.mail_button_disabled:hover {
     opacity: 0.8;
 }
 
@@ -458,7 +458,7 @@
     max-height: 28em;
     overflow-x: hidden;
     overflow-y: auto;
-    box-shadow: 2px 1px 1px 0px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 1px 1px 0 rgba(0, 0, 0, 0.2);
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -496,12 +496,12 @@
     cursor: pointer;
 }
 
-.mail_toolbar .mail_menu_labels .mail_adv_checkbox{
+.mail_toolbar .mail_menu_labels .mail_adv_checkbox {
     display: inline-block;
     margin: 0 0.5em 0 0.1em;
 }
 
-.mail_toolbar .mail_menu_labels .mail_label_name{
+.mail_toolbar .mail_menu_labels .mail_label_name {
     display: inline-block;
     width: 80%;
 }
@@ -550,7 +550,7 @@
 .mail_toolbar .mail_button:hover,
 .mail_toolbar_down .mail_button:hover {
     border: 1px solid #aaa;
-    box-shadow: rgba(0, 0, 0, 0.10) 0px 1px 1px 0px;
+    box-shadow: rgba(0, 0, 0, 0.10) 0 1px 1px 0;
 }
 
 .mail_toolbar input.mail_button[disabled]:hover,
@@ -558,7 +558,7 @@
 .mail_toolbar_down input.mail_button[disabled]:hover,
 .mail_toolbar_down .mail_button.mail_button_disabled:hover {
     border: 1px solid #ccc;
-    box-shadow: 0px 0px 0px #000;
+    box-shadow: 0 0 0 #000;
 }
 
 .mail_toolbar_sep {
@@ -590,7 +590,7 @@
     padding: 0 1em;
     border-radius: 0.2em;
     height: 2.3em;
-    width: 26em!important;
+    width: 26em !important;
 }
 
 .mail_search_date {
@@ -636,7 +636,7 @@
 
 .mail_paging .singlebutton:nth-child(2) {
     border-radius: 0.2em 0 0 0.2em;
-    margin-right: 0px;
+    margin-right: 0;
 }
 
 .mail_paging .singlebutton:last-child {
@@ -650,9 +650,9 @@
 
 .mail_buttons {
     float: left;
- }
+}
 
-.mail_perpage span{
+.mail_perpage span {
     margin: 0 0.5em;
 }
 
@@ -676,15 +676,15 @@
 
 .mail_subject .mail_flags {
     margin-left: 0.5em;
-    vertical-align:middle;
+    vertical-align: middle;
 }
 
 .mail_subject h3 {
-    display:inline;
+    display: inline;
 }
 
 .mail_header {
-    display:block;
+    display: block;
 }
 
 .mail_info {
@@ -696,7 +696,7 @@
 }
 
 .mail_header {
-    margin-botton: 1em;
+    margin-bottom: 1em;
 }
 
 .mail_header .left,
@@ -832,114 +832,138 @@
     transform: rotate(-45deg) translate(-9px, 4px);
 }
 
-.mail_label_lightgray, .mail_label_colors option[value="lightgray"] {
+.mail_label_lightgray,
+.mail_label_colors option[value="lightgray"] {
     background-color: #999;
     color: #fff;
 }
 
-.mail_label_lightred, .mail_label_colors option[value="lightred"] {
+.mail_label_lightred,
+.mail_label_colors option[value="lightred"] {
     background-color: #e66550;
     color: #fff;
 }
 
-.mail_label_lightorange, .mail_label_colors option[value="lightorange"] {
+.mail_label_lightorange,
+.mail_label_colors option[value="lightorange"] {
     background-color: #ffbc6b;
 }
 
-.mail_label_lighbrown, .mail_label_colors option[value="lightbrown"] {
+.mail_label_lighbrown,
+.mail_label_colors option[value="lightbrown"] {
     background-color: #e9b96e;
 }
 
-.mail_label_lightyellow, .mail_label_colors option[value="lightyellow"] {
+.mail_label_lightyellow,
+.mail_label_colors option[value="lightyellow"] {
     background-color: #fdee7c;
 }
 
-.mail_label_lightgreen, .mail_label_colors option[value="lightgreen"] {
+.mail_label_lightgreen,
+.mail_label_colors option[value="lightgreen"] {
     background-color: #b3e622;
 }
 
-.mail_label_lightblue, .mail_label_colors option[value="lightblue"]{
+.mail_label_lightblue,
+.mail_label_colors option[value="lightblue"] {
     background-color: #6d9eeb;
 }
 
-.mail_label_lightpurple, .mail_label_colors option[value="lightpurple"] {
+.mail_label_lightpurple,
+.mail_label_colors option[value="lightpurple"] {
     background-color: #b694e8;
     color: #fff;
 }
 
-.mail_label_gray, .mail_label_colors option[value="gray"] {
+.mail_label_gray,
+.mail_label_colors option[value="gray"] {
     background-color: #555;
     color: #fff;
 }
 
-.mail_label_red, .mail_label_colors option[value="red"] {
-    background-color: #cc0000;
+.mail_label_red,
+.mail_label_colors option[value="red"] {
+    background-color: #c00;
     color: #fff;
 }
 
-.mail_label_orange, .mail_label_colors option[value="orange"] {
+.mail_label_orange,
+.mail_label_colors option[value="orange"] {
     background-color: #f57900;
     color: #fff;
 }
 
-.mail_label_brown, .mail_label_colors option[value="brown"] {
+.mail_label_brown,
+.mail_label_colors option[value="brown"] {
     background-color: #c17d11;
 }
 
-.mail_label_yellow, .mail_label_colors option[value="yellow"] {
+.mail_label_yellow,
+.mail_label_colors option[value="yellow"] {
     background-color: #edd400;
 }
 
-.mail_label_green, .mail_label_colors option[value="green"] {
+.mail_label_green,
+.mail_label_colors option[value="green"] {
     background-color: #73d216;
 }
 
-.mail_label_blue, .mail_label_colors option[value="blue"]{
+.mail_label_blue,
+.mail_label_colors option[value="blue"] {
     background-color: #005dd6;
     color: #fff;
 }
 
-.mail_label_purple, .mail_label_colors option[value="purple"] {
+.mail_label_purple,
+.mail_label_colors option[value="purple"] {
     background-color: #b100cc;
     color: #fff;
 }
 
-.mail_label_black, .mail_label_colors option[value="black"] {
+.mail_label_black,
+.mail_label_colors option[value="black"] {
     background-color: #05181e;
     color: #fff;
 }
 
-.mail_label_darkred, .mail_label_colors option[value="darkred"] {
+.mail_label_darkred,
+.mail_label_colors option[value="darkred"] {
     background-color: #8b1818;
     color: #fff;
 }
 
-.mail_label_darkorange, .mail_label_colors option[value="darkorange"] {
+.mail_label_darkorange,
+.mail_label_colors option[value="darkorange"] {
     background-color: #ad5f1f;
     color: #fff;
 }
 
-.mail_label_darkbrown, .mail_label_colors option[value="darkbrown"] {
+.mail_label_darkbrown,
+.mail_label_colors option[value="darkbrown"] {
     background-color: #8f5902;
     color: #fff;
 }
 
-.mail_label_darkyellow, .mail_label_colors option[value="darkyellow"] {
+.mail_label_darkyellow,
+.mail_label_colors option[value="darkyellow"] {
     background-color: #a58c1d;
     color: #fff;
 }
 
-.mail_label_darkgreen, .mail_label_colors option[value="darkgreen"] {
+.mail_label_darkgreen,
+.mail_label_colors option[value="darkgreen"] {
     background-color: #4d8618;
     color: #fff;
 }
 
-.mail_label_darkblue, .mail_label_colors option[value="darkblue"]{
+.mail_label_darkblue,
+.mail_label_colors option[value="darkblue"] {
     background-color: #19488f;
     color: #fff;
 }
 
-.mail_label_darkpurple, .mail_label_colors option[value="darkpurple"] {
+.mail_label_darkpurple,
+.mail_label_colors option[value="darkpurple"] {
     background-color: #6d1782;
     color: #fff;
 }
@@ -964,12 +988,12 @@
     visibility: hidden !important;
 }
 
-#page-local-mail-view #confirmdialog{
-    width: 400px!important;
+#page-local-mail-view #confirmdialog {
+    width: 400px !important;
 }
 
 /* Edit label form */
-.local_mail_form .label_form  {
+.local_mail_form .label_form {
     text-align: center;
     padding: 1em 0;
     margin: 0 auto 5em auto;
@@ -977,13 +1001,13 @@
 }
 
 .local_mail_form .label_name,
-.local_mail_form .label_color{
-   clear: both;
-   padding: 0.5em 0;
+.local_mail_form .label_color {
+    clear: both;
+    padding: 0.5em 0;
 }
 
 .local_mail_form .label_name label,
-.local_mail_form .label_color label{
+.local_mail_form .label_color label {
     float: left;
     text-align: right;
     width: 15%;
@@ -1035,11 +1059,11 @@
 
 .dir-rtl .mail_paging .singlebutton:nth-child(2) {
     margin-left: 0;
-    border-radius: 0px 0.2em 0.2em 0px;
+    border-radius: 0 0.2em 0.2em 0;
 }
 
 .dir-rtl .mail_paging .singlebutton:last-child {
-    border-radius: 0.2em 0px 0px 0.2em;
+    border-radius: 0.2em 0 0 0.2em;
     margin-right: 0;
 }
 
@@ -1069,7 +1093,7 @@
 }
 
 .dir-rtl .mail_content {
-    margin: 1em 0px 0.2em;
+    margin: 1em 0 0.2em;
 }
 
 .dir-rtl .mail_body {

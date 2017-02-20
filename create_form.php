@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->libdir . '/formslib.php');
 
 class local_mail_create_form extends moodleform {
@@ -29,12 +31,12 @@ class local_mail_create_form extends moodleform {
         $mform = $this->_form;
         $courses = $this->_customdata['courses'];
 
-        // Header
+        // Header.
 
         $label = get_string('compose', 'local_mail');
         $mform->addElement('header', 'general', $label);
 
-        // Course
+        // Course.
 
         $label = get_string('course');
         $options = array(SITEID => '');
@@ -43,7 +45,7 @@ class local_mail_create_form extends moodleform {
         }
         $mform->addElement('select', 'c', $label, $options);
 
-        // Button
+        // Button.
 
         $label = get_string('continue', 'local_mail');
         $mform->addElement('submit', 'continue', $label);

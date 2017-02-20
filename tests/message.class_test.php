@@ -605,54 +605,54 @@ class local_mail_message_test extends local_mail_testcase {
         $message5->add_recipient('to', 201);
         $message5->save('subject5', 'content5', 301, 1, 1234567890);
 
-        // Subject and content
+        // Subject and content.
         $query = array('pattern' => ' foo  bar ');
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message3, $message2), $result);
 
-        // Users
+        // Users.
         $query = array('pattern' => fullname($this->user2));
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message2, $message1), $result);
 
-        // Unread
+        // Unread.
         $query = array('unread' => true);
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message4), $result);
 
-        // Date
+        // Date.
         $query = array('time' => 1234567890);
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message2, $message1), $result);
 
-        // Limit
+        // Limit.
         $query = array('limit' => 2);
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message4, $message3), $result);
 
-        // Before
+        // Before.
         $query = array('before' => $message2->id());
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message1), $result);
 
-        // After
+        // After.
         $query = array('after' => $message1->id(), 'limit' => 2);
         $result = local_mail_message::search_index(201, 'course', 101, $query);
         $this->assertEquals(array($message3, $message2), $result);
 
-        // Attach
+        // Attach.
 
         $query = array('attach' => true);
         $result = local_mail_message::search_index(202, 'course', 101, $query);
         $this->assertEquals(array($message5), $result);
 
-        // From
+        // From.
 
         $query = array('searchfrom' => fullname($this->user2));
         $result = local_mail_message::search_index(202, 'course', 101, $query);
         $this->assertEquals(array($message5), $result);
 
-        // To
+        // To.
 
         $query = array('searchto' => fullname($this->user1));
         $result = local_mail_message::search_index(202, 'course', 101, $query);

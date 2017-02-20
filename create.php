@@ -30,7 +30,7 @@ $recipient = optional_param('r', false, PARAM_INT);
 $recipients = optional_param('rs', '', PARAM_SEQUENCE);
 $role = optional_param('local_mail_role', 0, PARAM_INT);
 
-// Setup page
+// Setup page.
 
 if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourse', 'error');
@@ -38,7 +38,8 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
 $url = new moodle_url('/local/mail/create.php');
 local_mail_setup_page($course, $url);
 $context = context_course::instance($course->id);
-// Create message
+
+// Create message.
 
 if ($course->id != $SITE->id and has_capability('local/mail:usemail', $context)) {
     require_sesskey();
@@ -53,14 +54,14 @@ if ($course->id != $SITE->id and has_capability('local/mail:usemail', $context))
     redirect($url);
 }
 
-// Setup form
+// Setup form.
 
 $courses = local_mail_get_my_courses();
 $customdata = array('courses' => $courses);
 $mform = new local_mail_create_form($url, $customdata);
 $mform->get_data();
 
-// Display page
+// Display page.
 
 echo $OUTPUT->header();
 if ($courses) {

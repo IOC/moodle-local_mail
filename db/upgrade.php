@@ -20,6 +20,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 function xmldb_local_mail_upgrade($oldversion) {
     global $CFG, $DB;
 
@@ -42,7 +44,7 @@ function xmldb_local_mail_upgrade($oldversion) {
 
     if ($oldversion < 2015121400) {
 
-        // Clean obsolete local_mail_fullmessage preference
+        // Clean obsolete local_mail_fullmessage preference.
         $DB->execute('DELETE FROM {user_preferences} WHERE name="local_mail_fullmessage"');
 
         upgrade_plugin_savepoint(true, 2015121400, 'local', 'mail');
@@ -65,7 +67,7 @@ function xmldb_local_mail_upgrade($oldversion) {
 
     if ($oldversion < 2016070101) {
 
-        // Update field attachments
+        // Update field attachments.
         $sql = 'SELECT f.itemid, COUNT(*) as numfiles
                 FROM {files} f
                 WHERE f.component = :component
@@ -89,7 +91,7 @@ function xmldb_local_mail_upgrade($oldversion) {
 
     if ($oldversion < 2016070102) {
 
-        // Delete attachment records from local_mail_index, 1000 at a time
+        // Delete attachment records from local_mail_index, 1000 at a time.
         while (true) {
             $records = $DB->get_records('local_mail_index', array('type' => 'attachment'), '', 'id', 0, 1000);
             if (!$records) {
@@ -105,7 +107,7 @@ function xmldb_local_mail_upgrade($oldversion) {
 
     if ($oldversion < 2016070103) {
 
-        // Clean obsolete settings
+        // Clean obsolete settings.
         unset_config('cronenabled', 'local_mail');
         unset_config('cronstart', 'local_mail');
         unset_config('cronstop', 'local_mail');

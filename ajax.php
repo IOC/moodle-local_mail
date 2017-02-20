@@ -43,7 +43,7 @@ $roleid     = optional_param('roleid', 0, PARAM_INT);
 $roleids    = optional_param('roleids', '', PARAM_SEQUENCE);
 $recipients = optional_param('recipients', '', PARAM_SEQUENCE);
 $undo       = optional_param('undo', false, PARAM_BOOL);
-// Search messages
+// Search messages.
 $searching  = optional_param('searching', false, PARAM_BOOL);
 $searchfrom = optional_param('searchfrom', '', PARAM_RAW);
 $searchto   = optional_param('searchto', '', PARAM_RAW);
@@ -224,7 +224,7 @@ if ($action and in_array($action, $validactions) and !empty($USER->id)) {
         $func = 'local_mail_getmail';
         array_push($params, $message);
         array_push($params, $type);
-        array_push($params, false); // reply
+        array_push($params, false); // Reply.
         array_push($params, $offset);
         array_push($params, $itemid);
     } else if ($action === 'goback') {
@@ -314,7 +314,8 @@ function local_mail_setstarred ($messages, $bool, $search, $data = false) {
         if (!empty($search)) {
             return local_mail_searchmessages($data['type'], $data['itemid'], $search, $data['offset']);
         } else {
-            $messages = local_mail_message::fetch_index($USER->id, $data['type'], $data['itemid'], $data['offset'], $data['mailpagesize']);
+            $messages = local_mail_message::fetch_index($USER->id, $data['type'], $data['itemid'],
+                                                        $data['offset'], $data['mailpagesize']);
             $content = local_mail_print_messages($data['itemid'], $data['type'], $data['offset'], $messages, $totalcount);
         }
     }
@@ -337,7 +338,8 @@ function local_mail_setread($messages, $bool, $mailview = false) {
 
     if ($mailview) {
         $totalcount = local_mail_message::count_index($USER->id, $mailview['type'], $mailview['itemid']);
-        $messages = local_mail_message::fetch_index($USER->id, $mailview['type'], $mailview['itemid'], $mailview['offset'], $mailview['mailpagesize']);
+        $messages = local_mail_message::fetch_index($USER->id, $mailview['type'], $mailview['itemid'],
+                                                    $mailview['offset'], $mailview['mailpagesize']);
         $content = local_mail_print_messages($mailview['itemid'], $mailview['type'], $mailview['offset'], $messages, $totalcount);
     }
     return array(
@@ -479,7 +481,8 @@ function local_mail_assignlabels($messages, $labelids, $labeltsids, $data, $sear
             if ($data['offset'] > $totalcount - 1) {
                 $data['offset'] = min(0, $data['offset'] - $data['mailpagesize']);
             }
-            $messages = local_mail_message::fetch_index($USER->id, $data['type'], $data['itemid'], $data['offset'], $data['mailpagesize']);
+            $messages = local_mail_message::fetch_index($USER->id, $data['type'], $data['itemid'],
+                                                        $data['offset'], $data['mailpagesize']);
             $content = local_mail_print_messages($data['itemid'], $data['type'], $data['offset'], $messages, $totalcount);
         }
     }
@@ -612,7 +615,8 @@ function local_mail_setlabel($type, $labelid, $labelname, $labelcolor) {
             if ($labelname and (!$labelcolor or in_array($labelcolor, $colors))) {
                 $label->save($labelname, $labelcolor);
             } else {
-                $error = (!$labelname ? get_string('erroremptylabelname', 'local_mail') : get_string('errorinvalidcolor', 'local_mail'));
+                $stringname = (!$labelname ? 'erroremptylabelname' : 'errorinvalidcolor');
+                $error = get_string($stringname, 'local_mail');
             }
         } else {
             $error = get_string('errorrepeatedlabelname', 'local_mail');
@@ -650,7 +654,8 @@ function local_mail_newlabel($messages, $labelname, $labelcolor, $data) {
                 }
             }
         } else {
-            $error = (empty($labelname) ? get_string('erroremptylabelname', 'local_mail') : get_string('errorinvalidcolor', 'local_mail'));
+            $stringname = (empty($labelname) ? 'erroremptylabelname' : 'errorinvalidcolor');
+            $error = get_string($stringname, 'local_mail');
         }
     } else {
         $error = get_string('errorrepeatedlabelname', 'local_mail');
@@ -754,7 +759,7 @@ function local_mail_getrecipients($message, $search, $groupid, $roleid) {
         $to = array_map($getid, $message->recipients('to'));
         $cc = array_map($getid, $message->recipients('cc'));
         $bcc = array_map($getid, $message->recipients('bcc'));
-        // list of users
+        // List of users.
         $rs = $DB->get_recordset_sql("$select $from $where $sort", $params);
         foreach ($rs as $rec) {
             if (!array_key_exists($rec->id, $participants)) {
@@ -800,14 +805,14 @@ function local_mail_updaterecipients($message, $recipients, $roles) {
                     'html' => '',
                     'redirect' => 'ok'
                 );
-        } else if (count($groups[0]) == 1) {// Only one group
+        } else if (count($groups[0]) == 1) {// Only one group.
             $groupid = $groups[0][0];
         } else {
-            $severalseparategroups = true;// Several groups
+            $severalseparategroups = true;// Several groups.
         }
     }
 
-    // Make sure recipients ids are integers
+    // Make sure recipients ids are integers.
     $recipients = clean_param_array($recipients, PARAM_INT);
 
     foreach ($recipients as $key => $recipid) {
@@ -815,11 +820,12 @@ function local_mail_updaterecipients($message, $recipients, $roles) {
     }
 
     $participants = array();
-    list($select, $from, $where, $sort, $params) = local_mail_getsqlrecipients($message->course()->id, '', $groupid, 0, implode(',', $recipients));
+    list($select, $from, $where, $sort, $params) = local_mail_getsqlrecipients($message->course()->id, '',
+                                                                               $groupid, 0, implode(',', $recipients));
     $rs = $DB->get_recordset_sql("$select $from $where $sort", $params);
 
     foreach ($rs as $rec) {
-        if (!array_key_exists($rec->id, $participants)) {// Avoid duplicated users
+        if (!array_key_exists($rec->id, $participants)) {// Avoid duplicated users.
             if ($severalseparategroups) {
                 $valid = false;
                 foreach ($groups[0] as $group) {

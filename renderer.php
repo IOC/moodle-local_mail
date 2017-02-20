@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
+
 class local_mail_renderer extends plugin_renderer_base {
 
     public function date($message, $viewmail = false) {
@@ -82,7 +84,8 @@ class local_mail_renderer extends plugin_renderer_base {
                 array('class' => 'mail_label mail_label_'. $label->color() . ' mail_label_' . $label->id()));
             if ($mailview) {
                 $linkparams = array('title' => get_string('showlabelmessages', 'local_mail', s($label->name())));
-                $output .= html_writer::link(new moodle_url('/local/mail/view.php', array('t' => 'label', 'l' => $label->id())), $text, $linkparams);
+                $urlparams = array('t' => 'label', 'l' => $label->id());
+                $output .= html_writer::link(new moodle_url('/local/mail/view.php', $urlparams), $text, $linkparams);
             } else {
                 $output .= $text;
             }
@@ -111,7 +114,10 @@ class local_mail_renderer extends plugin_renderer_base {
             $checkbox = html_writer::start_tag('noscript');
             $checkbox .= html_writer::empty_tag('input', $attributes);
             $checkbox .= html_writer::end_tag('noscript');
-            $checkbox .= html_writer::tag('span', '', array('class' => 'mail_adv_checkbox mail_checkbox0 mail_checkbox_value_' . $message->id()));
+            $attributes = array(
+                    'class' => 'mail_adv_checkbox mail_checkbox0 mail_checkbox_value_' . $message->id()
+            );
+            $checkbox .= html_writer::tag('span', '', $attributes);
             $flags = '';
             if ($type !== 'trash') {
                 $flags = $this->starred($message, $userid, $type, $offset);
@@ -122,7 +128,8 @@ class local_mail_renderer extends plugin_renderer_base {
                         $this->date($message));
             $context = context_course::instance($message->course()->id);
             $draftmessage = ($message->editable($userid) and
-                    (array_key_exists($message->course()->id, local_mail_get_my_courses()) or has_capability('moodle/course:view', $context)));
+                    (array_key_exists($message->course()->id, local_mail_get_my_courses()) or
+                    has_capability('moodle/course:view', $context)));
             if ($draftmessage) {
                 $url = new moodle_url('/local/mail/compose.php', array('m' => $message->id()));
             } else {
@@ -208,7 +215,11 @@ class local_mail_renderer extends plugin_renderer_base {
         $output = html_writer::start_tag('noscript');
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('noscript');
-        $output .= html_writer::start_tag('span', array('id' => 'mail_'. $type, 'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'));
+        $attributes = array(
+            'id' => 'mail_'. $type,
+            'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'
+        );
+        $output .= html_writer::start_tag('span', $attributes);
         $output .= html_writer::tag('span', $label);
         $output .= html_writer::end_tag('span');
         return $output;
@@ -226,7 +237,11 @@ class local_mail_renderer extends plugin_renderer_base {
         $output = html_writer::start_tag('noscript');
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('noscript');
-        $output .= html_writer::start_tag('span', array('id' => 'mail_'. $type, 'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'));
+        $attributes = array(
+            'id' => 'mail_'. $type,
+            'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'
+        );
+        $output .= html_writer::start_tag('span', $attributes);
         $output .= html_writer::tag('span', $label);
         $output .= html_writer::end_tag('span');
         return $output;
@@ -311,16 +326,22 @@ class local_mail_renderer extends plugin_renderer_base {
         $output = html_writer::start_tag('noscript');
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('noscript');
-        $output .= html_writer::start_tag('span', array('class' => 'singlebutton mail_button mail_assignlbl mail_button_disabled mail_hidden'));
+        $attributes = array(
+            'class' => 'singlebutton mail_button mail_assignlbl mail_button_disabled mail_hidden'
+        );
+        $output .= html_writer::start_tag('span', $attributes);
         $output .= html_writer::tag('span', $label);
         $url = $this->output->pix_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
         $output .= html_writer::end_tag('span');
-        // List labels and options
+        // List labels and options.
         $labels = local_mail_label::fetch_user($USER->id);
         $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_labelselect'));
         foreach ($labels as $key => $label) {
-            $content = html_writer::tag('span', '', array('class' => 'mail_adv_checkbox mail_checkbox0 mail_label_value_'.$label->id()));
+            $attributes = array(
+                'class' => 'mail_adv_checkbox mail_checkbox0 mail_label_value_' . $label->id()
+            );
+            $content = html_writer::tag('span', '', $attributes);
             $content .= html_writer::tag('span', $label->name(), array('class' => 'mail_label_name'));
             $items[$key] = $content;
         }
@@ -371,7 +392,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $url = $this->output->pix_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expand'));
         $output .= html_writer::end_tag('span');
-        // Menu options
+        // Menu options.
         $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_optselect'));
         $items = array(
             'all' => get_string('all', 'local_mail'),
@@ -404,7 +425,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $url = $this->output->pix_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
         $output .= html_writer::end_tag('span');
-        // Menu options
+        // Menu options.
         $output .= html_writer::start_tag('div', array('class' => 'mail_hidden mail_actselect'));
         $items = array(
             'markasread' => get_string('markasread', 'local_mail'),
@@ -448,7 +469,11 @@ class local_mail_renderer extends plugin_renderer_base {
 
 
     public function search() {
-        $output = html_writer::start_tag('span', array('id' => 'mail_search', 'class' => 'mail_hidden mail_search_button singlebutton mail_button'));
+        $attributes = array(
+            'id' => 'mail_search',
+            'class' => 'mail_hidden mail_search_button singlebutton mail_button'
+        );
+        $output = html_writer::start_tag('span', $attributes);
         $output .= html_writer::tag('span', get_string('search', 'local_mail'));
         $url = $this->output->pix_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
@@ -517,7 +542,12 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('span', array('class' => 'mail_search_date'));
         $output .= html_writer::tag('span', '', array('id' => 'searchdate', ''));
         $url = $this->output->pix_url('i/calendar', 'core');
-        $output .= html_writer::empty_tag('img', array('id' => 'mail_toggle_datepicker', 'class' => 'mail_toggle_datepicker', 'src' => $url, 'alt' => 'calendar'));
+        $attributes = array(
+            'id' => 'mail_toggle_datepicker',
+            'class' => 'mail_toggle_datepicker',
+            'src' => $url, 'alt' => 'calendar'
+        );
+        $output .= html_writer::empty_tag('img', $attributes);
         $output .= html_writer::end_tag('span');
         $output .= html_writer::end_tag('div');
         $output .= html_writer::end_tag('div');
@@ -542,7 +572,11 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     public function editlabelform() {
-        $content = html_writer::start_tag('div', array('id' => 'local_mail_form_edit_label', 'class' => 'local_mail_form mail_hidden'));
+        $attributes = array(
+            'id' => 'local_mail_form_edit_label',
+            'class' => 'local_mail_form mail_hidden'
+        );
+        $content = html_writer::start_tag('div', $attributes);
         $content .= html_writer::start_tag('div', array('class' => 'label_form'));
         $content .= html_writer::start_tag('div', array('class' => 'label_name'));
         $text = get_string('labelname', 'local_mail');
@@ -575,7 +609,11 @@ class local_mail_renderer extends plugin_renderer_base {
     }
 
     public function newlabelform() {
-        $content = html_writer::start_tag('div', array('id' => 'local_mail_form_new_label', 'class' => 'local_mail_form mail_hidden'));
+        $attributes = array(
+            'id' => 'local_mail_form_new_label',
+            'class' => 'local_mail_form mail_hidden'
+        );
+        $content = html_writer::start_tag('div', $attributes);
         $content .= html_writer::start_tag('div', array('class' => 'label_form'));
         $content .= html_writer::start_tag('div', array('class' => 'label_name'));
         $text = get_string('labelname', 'local_mail');
@@ -627,7 +665,11 @@ class local_mail_renderer extends plugin_renderer_base {
             $content .= html_writer::start_tag('div', array('class' => 'mail_label_colors_row'));
             foreach ($colors as $color) {
                 $count += 1;
-                $content .= html_writer::tag('div', 'a', array('data-color' => $color, 'class' => 'mail_label_color  mail_label_' . $color));
+                $attributes = array(
+                    'data-color' => $color,
+                    'class' => 'mail_label_color  mail_label_' . $color
+                );
+                $content .= html_writer::tag('div', 'a', $attributes);
                 if (($count % $cols == 0) and $count < $total) {
                     $content .= html_writer::end_tag('div');
                     $content .= html_writer::start_tag('div', array('class' => 'mail_label_colors_row'));
@@ -645,20 +687,25 @@ class local_mail_renderer extends plugin_renderer_base {
         $options = array();
 
         $owngroups = groups_get_user_groups($courseid, $userid);
-        $content = html_writer::start_tag('div', array('id' => 'local_mail_recipients_form', 'class' => 'local_mail_form mail_hidden'));
+        $attributes = array(
+            'id' => 'local_mail_recipients_form',
+            'class' => 'local_mail_form mail_hidden'
+        );
+        $content = html_writer::start_tag('div', $attributes);
 
         if ($COURSE->groupmode == SEPARATEGROUPS and empty($owngroups[0])) {
             return '';
         }
         $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_toolbar'));
 
-        // Roles
+        // Roles.
         $context = context_course::instance($courseid);
         $roles = role_get_names($context);
         $userroles = local_mail_get_user_roleids($userid, $context);
         $mailsamerole = has_capability('local/mail:mailsamerole', $context);
         foreach ($roles as $key => $role) {
-            $count = $DB->count_records_select('role_assignments', "contextid = :contextid AND roleid = :roleid AND userid <> :userid",
+            $count = $DB->count_records_select('role_assignments',
+                "contextid = :contextid AND roleid = :roleid AND userid <> :userid",
                 array('contextid' => $context->id, 'roleid' => $role->id, 'userid' => $userid));
             if (($count && $mailsamerole)
                 || ($count && !$mailsamerole && !in_array($role->id, $userroles))) {
@@ -669,12 +716,14 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::start_tag('span', array('class' => 'roleselector'));
         $content .= html_writer::label($text, 'local_mail_roles');
         $text = get_string('all', 'local_mail');
-        $content .= html_writer::select($options, 'local_mail_roles', '', array('' => $text), array('id' => 'local_mail_recipients_roles', 'class' => ''));
+        $content .= html_writer::select($options, 'local_mail_roles', '', array('' => $text),
+                                        array('id' => 'local_mail_recipients_roles', 'class' => ''));
         $content .= html_writer::end_tag('span');
-        // Groups
+        // Groups.
         $groups = groups_get_all_groups($courseid);
         if ($COURSE->groupmode == NOGROUPS or ($COURSE->groupmode == VISIBLEGROUPS and empty($groups))) {
-            $content .= html_writer::tag('span', get_string('allparticipants', 'moodle'), array('class' => 'groupselector groupname'));
+            $text = get_string('allparticipants', 'moodle');
+            $content .= html_writer::tag('span', $text, array('class' => 'groupselector groupname'));
         } else {
             if ($COURSE->groupmode == VISIBLEGROUPS or has_capability('moodle/site:accessallgroups', $context)) {
                 unset($options);
@@ -685,15 +734,16 @@ class local_mail_renderer extends plugin_renderer_base {
                 $content .= html_writer::start_tag('span', array('class' => 'groupselector'));
                 $content .= html_writer::label($text, 'local_mail_recipients_groups');
                 $text = get_string('allparticipants', 'moodle');
-                $content .= html_writer::select($options, 'local_mail_recipients_groups', '', array('' => $text), array('id' => 'local_mail_recipients_groups', 'class' => ''));
+                $content .= html_writer::select($options, 'local_mail_recipients_groups', '', array('' => $text),
+                                                array('id' => 'local_mail_recipients_groups', 'class' => ''));
                 $content .= html_writer::end_tag('span');
-            } else if (count($owngroups[0]) == 1) {// SEPARATEGROUPS and user in only one group
+            } else if (count($owngroups[0]) == 1) {// SEPARATEGROUPS and user in only one group.
                 $text = get_string('group', 'moodle');
                 $content .= html_writer::start_tag('span', array('class' => 'groupselector'));
                 $content .= html_writer::label("$text: ", null);
                 $content .= html_writer::tag('span', groups_get_group_name($owngroups[0][0]), array('class' => 'groupname'));
                 $content .= html_writer::end_tag('span');
-            } else if (count($owngroups[0]) > 1) {// SEPARATEGROUPS and user in several groups
+            } else if (count($owngroups[0]) > 1) {// SEPARATEGROUPS and user in several groups.
                 unset($options);
                 foreach ($owngroups[0] as $key => $group) {
                     $options[$group] = groups_get_group_name($group);
@@ -708,7 +758,7 @@ class local_mail_renderer extends plugin_renderer_base {
             }
         }
         $content .= html_writer::tag('div', '', array('class' => 'mail_separator'));
-        // Search
+        // Search.
         $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_search'));
         $attributes = array(
                 'type'  => 'text',
@@ -720,7 +770,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $text = get_string('search', 'local_mail');
         $content .= html_writer::label($text, 'recipients_search');
         $content .= html_writer::empty_tag('input', $attributes);
-        // Select all recipients
+        // Select all recipients.
         $content .= html_writer::start_tag('span', array('class' => 'mail_all_recipients_actions'));
         $attributes = array(
            'type' => 'button',
@@ -776,7 +826,11 @@ class local_mail_renderer extends plugin_renderer_base {
                 $recipselected = '';
             }
             $content .= html_writer::start_tag('div', array('class' => 'mail_form_recipient' . $recipselected));
-            $content .= html_writer::tag('span', $rolestring, array('class' => 'mail_form_recipient_role' . $hidden, 'data-role-recipient' => $participant->id));
+            $attributes = array(
+                'class' => 'mail_form_recipient_role' . $hidden,
+                'data-role-recipient' => $participant->id
+            );
+            $content .= html_writer::tag('span', $rolestring, $attributes);
             $content .= $this->output->user_picture($participant, array('link' => false, 'alttext' => false));
             $content .= html_writer::tag('span', fullname($participant), array('class' => 'mail_form_recipient_name'));
             $content .= html_writer::start_tag('span', array('class' => 'mail_recipient_actions'));
@@ -921,23 +975,27 @@ class local_mail_renderer extends plugin_renderer_base {
                 $text = get_string('attachnumber', 'local_mail', count($attachments));
                 $output .= html_writer::tag('span', $text, array('class' => 'mail_attachment_text'));
                 $downloadurl = new moodle_url($this->page->url, array('downloadall' => '1'));
-                $iconimage = $this->output->pix_icon('a/download_all', get_string('downloadall', 'local_mail'), 'moodle', array('class' => 'icon'));
+                $text = get_string('downloadall', 'local_mail');
+                $iconimage = $this->output->pix_icon('a/download_all', $text, 'moodle', array('class' => 'icon'));
                 $output .= html_writer::start_div('mail_attachment_downloadall');
                 $output .= html_writer::link($downloadurl, $iconimage);
-                $output .= html_writer::link($downloadurl, get_string('downloadall', 'local_mail'), array('class' => 'mail_downloadall_text'));
+                $text = get_string('downloadall', 'local_mail');
+                $output .= html_writer::link($downloadurl, $text, array('class' => 'mail_downloadall_text'));
                 $output .= html_writer::end_div();
             }
             foreach ($attachments as $attach) {
                 $filename = $attach->get_filename();
                 $filepath = $attach->get_filepath();
                 $mimetype = $attach->get_mimetype();
-                $iconimage = $this->output->pix_icon(file_file_icon($attach), get_mimetype_description($attach), 'moodle', array('class' => 'icon'));
-                $path = '/'.$attach->get_contextid().'/local_mail/message/'.$attach->get_itemid().$filepath.$filename;
+                $iconimage = $this->output->pix_icon(file_file_icon($attach), get_mimetype_description($attach),
+                                                     'moodle', array('class' => 'icon'));
+                $path = '/' . $attach->get_contextid().'/local_mail/message/' . $attach->get_itemid() . $filepath . $filename;
                 $fullurl = moodle_url::make_file_url('/pluginfile.php', $path, true);
                 $output .= html_writer::start_tag('div', array('class' => 'mail_attachment'));
                 $output .= html_writer::link($fullurl, $iconimage);
                 $output .= html_writer::link($fullurl, s($filename));
-                $output .= html_writer::tag('span', display_size($attach->get_filesize()), array('class' => 'mail_attachment_size'));
+                $output .= html_writer::tag('span', display_size($attach->get_filesize()),
+                                            array('class' => 'mail_attachment_size'));
                 $output .= html_writer::end_tag('div');
             }
             $output .= $this->output->container_end();
@@ -966,7 +1024,7 @@ class local_mail_renderer extends plugin_renderer_base {
         if ($type === 'reply') {
             $viewcourse = array_key_exists($courseid, local_mail_get_my_courses());
             $output = $this->reply($viewcourse);
-            // all recipients
+            // All recipients.
             $output .= $this->replyall(($viewcourse and $replyall));
             $output .= $this->forward($viewcourse);
             $toolbardown = true;
@@ -1016,7 +1074,11 @@ class local_mail_renderer extends plugin_renderer_base {
     public function notification_bar() {
         $output = html_writer::start_tag('div', array('id' => 'mail_notification', 'class' => 'mail_novisible mail_notification'));
         $output .= html_writer::tag('span', '', array('id' => 'mail_notification_message'));
-        $output .= html_writer::link('#', get_string('undo', 'local_mail'), array('id' => 'mail_notification_undo', 'class' => 'mail_novisible'));
+        $attributes = array(
+            'id' => 'mail_notification_undo',
+            'class' => 'mail_novisible'
+        );
+        $output .= html_writer::link('#', get_string('undo', 'local_mail'), $attributes);
         $output .= html_writer::end_tag('div');
         return $output;
     }

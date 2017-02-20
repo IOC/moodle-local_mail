@@ -13,13 +13,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     };
 
     var mail_update_compose_url = function() {
-         if (history.pushState) {
+        if (history.pushState) {
             var node = Y.one('input[name="m"]');
             if (node) {
                 history.pushState({}, document.title, M.cfg.wwwroot + '/local/mail/compose.php?m=' + node.get('value'));
             }
-         }
-    }
+        }
+    };
 
     var mail_show_recipipients_button_ajax = function () {
         var ajaxbutton = Y.one('input[id$="id_recipients_ajax"]') || Y.one('button[id$="id_recipients_ajax"]');
@@ -38,7 +38,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         var width = 500;
         var obj = Y.one('#region-main');
         var position = obj.getXY();
-        var posx = position[0]+(Y.one('body').get('offsetWidth')/2)-width;
+        var posx = position[0] + (Y.one('body').get('offsetWidth') / 2) - width;
 
         if (Y.one('#local_mail_recipients_form')) {
             mail_recipients_panel = new Y.Panel({
@@ -71,7 +71,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
-    //Success call
+    // Success call.
     var handleSuccess = function (transactionid, response, args) {
         var obj = Y.JSON.parse(response.responseText);
         var node;
@@ -104,13 +104,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
-    //Failure call
+    // Failure call.
     var handleFailure = function (transactionid, response, args) {
         clearInterval(timeout);
         console.log(response);
     };
 
-    //Update screen data and async call
+    // Update screen data and async call.
     var mail_doaction = function(action){
         var search = '';
         var cfg;
@@ -134,15 +134,15 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             if (mail_existing_recipients) {
                 Y.Array.each(mail_existing_recipients, function(recipient, index) {
                     if (Y.Array.indexOf(mail_recipients[3], recipient) != -1) {
-                        recipients += mail_recipients[3][index]+',';
+                        recipients += mail_recipients[3][index] + ',';
                         roleids += '3,';
                     }
                 });
             }
-            for (var i=0;i<mail_recipients.length;i++){
-                for (var j=0;j<mail_recipients[i].length;j++){
-                    recipients += mail_recipients[i][j]+',';
-                    roleids += i+',';
+            for (var i = 0; i < mail_recipients.length; i++) {
+                for (var j = 0; j < mail_recipients[i].length; j++) {
+                    recipients += mail_recipients[i][j] + ',';
+                    roleids += i + ',';
                 }
             }
             recipients = recipients.replace(/,$/, '');
@@ -151,8 +151,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             action = 'getrecipients';
         }
 
-        //Ajax call
-        cfg =  {
+        // Ajax call.
+        cfg = {
             method: 'POST',
             data: {
                 msgs:    Y.one('input[name="m"]').get('value'),
@@ -173,7 +173,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             cfg.data.roleids = roleids;
         }
 
-        request = Y.io(M.cfg.wwwroot + '/local/mail/ajax.php', cfg);
+        Y.io(M.cfg.wwwroot + '/local/mail/ajax.php', cfg);
     };
 
     var wait = function() {
@@ -183,22 +183,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     var getgroupid = function() {
         var select = Y.one('#local_mail_recipients_groups');
-        return (select?select.get('options').item(select.get('selectedIndex')).get('value'):0);
+        return (select ? select.get('options').item(select.get('selectedIndex')).get('value') : 0);
     };
 
     var getroleid = function() {
         var select = Y.one('#local_mail_recipients_roles');
-        return (select?select.get('options').item(select.get('selectedIndex')).get('value'):0);
-    };
-
-    var setassignedrecipients = function() {
-        var nodes = Y.all('.mail_recipient input[name^="remove"]');
-        var name;
-        if (nodes) {
-            nodes.each(function (node) {
-                name = /\d+/.exec(node.get('name'));
-            });
-        }
+        return (select ? select.get('options').item(select.get('selectedIndex')).get('value') : 0);
     };
 
     var mail_recipient_action = function(node) {
@@ -222,7 +212,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             mail_hide_recipients_button('bcc', userid);
             node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
             noderolestring = node.ancestor('.mail_recipient_actions').siblings('.mail_form_recipient_role');
-            noderolestring.set('innerHTML', M.util.get_string('shortadd'+role, 'local_mail')+':');
+            noderolestring.set('innerHTML', M.util.get_string('shortadd' + role, 'local_mail') + ':');
             noderolestring.removeClass('mail_hidden');
             node.siblings('input[type="button"]').set('disabled', 'disabled');
             node.siblings('input[type="button"]').addClass('mail_hidden');
@@ -234,7 +224,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     var mail_select_all_recipient_action = function(node) {
         var role = /^[^_]*/.exec(node.get('name'));
-        var nodes = Y.all(".mail_recipient_actions input[name^="+role[0]+"]");
+        var nodes = Y.all(".mail_recipient_actions input[name^=" + role[0] + "]");
         if (nodes) {
             nodes.each(function (node) {
                 mail_recipient_action(node);
@@ -243,7 +233,6 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     };
 
     var mail_add_recipient = function(userid, role) {
-        var addto = false;
         if (role == 'to') {
             mail_recipients[0].push(userid);
             mail_remove_recipient(userid, [1,2,3]);
@@ -278,12 +267,12 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             );
     };
 
-    var mail_reset_recipients =  function() {
+    var mail_reset_recipients = function() {
         mail_recipients = [
-            [],//to
-            [],//cc
-            [],//bcc
-            []//remove
+            [],// To.
+            [],// Cc.
+            [],// Bcc.
+            []// Remove.
         ];
     };
 
@@ -293,13 +282,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             mail_hide_recipients_button('to', recipient);
             mail_hide_recipients_button('cc', recipient);
             mail_hide_recipients_button('bcc', recipient);
-            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="' + recipient + '"]');
             if (node) {
-                node.set('innerHTML', M.util.get_string('shortaddto', 'local_mail')+':');
+                node.set('innerHTML', M.util.get_string('shortaddto', 'local_mail') + ':');
                 node.removeClass('mail_hidden');
                 node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
             }
-            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            node = Y.one('.mail_recipient_actions input[name="remove[' + recipient + ']"]');
             if (node) {
                 node.set('disabled', '');
                 node.removeClass('mail_novisible');
@@ -309,13 +298,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             mail_hide_recipients_button('cc', recipient);
             mail_hide_recipients_button('to', recipient);
             mail_hide_recipients_button('bcc', recipient);
-            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="' + recipient + '"]');
             if (node) {
-                node.set('innerHTML', M.util.get_string('shortaddcc', 'local_mail')+':');
+                node.set('innerHTML', M.util.get_string('shortaddcc', 'local_mail') + ':');
                 node.removeClass('mail_hidden');
                 node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
             }
-            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            node = Y.one('.mail_recipient_actions input[name="remove[' + recipient + ']"]');
             if (node) {
                 node.set('disabled', '');
                 node.removeClass('mail_novisible');
@@ -325,13 +314,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             mail_hide_recipients_button('bcc', recipient);
             mail_hide_recipients_button('to', recipient);
             mail_hide_recipients_button('cc', recipient);
-            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="' + recipient + '"]');
             if (node) {
-                node.set('innerHTML', M.util.get_string('shortaddbcc', 'local_mail')+':');
+                node.set('innerHTML', M.util.get_string('shortaddbcc', 'local_mail') + ':');
                 node.removeClass('mail_hidden');
                 node.ancestor('.mail_form_recipient').addClass('mail_recipient_selected');
             }
-            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            node = Y.one('.mail_recipient_actions input[name="remove[' + recipient + ']"]');
             if (node) {
                 node.set('disabled', '');
                 node.removeClass('mail_novisible');
@@ -341,13 +330,13 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
             mail_show_recipients_button('to', recipient);
             mail_show_recipients_button('cc', recipient);
             mail_show_recipients_button('bcc', recipient);
-            node = Y.one('.mail_recipient_actions input[name="remove['+recipient+']"]');
+            node = Y.one('.mail_recipient_actions input[name="remove[' + recipient + ']"]');
             if (node) {
                 node.addClass('mail_novisible');
                 node.set('disabled', 'disabled');
                 node.ancestor('.mail_form_recipient').removeClass('mail_recipient_selected');
             }
-            node = Y.one('span.mail_form_recipient_role[data-role-recipient="'+recipient+'"]');
+            node = Y.one('span.mail_form_recipient_role[data-role-recipient="' + recipient + '"]');
             if (node) {
                 node.set('innerHTML', '');
                 node.addClass('mail_hidden');
@@ -356,7 +345,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     };
 
     var mail_show_recipients_button = function (role, recipient) {
-        var node = Y.one('.mail_recipient_actions input[name="'+role+'['+recipient+']"]');
+        var node = Y.one('.mail_recipient_actions input[name="' + role + '[' + recipient + ']"]');
         if (node) {
             node.set('disabled', '');
             node.removeClass('mail_hidden');
@@ -364,7 +353,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
     };
 
     var mail_hide_recipients_button = function (role, recipient) {
-        var node = Y.one('.mail_recipient_actions input[name="'+role+'['+recipient+']"]');
+        var node = Y.one('.mail_recipient_actions input[name="' + role + '[' + recipient + ']"]');
         if (node) {
             node.set('disabled', 'disabled');
             node.addClass('mail_hidden');
@@ -384,7 +373,7 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     };
 
-    //Click label on recipients button
+    // Click label on recipients button.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_reset_recipients();
@@ -397,35 +386,35 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
         }
     }, '#id_recipients_ajax');
 
-    //Change on group select
+    // Change on group select.
     Y.one("#region-main").delegate('change', function(e) {
         e.preventDefault();
         mail_doaction('setgroup');
     }, '#local_mail_recipients_groups');
 
-    //Change on role select
+    // Change on role select.
     Y.one("#region-main").delegate('change', function(e) {
         e.preventDefault();
         mail_doaction('setrole');
     }, '#local_mail_recipients_roles');
 
-    //Keyup on search input
+    // Keyup on search input.
     Y.one("#region-main").delegate('keyup', function(e) {
         wait();
     }, 'input[name="recipients_search"]');
 
-    //Keydown on search input
+    // Keydown on search input.
     Y.one("#region-main").delegate('keydown', function(e) {
         clearInterval(timeout);
     }, 'input[name="recipients_search"]');
 
-    //Click on recipient action
+    // Click on recipient action.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_recipient_action(this);
     }, '.mail_recipient_actions input');
 
-    //Click on select all recipients action
+    // Click on select all recipients action.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_select_all_recipient_action(this);

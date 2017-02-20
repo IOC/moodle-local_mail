@@ -21,6 +21,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->libdir . '/formslib.php');
 
@@ -60,12 +61,13 @@ class mail_labels_form extends moodleform {
             $mform->setType('m', PARAM_INT);
         }
 
-        // List labels
+        // List labels.
 
         $mform->addElement('header', 'listlabels', get_string('labels', 'local_mail'));
         if ($labelids) {
             foreach ($labelids as $id) {
-                $html = html_writer::tag('span', $this->_customdata['labelname'.$id], array('class' => 'mail_label '.'mail_label_'.$this->_customdata['color'.$id]));
+                $html = html_writer::tag('span', $this->_customdata['labelname'.$id],
+                                        array('class' => 'mail_label ' . 'mail_label_'.$this->_customdata['color' . $id]));
                 $mform->addElement('advcheckbox', 'labelid['.$id.']', '', $html);
                 $mform->setDefault('labelid['.$id.']', 0);
             }
@@ -74,15 +76,16 @@ class mail_labels_form extends moodleform {
         }
         $mform->addElement('header', 'newlabel', get_string('assigntonewlabel', 'local_mail'));
 
-        // New label
+        // New label.
 
         $mform->addElement('text', 'newlabelname', get_string('labelname', 'local_mail'));
         $mform->setType('newlabelname', PARAM_TEXT);
         $text = get_string('maximumchars', '', 100);
         $mform->addRule('newlabelname', $text, 'maxlength', 100, 'client');
-        $mform->addElement('select', 'newlabelcolor', get_string('labelcolor', 'local_mail'), $colors, array('class' => 'mail_label_colors'));
+        $mform->addElement('select', 'newlabelcolor', get_string('labelcolor', 'local_mail'), $colors,
+                            array('class' => 'mail_label_colors'));
 
-        // Buttons
+        // Buttons.
 
         $buttonarray = array();
 

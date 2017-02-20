@@ -40,7 +40,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_define_label_handlers = function () {
         if (Y.one('#local_mail_form_new_label')) {
-            //Click on new label color div
+            // Click on new label color div.
             Y.one('#local_mail_form_new_label').delegate('click', function(e) {
                 e.stopPropagation();
                 mail_label_set_selected(this, 'new');
@@ -48,7 +48,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
 
         if (Y.one('#local_mail_form_edit_label')) {
-            //Click on edit label color div
+            // Click on edit label color div.
             Y.one('#local_mail_form_edit_label').delegate('click', function(e) {
                 e.stopPropagation();
                 mail_label_set_selected(this, 'edit');
@@ -58,10 +58,10 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_create_edit_label_panel = function () {
         var title = M.util.get_string('editlabel', 'local_mail');
-        var obj = (Y.one('.mail_list')?Y.one('.mail_list'):Y.one('.mail_view'));
+        var obj = (Y.one('.mail_list') ? Y.one('.mail_list') : Y.one('.mail_view'));
         var position = obj.getXY();
         var width = 400;
-        var posx = position[0]+(Y.one('body').get('offsetWidth')/2)-width;
+        var posx = position[0] + (Y.one('body').get('offsetWidth') / 2) - width;
         mail_edit_label_panel = new Y.Panel({
             srcNode      : '#local_mail_form_edit_label',
             headerContent: title,
@@ -95,10 +95,10 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_create_new_label_panel = function () {
         var title = M.util.get_string('newlabel', 'local_mail');
-        var obj = (Y.one('.mail_list')?Y.one('.mail_list'):Y.one('.mail_view'));
+        var obj = (Y.one('.mail_list') ? Y.one('.mail_list') : Y.one('.mail_view'));
         var position = obj.getXY();
         var width = 400;
-        var posx = position[0]+(Y.one('body').get('offsetWidth')/2)-width;
+        var posx = position[0] + (Y.one('body').get('offsetWidth') / 2) - width;
         mail_new_label_panel = new Y.Panel({
             srcNode      : '#local_mail_form_new_label',
             headerContent: title,
@@ -244,7 +244,6 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         var menu = Y.one('#mail_menu_search');
         var advsearch = Y.one('#mail_adv_search');
         var position = button.getXY();
-        var date;
         position[1] += button.get('clientHeight') + 2;
         menu.toggleClass('mail_hidden');
         menu.setXY(position);
@@ -321,7 +320,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         var separator = false;
         var nodes;
         if (mail_is_checkbox_checked(checkbox)) {
-            //Read or unread
+            // Read or unread.
             if (mailitem.hasClass('mail_unread')) {
                 menu.one('a.mail_menu_action_markasread').ancestor('li').show();
                 separator = true;
@@ -329,7 +328,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 menu.one('a.mail_menu_action_markasunread').ancestor('li').show();
                 separator = true;
             }
-            //Starred or unstarred
+            // Starred or unstarred.
             if (mail_view_type != 'trash' && mailitem.one('.mail_flags span').hasClass('mail_starred')) {
                 menu.one('a.mail_menu_action_markasunstarred').ancestor('li').show();
                 separator = true;
@@ -343,7 +342,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             if (!Y.all('.mail_list .mail_selected').size()) {
                 mail_hide_actions();
             } else {
-                //Read or unread
+                // Read or unread.
                 if (mailitem.hasClass('mail_unread')) {
                     if (!mailitem.siblings('.mail_selected.mail_unread').size()) {
                         menu.one('a.mail_menu_action_markasread').ancestor('li').hide();
@@ -353,7 +352,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                         menu.one('a.mail_menu_action_markasunread').ancestor('li').hide();
                     }
                 }
-                //Starred or unstarred
+                // Starred or unstarred.
                 if (mail_view_type != 'trash' && mailitem.one('.mail_flags a span').hasClass('mail_starred')) {
                     nodes = mailitem.siblings(function(obj) {
                         return obj.hasClass('mail_selected') && obj.one('.mail_flags a span.mail_starred');
@@ -476,7 +475,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     };
 
     var mail_label_set_values = function () {
-        var total = (mail_message_view?1:mail_get_checkboxs_checked().size());
+        var total = (mail_message_view ? 1 : mail_get_checkboxs_checked().size());
         var state;
 
         Y.each(mail_checkbox_labels_default, function(value, index){
@@ -487,13 +486,14 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             } else {
                 state = 0;
             }
-            mail_set_checkbox(Y.one('.mail_menu_labels .mail_label_value_'+index), state);
+            mail_set_checkbox(Y.one('.mail_menu_labels .mail_label_value_' + index), state);
         });
     };
 
     var mail_get_label_value = function(checkbox){
         var value;
-        classnames = checkbox.getAttribute('class').split(' ');
+        var classnames = checkbox.getAttribute('class').split(' ');
+        var num;
         Y.each(classnames, function(classname){
             num = /mail_label_value_(\d+)/.exec(classname);
             if (num) {
@@ -512,7 +512,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     };
 
     var mail_get_labels_values = function(thirdstate){
-        var nodes = (thirdstate?mail_get_labels_thirdstate():mail_get_labels_checked());
+        var nodes = (thirdstate ? mail_get_labels_thirdstate() : mail_get_labels_checked());
         var values = [];
         Y.each(nodes, function (node, index) {
             values.push(mail_get_label_value(node));
@@ -539,9 +539,12 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         Y.each(M.local_mail.mail_labels, function (value, index) {
             if (Y.Array.indexOf(lblstoadd, index) != -1) {
                 if (index != labelid) {
-                    elem = grouplabels.one('.mail_label_'+index);
+                    elem = grouplabels.one('.mail_label_' + index);
                     if (!elem) {
-                        elem = Y.Node.create('<span class="mail_label mail_label_'+M.local_mail.mail_labels[index].color+' mail_label_'+index+'">'+M.local_mail.mail_labels[index].name+'</span>');
+                        elem = Y.Node.create('<span class="mail_label mail_label_' +
+                                M.local_mail.mail_labels[index].color +
+                                ' mail_label_' + index + '">' +
+                                M.local_mail.mail_labels[index].name + '</span>');
                         grouplabels.append(elem);
                     }
                 }
@@ -549,7 +552,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 if (!mail_message_view && index == labelid) {
                     grouplabels.ancestor('.mail_item').remove();
                 } else {
-                    elem = grouplabels.one('.mail_label_'+index);
+                    elem = grouplabels.one('.mail_label_' + index);
                     if (elem) {
                         elem.remove();
                     }
@@ -597,7 +600,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_get_checkbox_value = function(checkbox){
         var value;
-        classnames = checkbox.getAttribute('class').split(' ');
+        var classnames = checkbox.getAttribute('class').split(' ');
+        var num;
         Y.each(classnames, function(classname){
             num = /mail_checkbox_value_(\d+)/.exec(classname);
             if (num) {
@@ -737,7 +741,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
     };
 
-    //Success call
+    // Success call.
     var handleSuccess = function (transactionid, response, args) {
         var obj = Y.JSON.parse(response.responseText);
         var img;
@@ -797,7 +801,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                         img = node.get('outerHTML');
                         node = Y.one('.mail_inbox a');
                         if (node) {
-                            node.setContent(img+obj.info.inbox);
+                            node.setContent(img + obj.info.inbox);
                         }
                     }
                 }
@@ -807,38 +811,38 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                         img = node.get('outerHTML');
                         node = Y.one('.mail_drafts a');
                         if (node) {
-                            node.setContent(img+obj.info.drafts);
+                            node.setContent(img + obj.info.drafts);
                         }
                     }
                 }
                 if (obj.info.courses) {
                     Y.each(obj.info.courses, (function(value, index) {
-                        node = Y.one('.mail_course_'+index+' a img');
+                        node = Y.one('.mail_course_' + index + ' a img');
                         if (node) {
                             img = node.get('outerHTML');
-                            node = Y.one('.mail_course_'+index+' a');
+                            node = Y.one('.mail_course_' + index + ' a');
                             if (node) {
-                                Y.one('.mail_course_'+index+' a').setContent(img+value);
+                                Y.one('.mail_course_' + index + ' a').setContent(img + value);
                             }
                         }
                     }));
                 }
                 if (obj.info.labels) {
                     Y.each(obj.info.labels, (function(value, index) {
-                        node = Y.one('.mail_label_'+index+' a img');
+                        node = Y.one('.mail_label_' + index + ' a img');
                         if (node) {
                             img = node.get('outerHTML');
-                            node = Y.one('.mail_label_'+index+' a');
+                            node = Y.one('.mail_label_' + index + ' a');
                             if (node) {
-                                node.setContent(img+value);
+                                node.setContent(img + value);
                             }
                         }
                     }));
                 }
             }
-            //Undo last action
+            // Undo last action.
             if (obj.undo && mail_undo_function != 'undo') {
-                var msg = M.util.get_string('undo'+mail_undo_function, 'local_mail', obj.undo.split(',').length);
+                var msg = M.util.get_string('undo' + mail_undo_function, 'local_mail', obj.undo.split(',').length);
                 if (mail_undo_function == 'delete') {
                     mail_undo_function = 'restore';
                 } else if (mail_undo_function == 'restore') {
@@ -855,12 +859,12 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
     };
 
-    //Failure call
+    // Failure call.
     var handleFailure = function (transactionid, response, args) {
         console.log(response);
     };
 
-    //Update screen data and async call
+    // Update screen data and async call.
     var mail_doaction = function(action, node) {
         node = (typeof node !== 'undefined' ? node : null);
         var nodes = mail_get_checkboxs_checked();
@@ -868,7 +872,6 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         var child;
         var ancestor;
         var ids;
-        var request;
         var mail_view;
 
         if(mail_message_view) {
@@ -903,7 +906,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             }
             mail_view = true;
             ids = Y.one('input[name="m"]').get('value');
-        } else {//List messages view
+        } else {// List messages view.
             if(action == 'viewmail') {
                 nodes.empty();
                 var url = node.get('href');
@@ -972,8 +975,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             }
             mail_view = false;
         }
-        //Ajax call
-        var cfg =  {
+        // Ajax call.
+        var cfg = {
             method: 'POST',
             data: {
                 msgs: ids,
@@ -982,7 +985,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 offset: Y.one('input[name="offset"]').get('value'),
                 action: action,
                 mailview: mail_view
-             },
+            },
             on: {
                 success:handleSuccess,
                 failure:handleFailure
@@ -995,7 +998,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             cfg.data.itemid = Y.one('input[name="itemid"]').get('value');
         }
         if (action == 'perpage') {
-            cfg.data.perpage = (node.get('innerText')?node.get('innerText'):node.get('textContent'));
+            cfg.data.perpage = (node.get('innerText') ? node.get('innerText') : node.get('textContent'));
         }
         if (action == 'assignlabels') {
             cfg.data.labelids = mail_get_labels_values(false);
@@ -1031,15 +1034,15 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
         if (action == 'nextpage' || action == 'prevpage' ) {
             obj = Y.one('#mail_loading_small');
-            var btn = Y.one('.mail_paging input[name="'+action+'"]');
+            var btn = Y.one('.mail_paging input[name="' + action + '"]');
             var position = btn.getXY();
             obj.removeClass('mail_hidden');
-            position[0] += (btn.get('offsetWidth')/2) - (obj.one('img').get('offsetWidth')/2);
-            position[1] = btn.getXY()[1] + (obj.one('img').get('offsetHeight')/2);
+            position[0] += (btn.get('offsetWidth') / 2) - (obj.one('img').get('offsetWidth') / 2);
+            position[1] = btn.getXY()[1] + (obj.one('img').get('offsetHeight') / 2);
             obj.setXY(position);
         }
         if (mail_doing_search) {
-            //Go back when searching keeps current page
+            // Go back when searching keeps current page.
             if (action == 'goback') {
                 if (mail_before_message_search) {
                     cfg.data.before = mail_before_message_search;
@@ -1047,11 +1050,11 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                     cfg.data.after = mail_after_message_search;
                 }
             }
-            cfg.data.search =  mail_search_selected;
+            cfg.data.search = mail_search_selected;
             cfg.data.searchfrom = mail_searchfrom_selected;
             cfg.data.searchto = mail_searchto_selected;
-            cfg.data.unread = (mail_unread_selected?'1':'');
-            cfg.data.attach = (mail_attach_selected?'1':'');
+            cfg.data.unread = (mail_unread_selected ? '1' : '');
+            cfg.data.attach = (mail_attach_selected ? '1' : '');
             cfg.data.time = mail_date_selected;
             cfg.data.perpageid = mail_perpageid;
             if (action == 'prevpage') {
@@ -1073,7 +1076,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         if (mail_undo_function == 'undo') {
             cfg.data.undo = true;
         }
-        request = Y.io(M.cfg.wwwroot + '/local/mail/ajax.php', cfg);
+        Y.io(M.cfg.wwwroot + '/local/mail/ajax.php', cfg);
     };
 
     var mail_label_confirm_delete = function(e) {
@@ -1086,7 +1089,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             labelname = labelname.substring(0, 25) + '...';
         }
         message = M.util.get_string('labeldeleteconfirm', 'local_mail', labelname);
-        M.util.show_confirm_dialog(e, {
+        M.util.show_confirm_dialog(e,
+                                    {
                                         'callback' : mail_label_remove,
                                         'message' : message,
                                         'continuelabel': M.util.get_string('delete', 'local_mail')
@@ -1096,12 +1100,12 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_label_remove = function() {
         var params = [];
-        params.push('offset='+Y.one('input[name="offset"]').get('value'));
-        params.push('sesskey='+Y.one('input[name="sesskey"]').get('value'));
+        params.push('offset=' + Y.one('input[name="offset"]').get('value'));
+        params.push('sesskey=' + Y.one('input[name="sesskey"]').get('value'));
         params.push('removelbl=1');
         params.push('confirmlbl=1');
         var url = Y.one('#local_mail_main_form').get('action');
-        document.location.href = url+'&'+params.join('&');
+        document.location.href = url + '&' + params.join('&');
     };
 
     var mail_label_new = function() {
@@ -1137,24 +1141,22 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     var mail_update_url = function() {
         var params = [];
         var offset;
-        var m;
-        var type;
 
         if (history.pushState) {
-            params.push('t='+mail_view_type);
+            params.push('t=' + mail_view_type);
             if (mail_message_view) {
-                params.push('m='+Y.one('input[name="m"]').get('value'));
+                params.push('m=' + Y.one('input[name="m"]').get('value'));
             }
             if (mail_view_type == 'course') {
-                params.push('c='+Y.one('input[name="itemid"]').get('value'));
+                params.push('c=' + Y.one('input[name="itemid"]').get('value'));
             } else {
                 if (mail_view_type == 'label') {
-                    params.push('l='+Y.one('input[name="itemid"]').get('value'));
+                    params.push('l=' + Y.one('input[name="itemid"]').get('value'));
                 }
             }
             offset = Y.one('input[name="offset"]').get('value');
             if (parseInt(offset, 10) > 0) {
-                params.push('offset='+offset);
+                params.push('offset=' + offset);
             }
             history.pushState({}, document.title, M.cfg.wwwroot + '/local/mail/view.php?' + params.join('&'));
         }
@@ -1165,7 +1167,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         var datepicker = Y.one('#dateselector-calendar-panel');
         var search = Y.one('.mail_search_datepicker');
         var position = menu.getXY();
-        position[0] += (menu.get('offsetWidth')/2) - (datepicker.get('offsetWidth')/2);
+        position[0] += (menu.get('offsetWidth') / 2) - (datepicker.get('offsetWidth') / 2);
         position[1] = search.getXY()[1] - datepicker.get('offsetHeight');
         datepicker.setXY(position);
     };
@@ -1179,9 +1181,9 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     var mail_set_selected_date = function(date) {
         if (date) {
             var elems = date.split(',');
-            date = Y.Date.format(new Date(elems[0], elems[1], elems[2]), {format:"%x"})
+            date = Y.Date.format(new Date(elems[0], elems[1], elems[2]), {format:"%x"});
         } else {
-            date = Y.Date.format(new Date(), {format:"%x"})
+            date = Y.Date.format(new Date(), {format:"%x"});
         }
         Y.one('#searchdate').set('text', date);
     };
@@ -1206,7 +1208,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     /*** Event listeners***/
 
-    //Background selection
+    // Background selection.
     Y.one("#region-main").delegate('click', function(e) {
         var ancestor = this.ancestor('.mail_item');
         mail_toggle_checkbox(this);
@@ -1215,7 +1217,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_customize_menu_actions(this);
     }, '.mail_list .mail_adv_checkbox');
 
-    //Select all/none
+    // Select all/none.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_toggle_checkbox(this);
@@ -1230,7 +1232,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_update_menu_actions();
     }, '.mail_checkbox_all > .mail_adv_checkbox');
 
-    //Toggle menu select all/none
+    // Toggle menu select all/none.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_toggle_menu();
@@ -1239,13 +1241,13 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_hide_menu_search();
     }, '.mail_checkbox_all');
 
-    //Checkbox hides other menus
+    // Checkbox hides other menus.
     Y.one("#region-main").delegate('click', function(e) {
         mail_hide_menu_options();
         mail_hide_menu_labels();
     }, '.mail_checkbox_all > .mail_adv_checkbox');
 
-    //Toggle menu actions
+    // Toggle menu actions.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_toggle_menu_actions();
@@ -1254,7 +1256,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_hide_menu_search();
     }, '.mail_more_actions');
 
-    //Toggle menu actions
+    // Toggle menu actions.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_label_default_values();
@@ -1265,7 +1267,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_hide_menu_search();
     }, '.mail_assignlbl');
 
-    //Menu select all
+    // Menu select all.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
@@ -1273,14 +1275,14 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_update_menu_actions();
     }, '.mail_menu_option_all');
 
-    //Menu select none
+    // Menu select none.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
         mail_select_none();
     }, '.mail_menu_option_none');
 
-    //Menu select read
+    // Menu select read.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
@@ -1289,7 +1291,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_update_menu_actions();
     }, '.mail_menu_option_read');
 
-    //Menu select unread
+    // Menu select unread.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
@@ -1298,7 +1300,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_update_menu_actions();
     }, '.mail_menu_option_unread');
 
-    //Menu select starred
+    // Menu select starred.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
@@ -1307,7 +1309,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_update_menu_actions();
     }, '.mail_menu_option_starred');
 
-    //Menu select unstarred
+    // Menu select unstarred.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_toggle_menu();
@@ -1324,99 +1326,99 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         e.stopPropagation();
     }, '.mail_labelselect');
 
-    //Menu action starred
+    // Menu action starred.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('starred');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasstarred');
 
-    //Menu action unstarred
+    // Menu action unstarred.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('unstarred');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasunstarred');
 
-    //Menu action markasread
+    // Menu action markasread.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('markasread');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasread');
 
-    //Menu action markasunread
+    // Menu action markasunread.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('markasunread');
         mail_update_menu_actions();
     }, '.mail_menu_action_markasunread');
 
-    //Menu action editlabel
+    // Menu action editlabel.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_label_edit();
     }, '.mail_menu_action_editlabel');
 
-    //Menu action removelabel
+    // Menu action removelabel.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_label_confirm_delete(e);
     }, '.mail_menu_action_removelabel');
 
-    //Starred and unstarred
+    // Starred and unstarred.
     Y.one('#region-main').delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('togglestarred', this);
         mail_update_menu_actions();
     }, '.mail_flags a');
 
-    //Delete button
+    // Delete button.
     Y.one("#region-main").delegate('click', function(e) {
         if (!this.hasClass('mail_button_disabled')) {
             mail_doaction('delete');
         }
     }, '#mail_delete');
 
-    //Discard button
+    // Discard button.
     Y.one("#region-main").delegate('click', function(e) {
         if (!this.hasClass('mail_button_disabled')) {
             mail_doaction('discard');
         }
     }, '#mail_discard');
 
-    //Restore button
+    // Restore button.
     Y.one("#region-main").delegate('click', function(e) {
         if (!this.hasClass('mail_button_disabled')) {
             mail_doaction('restore');
         }
     }, '#mail_restore');
 
-    //Prev page button
+    // Prev page button.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('prevpage');
     }, 'input[name="prevpage"]');
 
-    //Prev page button
+    // Prev page button.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('nextpage');
     }, 'input[name="nextpage"]');
 
-    //Go back button
+    // Go back button.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('goback');
     }, '.mail_goback');
 
-    //Mail per page
+    // Mail per page.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('perpage', this);
     }, 'div.mail_perpage a');
 
-    //Hide all menus
+    // Hide all menus.
     Y.on('click', function(e) {
         mail_hide_menu_options();
         mail_hide_menu_actions();
@@ -1424,31 +1426,31 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_hide_menu_search();
     }, 'body');
 
-    //Show message
+    // Show message.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doaction('viewmail', this);
     }, 'a.mail_link');
 
-    //Click apply changes on labels
+    // Click apply changes on labels.
     Y.one("#region-main").delegate('click', function(e) {
         mail_hide_menu_labels();
         mail_doaction('assignlabels');
     }, '.mail_menu_label_apply');
 
-    //Click new label
+    // Click new label.
     Y.one("#region-main").delegate('click', function(e) {
         mail_hide_menu_labels();
         mail_label_new();
     }, '.mail_menu_label_newlabel');
 
-    //Click label on menu labels
+    // Click label on menu labels.
     Y.one("#region-main").delegate('click', function(e) {
         mail_menu_label_selection(this);
         mail_customize_menu_label();
     }, '.mail_menu_labels li');
 
-    //Click notification bar undo
+    // Click notification bar undo.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         var ancestor = Y.one('#mail_notification');
@@ -1458,7 +1460,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
     }, '#mail_notification_undo');
 
-    //Click cancel search button
+    // Click cancel search button.
     Y.one("#region-main").delegate('click', function(e) {
         e.preventDefault();
         mail_doing_search = false;
@@ -1469,8 +1471,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_reset_date_selected();
     }, '#buttoncancelsearch');
 
-
-    //Click search button
+    // Click search button.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         var date;
@@ -1484,19 +1485,19 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_set_selected_date(mail_date_selected);
     }, '#mail_search');
 
-    //Click menu search
+    // Click menu search.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         M.form.dateselector.panel.hide();
     }, '#mail_menu_search');
 
-    //Click adv search
+    // Click adv search.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
         mail_toggle_adv_search();
     }, '#mail_toggle_adv_search');
 
-    //Click date search
+    // Click date search.
     Y.one("#local_mail_main_form").delegate('click', function(e) {
         e.stopPropagation();
         if(Y.one('#dateselector-calendar-panel').hasClass('yui3-overlay-hidden')) {
@@ -1516,7 +1517,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
     }, '#dateselector-calendar-panel');
 
-    //Click on button search
+    // Click on button search.
     Y.one("#region-main").delegate('keydown', function(e) {
         e.stopPropagation();
         if (e.keyCode == 13) {
@@ -1525,12 +1526,12 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
     }, '#textsearch, #textsearchfrom, #textsearchto');
 
-    //Click on button search
+    // Click on button search.
     Y.one("#region-main").delegate('click', function(e) {
         mail_do_search();
     }, '#buttonsearch');
 
-    //Initialize
+    // Initialize.
     init();
     mail_update_url();
 });
