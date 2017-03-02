@@ -96,7 +96,7 @@ function local_mail_setup_page($course, $url) {
 }
 
 function local_mail_send_notifications($message) {
-    global $SITE;
+    global $CFG, $SITE;
 
     $plaindata = new stdClass;
     $htmldata = new stdClass;
@@ -122,7 +122,9 @@ function local_mail_send_notifications($message) {
         $fullplainmessage = format_text_email(get_string('notificationbody', 'local_mail', $plaindata), $message->format());
 
         $eventdata = new \core\message\message();
-        $eventdata->courseid          = $message->course()->id;
+        if ($CFG->branch >= 32) {
+            $eventdata->courseid      = $message->course()->id;
+        }
         $eventdata->component         = 'local_mail';
         $eventdata->name              = 'mail';
         $eventdata->userfrom          = $message->sender();
