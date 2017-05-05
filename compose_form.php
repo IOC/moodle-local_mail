@@ -164,6 +164,12 @@ class mail_compose_form extends moodleform {
 
         $content = '';
 
+        if (method_exists($OUTPUT, 'image_url')) {
+            $imageurl = 'image_url';
+        } else {
+            $imageurl = 'pix_url';
+        }
+
         foreach ($users as $user) {
             $content .= html_writer::start_tag('div', array('class' => 'mail_recipient'));
             $options = array('courseid' => $message->course(),
@@ -172,7 +178,7 @@ class mail_compose_form extends moodleform {
             $content .= html_writer::tag('span', s(fullname($user)));
             $attributes = array('type' => 'image',
                                 'name' => "remove[{$user->id}]",
-                                'src' => $OUTPUT->pix_url('t/delete'),
+                                'src' => $OUTPUT->$imageurl('t/delete'),
                                 'alt' => get_string('remove'));
             $content .= html_writer::tag('input', '', $attributes);
             $content .= html_writer::end_tag('div');

@@ -25,6 +25,13 @@ defined('MOODLE_INTERNAL') || die;
 
 class local_mail_renderer extends plugin_renderer_base {
 
+    private function custom_image_url($imagename, $component = 'moodle') {
+        if (method_exists($this->output, 'image_url')) {
+            return $this->output->image_url($imagename, $component);
+        }
+        return $this->output->pix_url($imagename, $component);
+    }
+
     public function date($message, $viewmail = false) {
         $tz = core_date::get_user_timezone();
         $date = new DateTime('now', new DateTimeZone($tz));
@@ -331,7 +338,7 @@ class local_mail_renderer extends plugin_renderer_base {
         );
         $output .= html_writer::start_tag('span', $attributes);
         $output .= html_writer::tag('span', $label);
-        $url = $this->output->pix_url('t/expanded', 'moodle');
+        $url = $this->custom_image_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
         $output .= html_writer::end_tag('span');
         // List labels and options.
@@ -389,7 +396,7 @@ class local_mail_renderer extends plugin_renderer_base {
     public function selectall() {
         $output = html_writer::start_tag('span', array('class' => 'mail_hidden mail_button mail_checkbox_all'));
         $output .= html_writer::tag('span', '', array('class' => 'mail_selectall mail_adv_checkbox mail_checkbox0'));
-        $url = $this->output->pix_url('t/expanded', 'moodle');
+        $url = $this->custom_image_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expand'));
         $output .= html_writer::end_tag('span');
         // Menu options.
@@ -422,7 +429,7 @@ class local_mail_renderer extends plugin_renderer_base {
     public function moreactions() {
         $output = html_writer::start_tag('span', array('class' => 'mail_hidden singlebutton mail_button mail_more_actions'));
         $output .= html_writer::tag('span', get_string('moreactions', 'local_mail'));
-        $url = $this->output->pix_url('t/expanded', 'moodle');
+        $url = $this->custom_image_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
         $output .= html_writer::end_tag('span');
         // Menu options.
@@ -475,7 +482,7 @@ class local_mail_renderer extends plugin_renderer_base {
         );
         $output = html_writer::start_tag('span', $attributes);
         $output .= html_writer::tag('span', get_string('search', 'local_mail'));
-        $url = $this->output->pix_url('t/expanded', 'moodle');
+        $url = $this->custom_image_url('t/expanded', 'moodle');
         $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
         $output .= html_writer::end_tag('span');
         $attributes = array(
@@ -488,7 +495,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::start_tag('div');
         $output .= html_writer::empty_tag('input', $attributes);
         $output .= html_writer::end_tag('div');
-        $url = $this->output->pix_url('t/collapsed', 'moodle');
+        $url = $this->custom_image_url('t/collapsed', 'moodle');
         $output .= html_writer::start_tag('div', array('id' => 'mail_toggle_adv_search', 'class' => 'mail_adv_search'));
         $output .= html_writer::empty_tag('img', array('id' => 'mail_adv_status', 'src' => $url, 'alt' => 'collapsed'));
         $output .= html_writer::tag('span', get_string('advsearch', 'local_mail'));
@@ -541,7 +548,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $output .= html_writer::label($text, null);
         $output .= html_writer::start_tag('span', array('class' => 'mail_search_date'));
         $output .= html_writer::tag('span', '', array('id' => 'searchdate', ''));
-        $url = $this->output->pix_url('i/calendar', 'core');
+        $url = $this->custom_image_url('i/calendar', 'core');
         $attributes = array(
             'id' => 'mail_toggle_datepicker',
             'class' => 'mail_toggle_datepicker',
@@ -792,7 +799,7 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::empty_tag('input', $attributes);
         $attributes = array('type' => 'image',
                                 'name' => "remove_all",
-                                'src' => $this->output->pix_url('t/delete'),
+                                'src' => $this->custom_image_url('t/delete'),
                                 'alt' => get_string('remove'));
         $content .= html_writer::empty_tag('input', $attributes);
         $content .= html_writer::end_tag('span');
@@ -866,7 +873,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $content .= html_writer::empty_tag('input', $attributes);
             $attributes = array('type' => 'image',
                             'name' => "remove[{$participant->id}]",
-                            'src' => $this->output->pix_url('t/delete'),
+                            'src' => $this->custom_image_url('t/delete'),
                             'alt' => get_string('remove'));
             if (!$selected) {
                 $attributes['class'] = 'mail_novisible';
