@@ -981,7 +981,12 @@ class local_mail_renderer extends plugin_renderer_base {
             if (count($attachments) > 1) {
                 $text = get_string('attachnumber', 'local_mail', count($attachments));
                 $output .= html_writer::tag('span', $text, array('class' => 'mail_attachment_text'));
-                $downloadurl = new moodle_url($this->page->url, array('downloadall' => '1'));
+                $urlparams = array(
+                    't' => 'course',
+                    'm' => $message->id(),
+                    'downloadall' => '1',
+                );
+                $downloadurl = new moodle_url('/local/mail/view.php', $urlparams);
                 $text = get_string('downloadall', 'local_mail');
                 $iconimage = $this->output->pix_icon('a/download_all', $text, 'moodle', array('class' => 'icon'));
                 $output .= html_writer::start_div('mail_attachment_downloadall');
