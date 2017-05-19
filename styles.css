@@ -107,6 +107,7 @@
     text-align: center;
     width: 16px;
     height: 16px;
+    z-index: 1;
 }
 
 .mail_adv_search {
@@ -338,7 +339,7 @@
 }
 
 .mail_list .mail_summary {
-    width: 45%;
+    width: 43%;
     text-overflow: ellipsis;
 }
 
@@ -398,6 +399,21 @@
 
 /* Toolbar */
 
+.mail_toolbar.fixed {
+    position: fixed;
+    background-color: #fafafa;
+    width: 100%;
+    top: 10px;
+    box-shadow: 2px 3px 5px 0px rgba(200,200,200, 0.3);
+    z-index: 1;
+}
+
+.mail_toolbar.fixed .mail_paging {
+    float: none;
+    position: fixed;
+    right: 13px;
+}
+
 .mail_toolbar,
 .mail_toolbar_down {
     font-size: 1em;
@@ -405,7 +421,8 @@
 }
 
 .mail_toolbar .mail_paging {
-    float: right;
+    position: absolute;
+    right: 13px;
 }
 
 .mail_toolbar .singlebutton,
@@ -414,6 +431,34 @@
     margin-top: 0.4em;
     margin-right: 0.5em;
     min-width: 4em;
+}
+
+.mail_toolbar .mail_button.mail_toggle_buttons {
+    display: block;
+    float: left;
+    width: 2em;
+    padding: 10px 15px;
+}
+
+.mail_toolbar .mail_button.mail_toggle_buttons::before {
+    content: '';
+    margin: 0;
+    padding: 0;
+    display: inline;
+}
+
+.mail_toolbar .mail_toggle_buttons .mail_icon-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background-color: grey;
+  .border-radius(1px);
+  .box-shadow(0 1px 0 rgba(0,0,0,.25));
+}
+
+
+.mail_toggle_buttons .mail_icon-bar + .mail_icon-bar {
+  margin-top: 3px;
 }
 
 .mail_toolbar .mail_checkbox_all {
@@ -649,6 +694,7 @@
 }
 
 .mail_buttons {
+    clear: left;
     float: left;
 }
 

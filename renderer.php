@@ -578,6 +578,19 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    public function toggle_buttons() {
+        $attributes = array(
+            'id' => 'mail_toggle_buttons',
+            'class' => 'singlebutton mail_button mail_toggle_buttons mail_hidden'
+        );
+        $output .= html_writer::start_tag('div', $attributes);
+        $output .= html_writer::tag('span', '', array('class' => 'mail_icon-bar'));
+        $output .= html_writer::tag('span', '', array('class' => 'mail_icon-bar'));
+        $output .= html_writer::tag('span', '', array('class' => 'mail_icon-bar'));
+        $output .= html_writer::end_tag('div');
+        return $output;
+    }
+
     public function editlabelform() {
         $attributes = array(
             'id' => 'local_mail_form_edit_label',
@@ -1045,6 +1058,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $output = $this->forward($viewcourse);
             $toolbardown = true;
         } else {
+            $toggle = $this->toggle_buttons();
             $selectall = $this->selectall();
             $labels = $extended = $goback = $search = $selectedlbl = '';
             if (!$trash and $type !== 'trash') {
@@ -1075,7 +1089,8 @@ class local_mail_renderer extends plugin_renderer_base {
             }
             $more = $this->moreactions();
             $clearer = $this->output->container('', 'clearer');
-            $left = html_writer::tag('div',
+            $left = $toggle;
+            $left .= html_writer::tag('div',
                 $goback . $selectall . $labels . $read . $unread . $delete . $extended . $more . $search . $selectedlbl,
                 array('class' => 'mail_buttons'));
             $output = $left . $pagingbar . $clearer;
