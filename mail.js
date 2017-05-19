@@ -36,6 +36,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_create_edit_label_panel();
         mail_create_new_label_panel();
         mail_define_label_handlers();
+        mail_fixed_toolbar_buttons();
+        mail_show_hide_toolbar_buttons();
     };
 
     var mail_define_label_handlers = function () {
@@ -236,6 +238,18 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             position[1] += button.get('clientHeight') + 2;
             menu.toggleClass('mail_hidden');
             menu.setXY(position);
+        }
+    };
+
+    var mail_position_button_menu = function(buttonname, menuname) {
+        var button = Y.one('.mail_' + buttonname);
+        var menu = Y.one('.mail_' + menuname);
+        if (button && menu) {
+            var position = button.getXY();
+            if (!button.hasClass('mail_button_disabled')) {
+                position[1] += button.get('clientHeight') + 2;
+                menu.setXY(position);
+            }
         }
     };
 
@@ -592,6 +606,47 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         if (mail_view_type == 'label') {
             mail_enable_button(Y.one('.mail_toolbar .mail_more_actions'), true);
         }
+        if (Y.one('#mail_toggle_buttons')) {
+            mail_enable_button(Y.one('#mail_toggle_buttons'), true);
+        }
+    };
+
+    var mail_toggle_all_buttons = function() {
+        var node = Y.one('.mail_toolbar .mail_buttons');
+        if (node) {
+            node.toggleView();
+        }
+    };
+
+    var mail_show_hide_toolbar_buttons = function() {
+        var width = Y.one('body').get('offsetWidth');
+        if (width < 990) {
+            Y.one('.mail_toggle_buttons').removeClass('mail_hidden');
+            Y.one('.mail_buttons').hide();
+        } else {
+            Y.one('.mail_toggle_buttons').addClass('mail_hidden');
+            Y.one('.mail_buttons').show();
+        }
+    };
+
+    var mail_fixed_toolbar_buttons = function() {
+        var navbar = Y.one('.navbar-fixed-top');
+        var posheader = navbar.get('offsetHeight');
+        var node = Y.one('.mail_toolbar');
+
+        if (window.scrollY > posheader) {
+            node.addClass('fixed');
+            if (navbar.getStyle('position') != 'fixed') {
+                node.setStyle('top', '0');
+            } else {
+                node.setStyle('top', posheader + 'px');
+            }
+        } else {
+            node.removeClass('fixed');
+        }
+        mail_position_button_menu('assignlbl', 'labelselect');
+        mail_position_button_menu('more_actions', 'actselect');
+        mail_position_button_menu('search_button', 'menu_search');
     };
 
     var mail_get_checkboxs_checked = function(){
@@ -1474,7 +1529,6 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     // Click search button.
     Y.one("#region-main").delegate('click', function(e) {
         e.stopPropagation();
-        var date;
         mail_hide_menu_options();
         mail_hide_menu_actions();
         mail_hide_menu_labels();
@@ -1507,6 +1561,16 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         }
     }, '.mail_search_date');
 
+    // Click toggle buttons.
+    Y.one("#region-main").delegate('click', function(e) {
+        e.stopPropagation();
+        mail_hide_menu_options();
+        mail_hide_menu_actions();
+        mail_hide_menu_labels();
+        mail_hide_menu_search();
+        mail_toggle_all_buttons();
+    }, '#mail_toggle_buttons');
+
     Y.on('contentready', function() {
         if (M.form.dateselector.calendar) {
             M.form.dateselector.calendar.on('dateClick', mail_get_selected_date);
@@ -1530,6 +1594,15 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     Y.one("#region-main").delegate('click', function(e) {
         mail_do_search();
     }, '#buttonsearch');
+
+    Y.on('scroll', function(e) {
+        mail_fixed_toolbar_buttons();
+    });
+
+    Y.one(window).on('resize', function(e){
+        mail_fixed_toolbar_buttons();
+        mail_show_hide_toolbar_buttons();
+    });
 
     // Initialize.
     init();
