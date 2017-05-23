@@ -482,99 +482,7 @@ class local_mail_renderer extends plugin_renderer_base {
         );
         $output = html_writer::start_tag('span', $attributes);
         $output .= html_writer::tag('span', get_string('search', 'local_mail'));
-        $url = $this->custom_image_url('t/expanded', 'moodle');
-        $output .= html_writer::empty_tag('img', array('src' => $url, 'alt' => 'expanded'));
         $output .= html_writer::end_tag('span');
-        $attributes = array(
-            'type' => 'text',
-            'id' => 'textsearch',
-            'name' => 'textsearch',
-            'maxlength' => 45
-        );
-        $output .= html_writer::start_tag('div', array('id' => 'mail_menu_search', 'class' => 'mail_hidden mail_menu_search'));
-        $output .= html_writer::start_tag('div');
-        $output .= html_writer::empty_tag('input', $attributes);
-        $output .= html_writer::end_tag('div');
-        $url = $this->custom_image_url('t/collapsed', 'moodle');
-        $output .= html_writer::start_tag('div', array('id' => 'mail_toggle_adv_search', 'class' => 'mail_adv_search'));
-        $output .= html_writer::empty_tag('img', array('id' => 'mail_adv_status', 'src' => $url, 'alt' => 'collapsed'));
-        $output .= html_writer::tag('span', get_string('advsearch', 'local_mail'));
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('id' => 'mail_adv_search', 'class' => 'mail_hidden'));
-        $attributes = array(
-            'type' => 'text',
-            'id' => 'textsearchfrom',
-            'name' => 'textsearchfrom',
-            'maxlength' => 45
-        );
-        $text = get_string('from', 'local_mail');
-        $output .= html_writer::label($text, 'textsearchfrom');
-        $output .= html_writer::start_tag('div');
-        $output .= html_writer::empty_tag('input', $attributes);
-        $output .= html_writer::end_tag('div');
-        $attributes = array(
-            'type' => 'text',
-            'id' => 'textsearchto',
-            'name' => 'textsearchto',
-            'maxlength' => 45
-        );
-        $text = get_string('to', 'local_mail');
-        $output .= html_writer::label($text, 'textsearchto');
-        $output .= html_writer::start_tag('div');
-        $output .= html_writer::empty_tag('input', $attributes);
-        $output .= html_writer::end_tag('div');
-        $attributes = array(
-            'type' => 'checkbox',
-            'id' => 'searchunread',
-            'name' => 'searchunread'
-        );
-        $output .= html_writer::start_tag('div');
-        $output .= html_writer::empty_tag('input', $attributes);
-        $text = get_string('searchbyunread', 'local_mail');
-        $output .= html_writer::label($text, 'searchunread');
-        $output .= html_writer::end_tag('div');
-        $attributesattach = array(
-            'type' => 'checkbox',
-            'id' => 'searchattach',
-            'name' => 'searchattach'
-        );
-        $output .= html_writer::start_tag('div');
-        $output .= html_writer::empty_tag('input', $attributesattach);
-        $text = get_string('searchbyattach', 'local_mail');
-        $output .= html_writer::label($text, 'searchattach');
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::start_tag('div', array('class' => 'mail_search_datepicker'));
-        $text = get_string('filterbydate', 'local_mail');
-        $output .= html_writer::label($text, null);
-        $output .= html_writer::start_tag('span', array('class' => 'mail_search_date'));
-        $output .= html_writer::tag('span', '', array('id' => 'searchdate', ''));
-        $url = $this->custom_image_url('i/calendar', 'core');
-        $attributes = array(
-            'id' => 'mail_toggle_datepicker',
-            'class' => 'mail_toggle_datepicker',
-            'src' => $url, 'alt' => 'calendar'
-        );
-        $output .= html_writer::empty_tag('img', $attributes);
-        $output .= html_writer::end_tag('span');
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('div');
-        $attributes = array(
-            'type' => 'button',
-            'id' => 'buttoncancelsearch',
-            'name' => 'buttoncancelsearch',
-            'value' => get_string('cancel', 'local_mail'),
-            'class' => 'btn btn-secondary mail_button_cancel_search mail_hidden'
-        );
-        $output .= html_writer::empty_tag('input', $attributes);
-        $attributes = array(
-            'type' => 'button',
-            'id' => 'buttonsearch',
-            'name' => 'buttonsearch',
-            'value' => get_string('search', 'local_mail'),
-            'class' => 'btn btn-secondary mail_button_search'
-        );
-        $output .= html_writer::empty_tag('input', $attributes);
-        $output .= html_writer::end_tag('div');
         return $output;
     }
 
@@ -583,7 +491,7 @@ class local_mail_renderer extends plugin_renderer_base {
             'id' => 'mail_toggle_buttons',
             'class' => 'singlebutton mail_button mail_toggle_buttons mail_hidden'
         );
-        $output .= html_writer::start_tag('div', $attributes);
+        $output = html_writer::start_tag('div', $attributes);
         $output .= html_writer::tag('span', '', array('class' => 'mail_icon-bar'));
         $output .= html_writer::tag('span', '', array('class' => 'mail_icon-bar'));
         $output .= html_writer::tag('span', '', array('class' => 'mail_icon-bar'));
@@ -663,6 +571,107 @@ class local_mail_renderer extends plugin_renderer_base {
         $content .= html_writer::end_tag('div');
         $content .= html_writer::end_tag('div');
         return $content;
+    }
+
+    public function searchform() {
+        $attributes = array(
+            'type' => 'text',
+            'id' => 'textsearch',
+            'name' => 'textsearch',
+            'maxlength' => 45
+        );
+        $output = html_writer::start_tag('div', array('id' => 'local_mail_form_search', 'class' => 'mail_hidden'));
+        $output .= html_writer::start_tag('div', array('class' => 'mail_menu_search'));
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('div');
+        $url = $this->custom_image_url('t/collapsed', 'moodle');
+        $output .= html_writer::start_tag('div', array('id' => 'mail_toggle_adv_search', 'class' => 'mail_toggle_adv_search'));
+        $output .= html_writer::empty_tag('img', array('id' => 'mail_adv_status', 'src' => $url, 'alt' => 'collapsed'));
+        $output .= html_writer::tag('span', get_string('advsearch', 'local_mail'));
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::start_tag('div', array('id' => 'mail_adv_search', 'class' => 'mail_adv_search mail_hidden'));
+        $attributes = array(
+            'type' => 'text',
+            'id' => 'textsearchfrom',
+            'name' => 'textsearchfrom',
+            'maxlength' => 45
+        );
+        $text = get_string('from', 'local_mail');
+        $output .= html_writer::label($text, 'textsearchfrom');
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('div');
+        $attributes = array(
+            'type' => 'text',
+            'id' => 'textsearchto',
+            'name' => 'textsearchto',
+            'maxlength' => 45
+        );
+        $text = get_string('to', 'local_mail');
+        $output .= html_writer::label($text, 'textsearchto');
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('div');
+        $attributes = array(
+            'type' => 'checkbox',
+            'id' => 'searchunread',
+            'name' => 'searchunread'
+        );
+
+        $output .= html_writer::start_div('mail_search_checkboxes');
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $text = get_string('searchbyunread', 'local_mail');
+        $output .= html_writer::label($text, 'searchunread');
+        $output .= html_writer::end_tag('div');
+        $attributesattach = array(
+            'type' => 'checkbox',
+            'id' => 'searchattach',
+            'name' => 'searchattach'
+        );
+        $output .= html_writer::start_tag('div');
+        $output .= html_writer::empty_tag('input', $attributesattach);
+        $text = get_string('searchbyattach', 'local_mail');
+        $output .= html_writer::label($text, 'searchattach');
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_div();
+
+        $output .= html_writer::start_tag('div', array('class' => 'mail_search_datepicker'));
+        $text = get_string('filterbydate', 'local_mail');
+        $output .= html_writer::label($text, null);
+        $output .= html_writer::start_tag('span', array('class' => 'mail_search_date'));
+        $output .= html_writer::tag('span', '', array('id' => 'searchdate', ''));
+        $url = $this->custom_image_url('i/calendar', 'core');
+        $attributes = array(
+            'id' => 'mail_toggle_datepicker',
+            'class' => 'mail_toggle_datepicker',
+            'src' => $url, 'alt' => 'calendar'
+        );
+        $output .= html_writer::empty_tag('img', $attributes);
+        $output .= html_writer::end_tag('span');
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
+        /*$attributes = array(
+            'type' => 'button',
+            'id' => 'buttoncancelsearch',
+            'name' => 'buttoncancelsearch',
+            'value' => get_string('cancel', 'local_mail'),
+            'class' => 'btn btn-secondary mail_button_cancel_search mail_hidden'
+        );
+        $output .= html_writer::empty_tag('input', $attributes);
+        $attributes = array(
+            'type' => 'button',
+            'id' => 'buttonsearch',
+            'name' => 'buttonsearch',
+            'value' => get_string('search', 'local_mail'),
+            'class' => 'btn btn-secondary mail_button_search'
+        );
+        $output .= html_writer::empty_tag('input', $attributes);*/
+        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div');
+
+        return $output;
     }
 
     private function htmllabelcolors($cols = 0, $default = false) {
@@ -1089,7 +1098,10 @@ class local_mail_renderer extends plugin_renderer_base {
             }
             $more = $this->moreactions();
             $clearer = $this->output->container('', 'clearer');
-            $left = $toggle;
+            $left = '';
+            if ($type != 'view') {
+                $left = $toggle;
+            }
             $left .= html_writer::tag('div',
                 $goback . $selectall . $labels . $read . $unread . $delete . $extended . $more . $search . $selectedlbl,
                 array('class' => 'mail_buttons'));
@@ -1227,6 +1239,7 @@ class local_mail_renderer extends plugin_renderer_base {
         ));
         $content .= $this->editlabelform();
         $content .= $this->newlabelform();
+        $content .= $this->searchform();
         $content .= html_writer::end_tag('div');
         $content .= html_writer::start_tag('div', array('class' => 'mail_perpage'));
         $content .= $this->perpage($offset, $mailpagesize);

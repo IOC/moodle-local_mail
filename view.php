@@ -388,7 +388,8 @@ if ($removelbl) {
         'newlabel',
         'erroremptylabelname',
         'undodelete',
-        'undorestore'
+        'undorestore',
+        'search'
         ), 'local_mail');
     $PAGE->requires->strings_for_js(array(
         'submit',
@@ -573,7 +574,8 @@ if ($removelbl) {
         'starred',
         'undodelete',
         'undorestore',
-        'unstarred'
+        'unstarred',
+        'search'
         ), 'local_mail');
      $PAGE->requires->strings_for_js(array(
         'submit',
