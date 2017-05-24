@@ -1192,3 +1192,74 @@
 .dir-rtl .mail_references .mail_info .mail_date {
     float: none;
 }
+
+@media (max-width: 769px) {
+    .mail_adv_checkbox {
+        -ms-transform: scale(1.5, 1.5);
+        -webkit-transform: scale(1.5, 1.5);
+        transform: scale(1.5, 1.5);
+    }
+    .mail_list .mail_item {
+        height: 90px;
+    }
+    .mail_list .mail_adv_checkbox {
+        margin: 34px 10px;
+        float: left;
+        padding: 0;
+    }
+    .mail_list .mail_link {
+        display: block;
+    }
+    .mail_list .mail_users {
+        width: 50%;
+        margin: 5px 0 0 10px;
+    }
+    .mail_list .mail_summary {
+        display: block;
+        width: 74%;
+        margin-left: 34px;
+    }
+    .mail_list .mail_flags {
+        position: absolute;
+        right: 35px;
+        margin-top: 36px;
+        -ms-transform: scale(1.5, 1.5);
+        -webkit-transform: scale(1.5, 1.5);
+        transform: scale(1.5, 1.5);
+    }
+    .has_dock .mail_list .mail_flags {
+        right: 50px;
+    }
+    .mail_list .mail_date {
+        position: absolute;
+        right: 28px;
+        margin-top: -72px;
+    }
+    .has_dock .mail_list .mail_date {
+        right: 43px;
+    }
+    .mail_list .mail_attached {
+        position: absolute;
+        margin-top: -7px;
+        right: 35px;
+        -ms-transform: scale(1.3, 1.3);
+        -webkit-transform: scale(1.3, 1.3);
+        transform: scale(1.3, 1.3);
+    }
+    .has_dock .mail_list .mail_attached {
+        right: 50px;
+    }
+    .mail_perpage {
+        margin: 1em 0;
+    }
+    .mail_menu_search input[name="textsearch"],
+    .mail_menu_search input[name="textsearchfrom"],
+    .mail_menu_search input[name="textsearchto"] {
+        width: 90% !important;
+    }
+    .local_mail_form .label_name,
+    .local_mail_form .label_color {
+        clear: both;
+        padding: 0.5em 0 2em;
+    }
+}
