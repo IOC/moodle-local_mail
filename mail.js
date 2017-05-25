@@ -21,6 +21,9 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var init = function(){
         mail_view_type = Y.one('input[name="type"]').get('value');
+        if (Y.one('.mail_adv_checkbox')) {
+            Y.all('.mail_adv_checkbox').removeClass('mail_hidden');
+        }
         if (Y.one('input[name="m"]')) {
             mail_message_view = true;
             Y.one('.mail_checkbox_all').remove();
