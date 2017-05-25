@@ -400,7 +400,14 @@ if ($removelbl) {
     $PAGE->requires->js_init_code($jslabels);
 
     echo $OUTPUT->header();
-    echo html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'id' => 'local_mail_main_form'));
+    $usesvg = $PAGE->theme->use_svg_icons();
+    $params = array(
+        'method' => 'post',
+        'action' => $url,
+        'id' => 'local_mail_main_form',
+        'class' => ($usesvg ? 'mail_svg' : ''),
+    );
+    echo html_writer::start_tag('form', $params);
     $mailoutput = $PAGE->get_renderer('local_mail');
     echo $mailoutput->toolbar('view', $message->course()->id, array('trash' => ($type === 'trash')));
     echo $mailoutput->notification_bar();
