@@ -65,11 +65,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_create_edit_label_panel = function () {
         var title = M.util.get_string('editlabel', 'local_mail');
-        var obj = (Y.one('.mail_list') ? Y.one('.mail_list') : Y.one('.mail_view'));
-        var position = obj.getXY();
         var bodywidth = Y.one('body').get('offsetWidth');
         var width = (bodywidth > 400 ? 400 : bodywidth - 10);
-        var posx = position[0] + (bodywidth / 2) - width;
         mail_edit_label_panel = new Y.Panel({
             srcNode      : '#local_mail_form_edit_label',
             headerContent: title,
@@ -79,7 +76,6 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             modal        : true,
             visible      : false,
             render       : true,
-            xy           : [posx,position[1]],
             plugins      : [Y.Plugin.Drag]
         });
         mail_edit_label_panel.addButton({
@@ -105,11 +101,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_create_new_label_panel = function () {
         var title = M.util.get_string('newlabel', 'local_mail');
-        var obj = (Y.one('.mail_list') ? Y.one('.mail_list') : Y.one('.mail_view'));
-        var position = obj.getXY();
         var bodywidth = Y.one('body').get('offsetWidth');
         var width = (bodywidth > 400 ? 400 : bodywidth - 10);
-        var posx = position[0] + (bodywidth / 2) - width;
         mail_new_label_panel = new Y.Panel({
             srcNode      : '#local_mail_form_new_label',
             headerContent: title,
@@ -119,7 +112,6 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             modal        : true,
             visible      : false,
             render       : true,
-            xy           : [posx,position[1]],
             plugins      : [Y.Plugin.Drag]
         });
         mail_new_label_panel.addButton({
@@ -145,11 +137,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
 
     var mail_create_new_search_panel = function () {
         var title = M.util.get_string('search', 'local_mail');
-        var obj = (Y.one('.mail_list') ? Y.one('.mail_list') : Y.one('.mail_view'));
-        var position = obj.getXY();
         var bodywidth = Y.one('body').get('offsetWidth');
         var width = (bodywidth > 400 ? 400 : bodywidth - 10);
-        var posx = position[0] + (Y.one('body').get('offsetWidth') / 2) - width;
         mail_new_search_panel = new Y.Panel({
             srcNode      : '#local_mail_form_search',
             headerContent: title,
@@ -159,7 +148,6 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             modal        : true,
             visible      : false,
             render       : true,
-            xy           : [posx,position[1]],
             plugins      : [Y.Plugin.Drag]
         });
         mail_new_search_panel.addButton({

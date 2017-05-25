@@ -35,10 +35,8 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
 
     var mail_create_recipients_panel = function () {
         var title = M.util.get_string('addrecipients', 'local_mail');
-        var width = 500;
-        var obj = Y.one('#region-main');
-        var position = obj.getXY();
-        var posx = position[0] + (Y.one('body').get('offsetWidth') / 2) - width;
+        var bodywidth = Y.one('body').get('offsetWidth');
+        var width = (bodywidth > 500 ? 500 : bodywidth - 10);
 
         if (Y.one('#local_mail_recipients_form')) {
             mail_recipients_panel = new Y.Panel({
@@ -47,11 +45,10 @@ YUI(M.yui.loader).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base'
                 width        : width,
                 autoScroll   : true,
                 zIndex       : 3000,
-                centered     : false,
+                centered     : true,
                 modal        : true,
                 visible      : false,
                 render       : true,
-                xy           : [posx,position[1]],
                 plugins      : [Y.Plugin.Drag]
             });
             mail_recipients_panel.plug(Y.Plugin.Drag,{handles:['.yui3-widget-hd']});
