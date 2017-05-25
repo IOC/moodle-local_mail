@@ -122,7 +122,7 @@ class local_mail_renderer extends plugin_renderer_base {
             $checkbox .= html_writer::empty_tag('input', $attributes);
             $checkbox .= html_writer::end_tag('noscript');
             $attributes = array(
-                    'class' => 'mail_adv_checkbox mail_checkbox0 mail_checkbox_value_' . $message->id()
+                    'class' => 'mail_hidden mail_adv_checkbox mail_checkbox0 mail_checkbox_value_' . $message->id()
             );
             $checkbox .= html_writer::tag('span', '', $attributes);
             $flags = '';
