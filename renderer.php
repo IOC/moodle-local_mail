@@ -1179,10 +1179,17 @@ class local_mail_renderer extends plugin_renderer_base {
         $totalcount = $params['totalcount'];
         $ajax = !empty($params['ajax']);
         $mailpagesize = get_user_preferences('local_mail_mailsperpage', MAIL_PAGESIZE, $USER->id);
+        $usesvg = $this->page->theme->use_svg_icons();
 
         if (!$ajax) {
             $url = new moodle_url($this->page->url);
-            $content .= html_writer::start_tag('form', array('method' => 'post', 'action' => $url, 'id' => 'local_mail_main_form'));
+            $params = array(
+                'method' => 'post',
+                'action' => $url,
+                'id' => 'local_mail_main_form',
+                'class' => ($usesvg ? 'mail_svg' : ''),
+            );
+            $content .= html_writer::start_tag('form', $params);
         }
         $paging = array(
             'offset' => $offset,

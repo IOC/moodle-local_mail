@@ -329,12 +329,24 @@
     background: transparent url('pix/icons.png') no-repeat 0 0;
 }
 
+.mail_svg .mail_checkbox0 {
+    background-image: url('pix/icons.svg');
+}
+
 .mail_checkbox1 {
     background: transparent url('pix/icons.png') no-repeat -18px 0;
 }
 
+.mail_svg .mail_checkbox1 {
+    background-image: url('pix/icons.svg');
+}
+
 .mail_checkbox2 {
     background: transparent url('pix/icons.png') no-repeat -36px 0;
+}
+
+.mail_svg .mail_checkbox2 {
+    background-image: url('pix/icons.svg');
 }
 
 .mail_list .mail_users {
@@ -385,11 +397,19 @@
     background: transparent url('pix/icons.png') no-repeat -54px 0;
 }
 
+.mail_svg .mail_unstarred {
+    background-image: url('pix/icons.svg');
+}
+
 .mail_starred {
     display: inline-block;
     width: 18px;
     height: 18px;
     background: transparent url('pix/icons.png') no-repeat -72px 0;
+}
+
+.mail_svg .mail_starred {
+    background-image: url('pix/icons.svg');
 }
 
 .mail_attached {
@@ -399,6 +419,10 @@
     width: 18px;
     height: 18px;
     background: transparent url('pix/icons.png') no-repeat -90px 0;
+}
+
+.mail_svg .mail_attached {
+    background-image: url('pix/icons.svg');
 }
 
 /* Toolbar */
