@@ -254,6 +254,50 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
+    public function hide() {
+        $type = 'hide';
+        $label = get_string('delete');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => $type,
+            'value' => $label,
+            'class' => 'mail_button singlebutton'
+        );
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        $attributes = array(
+            'id' => 'mail_' . $type,
+            'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'
+        );
+        $output .= html_writer::start_tag('span', $attributes);
+        $output .= html_writer::tag('span', $label);
+        $output .= html_writer::end_tag('span');
+        return $output;
+    }
+
+    public function empty_trash() {
+        $type = 'emptytrash';
+        $label = get_string('emptytrash', 'local_mail');
+        $attributes = array(
+            'type' => 'submit',
+            'name' => $type,
+            'value' => $label,
+            'class' => 'mail_button singlebutton'
+        );
+        $output = html_writer::start_tag('noscript');
+        $output .= html_writer::empty_tag('input', $attributes);
+        $output .= html_writer::end_tag('noscript');
+        $attributes = array(
+            'id' => 'mail_' . $type,
+            'class' => 'singlebutton mail_button mail_button_disabled mail_hidden'
+        );
+        $output .= html_writer::start_tag('span', $attributes);
+        $output .= html_writer::tag('span', $label);
+        $output .= html_writer::end_tag('span');
+        return $output;
+    }
+
     public function reply($enabled = true) {
         $label = get_string('reply', 'local_mail');
         $attributes = array(
@@ -1079,6 +1123,12 @@ class local_mail_renderer extends plugin_renderer_base {
                 $delete = $this->delete($trash);
             } else {
                 $delete = $this->discard();
+            }
+            if ($trash) {
+                $delete .= $this->hide();
+                if ($type !== 'view') {
+                    $delete .= $this->empty_trash();
+                }
             }
             $pagingbar = '';
             if ($type !== 'view') {

@@ -93,7 +93,7 @@ class restore_local_mail_plugin extends restore_local_plugin {
         if ((!$message->draft or $data->role == 'from') and !$data->deleted) {
             $this->add_to_index($data->userid, 'course', $message->courseid, $message->id, $message->time, $data->unread);
         }
-        if ($data->deleted) {
+        if ($data->deleted and $data->deleted == 1) {
             $this->add_to_index($data->userid, 'trash', 0, $message->id, $message->time, $data->unread);
         }
 

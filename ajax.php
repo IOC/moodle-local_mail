@@ -85,7 +85,9 @@ $validactions = array(
     'setlabel',
     'getrecipients',
     'updaterecipients',
-    'search'
+    'search',
+    'hide',
+    'emptytrash'
 );
 
 $nomessageactions = array(
@@ -94,7 +96,8 @@ $nomessageactions = array(
     'perpage',
     'goback',
     'setlabel',
-    'search'
+    'search',
+    'emptytrash'
 );
 
 if ($action and in_array($action, $validactions) and !empty($USER->id)) {
@@ -290,6 +293,22 @@ if ($action and in_array($action, $validactions) and !empty($USER->id)) {
         array_push($params, $type);
         array_push($params, $itemid);
         array_push($params, $searchdata);
+    } else if ($action === 'hide') {
+        $func = 'local_mail_hide';
+        array_push($params, $messages);
+        if ($type != 'course' and $type != 'label') {
+            $itemid = 0;
+        }
+        array_push($params, $itemid);
+        array_push($params, $type);
+        array_push($params, $offset);
+        array_push($params, $mailpagesize);
+        array_push($params, $searchdata);
+    } else if ($action === 'emptytrash') {
+        $func = 'local_mail_empty_trash';
+        array_push($params, 0);
+        array_push($params, 'trash');
+        array_push($params, $mailpagesize);
     }
     echo json_encode(call_user_func_array($func, $params));
 } else {
@@ -378,6 +397,50 @@ function local_mail_setdelete($messages, $bool, $itemid, $type, $offset, $mailpa
         'info' => local_mail_get_info(),
         'html' => $content,
         'undo' => implode(",", $ids)
+    );
+}
+
+function local_mail_hide($messages, $itemid, $type, $offset, $mailpagesize, $search) {
+    global $USER;
+
+    $ids = array();
+    $content = '';
+    $totalcount = local_mail_message::count_index($USER->id, $type, $itemid);
+    foreach ($messages as $message) {
+        if ($message->viewable($USER->id)) {
+            $message->set_invisible($USER->id);
+            array_push($ids, $message->id());
+            $totalcount -= 1;
+        }
+    }
+    if ($offset > $totalcount - 1) {
+        $offset = max(0, $offset - $mailpagesize);
+    }
+    if (!empty($search)) {
+        $data = local_mail_searchmessages($type, $itemid, $search, $offset);
+        $data['info'] = local_mail_get_info();
+        return $data;
+    } else {
+        $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
+        $content = local_mail_print_messages($itemid, $type, $offset, $messages, $totalcount);
+    }
+    return array(
+        'info' => local_mail_get_info(),
+        'html' => $content
+    );
+}
+
+function local_mail_empty_trash($itemid, $type, $mailpagesize) {
+    global $USER;
+
+    local_mail_message::empty_trash($USER->id);
+
+    $messages = array();
+    $content = local_mail_print_messages($itemid, $type, 0, $messages, 0);
+
+    return array(
+        'info' => local_mail_get_info(),
+        'html' => $content
     );
 }
 

@@ -26,6 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once('label.class.php');
 
+define('LOCAL_MAIL_MESSAGE_VISIBLE', 0);
+define('LOCAL_MAIL_MESSAGE_DELETED', 1);
+define('LOCAL_MAIL_MESSAGE_INVISIBLE', 2);
+
 class local_mail_message {
 
     private static $indextypes = array(
@@ -118,7 +122,7 @@ class local_mail_message {
         $record->role = $message->role[$userid] = 'from';
         $record->unread = $message->unread[$userid] = false;
         $record->starred = $message->starred[$userid] = false;
-        $record->deleted = $message->deleted[$userid] = false;
+        $record->deleted = $message->deleted[$userid] = LOCAL_MAIL_MESSAGE_VISIBLE;
         $DB->insert_record('local_mail_message_users', $record);
 
         $message->create_index($userid, 'drafts');
@@ -289,6 +293,20 @@ class local_mail_message {
         return !empty($query['after']) ? array_reverse($result) : $result;
     }
 
+    static public function empty_trash($userid) {
+        global $DB;
+
+        $messages = self::fetch_index($userid, 'trash');
+
+        if (empty($messages)) {
+            return;
+        }
+
+        foreach ($messages as $message) {
+            $message->set_invisible($userid);
+        }
+    }
+
     public function add_label(local_mail_label $label) {
         global $DB;
 
@@ -323,7 +341,7 @@ class local_mail_message {
         $record->role = $this->role[$userid] = $role;
         $record->unread = $this->unread[$userid] = true;
         $record->starred = $this->starred[$userid] = false;
-        $record->deleted = $this->deleted[$userid] = false;
+        $record->deleted = $this->deleted[$userid] = LOCAL_MAIL_MESSAGE_VISIBLE;
         $DB->insert_record('local_mail_message_users', $record);
     }
 
@@ -449,7 +467,8 @@ class local_mail_message {
         global $DB;
         assert($this->has_user($label->userid()));
         assert(!$this->draft or $this->role[$label->userid()] == 'from');
-        assert(!$this->deleted($label->userid()));
+        assert($this->deleted($label->userid()) == LOCAL_MAIL_MESSAGE_VISIBLE
+            or $this->deleted($label->userid()) == LOCAL_MAIL_MESSAGE_INVISIBLE);
 
         if (isset($this->labels[$label->id()])) {
             $transaction = $DB->start_delegated_transaction();
@@ -591,14 +610,14 @@ class local_mail_message {
         assert($this->has_user($userid));
         assert(!$this->draft or $this->role[$userid] == 'from');
 
-        if ($this->deleted[$userid] == (bool) $value) {
+        if ($this->deleted[$userid] == $value) {
             return;
         }
 
         $transaction = $DB->start_delegated_transaction();
 
         $conditions = array('messageid' => $this->id, 'userid' => $userid);
-        $DB->set_field('local_mail_message_users', 'deleted', (bool) $value, $conditions);
+        $DB->set_field('local_mail_message_users', 'deleted', $value, $conditions);
 
         if ($value) {
             $this->delete_index($userid);
@@ -621,7 +640,30 @@ class local_mail_message {
 
         $transaction->allow_commit();
 
-        $this->deleted[$userid] = (bool) $value;
+        $this->deleted[$userid] = $value;
+    }
+
+    public function set_invisible($userid) {
+        global $DB;
+
+        assert($this->has_user($userid));
+        assert(!$this->draft or $this->role[$userid] == 'from');
+        assert($this->deleted[$userid]);
+
+        if ($this->deleted[$userid] == LOCAL_MAIL_MESSAGE_INVISIBLE) {
+            return;
+        }
+
+        $transaction = $DB->start_delegated_transaction();
+        $conditions = array('messageid' => $this->id, 'userid' => $userid);
+        $DB->set_field('local_mail_message_users', 'deleted', LOCAL_MAIL_MESSAGE_INVISIBLE, $conditions);
+        $this->delete_index($userid);
+        $transaction->allow_commit();
+
+        $this->deleted[$userid] = LOCAL_MAIL_MESSAGE_INVISIBLE;
+        foreach ($this->labels($userid) as $label) {
+            $this->remove_label($label);
+        }
     }
 
     public function set_starred($userid, $value) {
@@ -692,7 +734,8 @@ class local_mail_message {
         global $DB;
 
         if ($this->has_user($userid)) {
-            return !$this->draft or $this->role[$userid] == 'from';
+            return ($this->deleted[$userid] != LOCAL_MAIL_MESSAGE_INVISIBLE
+                    and (!$this->draft or $this->role[$userid] == 'from'));
         }
 
         if ($includerefs) {
@@ -744,7 +787,7 @@ class local_mail_message {
                 $message->role[$r->userid] = $r->role;
                 $message->unread[$r->userid] = (bool) $r->unread;
                 $message->starred[$r->userid] = (bool) $r->starred;
-                $message->deleted[$r->userid] = (bool) $r->deleted;
+                $message->deleted[$r->userid] = (int) $r->deleted;
                 $fields = user_picture::fields('', array('username', 'maildisplay'));
                 $userfields = array();
                 foreach (explode(',', $fields) as $value) {

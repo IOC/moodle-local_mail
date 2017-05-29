@@ -32,6 +32,9 @@ $courseid    = optional_param('c', 0, PARAM_INT);
 $labelid     = optional_param('l', 0, PARAM_INT);
 $delete      = optional_param('delete', false, PARAM_ALPHA);
 $discard     = optional_param('discard', false, PARAM_ALPHA);
+$hide        = optional_param('hide', false, PARAM_BOOL);
+$emptytrash  = optional_param('emptytrash', false, PARAM_BOOL);
+$confirmmsg  = optional_param('confirmmsg', false, PARAM_BOOL);
 $forward     = optional_param('forward', false, PARAM_BOOL);
 $offset      = optional_param('offset', 0, PARAM_INT);
 $nextpage    = optional_param('nextpage', false, PARAM_BOOL);
@@ -100,6 +103,7 @@ if ($removelbl) {
 
         echo $OUTPUT->confirm(get_string('labeldeleteconfirm', 'local_mail', $label->name()), $url, $cancel);
         echo $OUTPUT->footer();
+        die;
     }
 } else if ($editlbl) {
     require_sesskey();
@@ -337,6 +341,27 @@ if ($removelbl) {
         redirect($url);
     }
 
+    if ($hide) {
+        require_sesskey();
+        if ($confirmmsg) {
+            if ($message->viewable($USER->id) and $message->deleted($USER->id)) {
+                $message->set_invisible($USER->id);
+            }
+            redirect($url);
+        } else {
+            echo $OUTPUT->header();
+            $cancel = clone $url;
+            $url->param('t', 'trash');
+            $url->param('m', $message->id());
+            $url->param('confirmmsg', '1');
+            $url->param('hide', '1');
+
+            echo $OUTPUT->confirm(get_string('messagedeleteconfirm', 'local_mail', $message->subject()), $url, $cancel);
+            echo $OUTPUT->footer();
+            die;
+        }
+    }
+
     if ($starred) {
         require_sesskey();
         if (!$message->deleted($USER->id) and $message->id() === $starred) {
@@ -389,7 +414,10 @@ if ($removelbl) {
         'erroremptylabelname',
         'undodelete',
         'undorestore',
-        'search'
+        'search',
+        'delete',
+        'messagedeleteconfirm',
+        'messagesdeleteconfirm',
         ), 'local_mail');
     $PAGE->requires->strings_for_js(array(
         'submit',
@@ -511,11 +539,61 @@ if ($removelbl) {
             }
         }
         if ($offset > $totalcount - 1) {
-            $url->offset = min(0, $offset - $mailpagesize);
+            $url->offset = max(0, $offset - $mailpagesize);
         } else {
             $url->offset = $offset;
         }
         redirect($url);
+    }
+
+    if ($hide) {
+        require_sesskey();
+        if ($confirmmsg) {
+            foreach ($messages as $message) {
+                if (in_array($message->id(), $msgs)) {
+                    if ($message->viewable($USER->id) and $message->deleted($USER->id)) {
+                        $message->set_invisible($USER->id);
+                    }
+                    $totalcount -= 1;
+                }
+            }
+            if ($offset > $totalcount - 1) {
+                $url->offset = max(0, $offset - $mailpagesize);
+            } else {
+                $url->offset = $offset;
+            }
+            redirect($url);
+        } else {
+            echo $OUTPUT->header();
+            $cancel = clone $url;
+            $url->param('confirmmsg', '1');
+            $url->param('hide', '1');
+            foreach ($msgs as $key => $value) {
+                $url->param("msgs[$key]", $value);
+            }
+
+            echo $OUTPUT->confirm(get_string('messagesdeleteconfirm', 'local_mail', count($msgs)), $url, $cancel);
+            echo $OUTPUT->footer();
+            die;
+        }
+    }
+
+    if ($emptytrash) {
+        require_sesskey();
+        if ($confirmmsg) {
+            local_mail_message::empty_trash($USER->id);
+            $url->offset = 0;
+            redirect($url);
+        } else {
+            echo $OUTPUT->header();
+            $cancel = clone $url;
+            $url->param('confirmmsg', '1');
+            $url->param('emptytrash', '1');
+
+            echo $OUTPUT->confirm(get_string('emptytrashconfirm', 'local_mail'), $url, $cancel);
+            echo $OUTPUT->footer();
+            die;
+        }
     }
 
     // Remove.
@@ -582,7 +660,11 @@ if ($removelbl) {
         'undodelete',
         'undorestore',
         'unstarred',
-        'search'
+        'search',
+        'messagedeleteconfirm',
+        'messagesdeleteconfirm',
+        'emptytrash',
+        'emptytrashconfirm',
         ), 'local_mail');
      $PAGE->requires->strings_for_js(array(
         'submit',
