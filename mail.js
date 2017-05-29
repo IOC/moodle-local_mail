@@ -983,7 +983,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                     obj.replaceClass('mail_unstarred', 'mail_starred');
                     node.set('title', M.util.get_string('starred','local_mail'));
                 }
-            } else if (action == 'delete' || action == 'restore') {
+            } else if (action == 'delete' || action == 'restore' || action == 'hide') {
                 mail_undo_function = action;
                 mail_message_view = false;
             } else if (action == 'starred') {
@@ -1013,10 +1013,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 } else {
                     ids = /m=(\d+)/.exec(node.get('href'))[1];
                 }
-            } else if (action == 'delete') {
-                mail_undo_function = action;
-                ids = mail_get_checkboxs_values();
-            } else if (action == 'restore') {
+            } else if (action == 'delete' || action == 'restore' || action == 'hide') {
                 mail_undo_function = action;
                 ids = mail_get_checkboxs_values();
             } else if (action == 'discard') {
@@ -1063,7 +1060,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                         ancestor.removeClass('mail_unread');
                     } else if(action == 'markasunread') {
                         ancestor.addClass('mail_unread');
-                    } else if(action == 'delete' || action == 'restore' || action == 'discard') {
+                    } else if(action == 'delete' || action == 'restore' || action == 'discard' || action == 'hide') {
                         ancestor.remove();
                     } else if(action == 'assignlabels') {
                         mail_assign_labels(node);
@@ -1189,6 +1186,29 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         M.util.show_confirm_dialog(e,
                                     {
                                         'callback' : mail_label_remove,
+                                        'message' : message,
+                                        'continuelabel': M.util.get_string('delete', 'local_mail')
+                                    }
+        );
+    };
+
+    var mail_message_confirm_delete = function(e) {
+        var message;
+        var subject;
+        if (mail_message_view) {
+            subject = Y.one('.mail_subject h3').get('text');
+            if (subject.length > 25) {
+                subject = subject.substring(0, 25) + '...';
+            }
+            message = M.util.get_string('messagedeleteconfirm', 'local_mail', subject);
+        } else {
+            ids = mail_get_checkboxs_checked();
+            message = M.util.get_string('messagesdeleteconfirm', 'local_mail', ids.size());
+        }
+        M.util.show_confirm_dialog(e,
+                                    {
+                                        'callbackargs' : ['hide'],
+                                        'callback' : mail_doaction,
                                         'message' : message,
                                         'continuelabel': M.util.get_string('delete', 'local_mail')
                                     }
@@ -1490,6 +1510,13 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             mail_doaction('restore');
         }
     }, '#mail_restore');
+
+    // Restore button.
+    Y.one("#region-main").delegate('click', function(e) {
+        if (!this.hasClass('mail_button_disabled')) {
+            mail_message_confirm_delete(e);
+        }
+    }, '#mail_hide');
 
     // Prev page button.
     Y.one("#region-main").delegate('click', function(e) {

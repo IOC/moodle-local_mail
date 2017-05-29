@@ -204,6 +204,18 @@ class local_mail_message_test extends local_mail_testcase {
         $result = local_mail_message::count_index(202, 'inbox');
 
         $this->assertEquals(2, $result);
+
+        $message1->set_deleted(202, LOCAL_MAIL_MESSAGE_DELETED);
+
+        $result = local_mail_message::count_index(202, 'trash');
+
+        $this->assertEquals(1, $result);
+
+        $message1->set_invisible(202);
+
+        $result = local_mail_message::count_index(202, 'trash');
+
+        $this->assertEquals(0, $result);
     }
 
     public function test_create() {
@@ -313,14 +325,14 @@ class local_mail_message_test extends local_mail_testcase {
         ));
         $this->loadRecords('local_mail_message_users', array(
              array('messageid', 'userid', 'role', 'unread', 'starred',  'deleted'),
-             array( 501,         201,     'from',  0,        0,          1 ),
-             array( 501,         202,     'to',    0,        1,          0 ),
-             array( 501,         203,     'cc',    1,        0,          0 ),
-             array( 502,         201,     'from',  0,        0,          0 ),
-             array( 503,         201,     'from',  0,        0,          0 ),
-             array( 503,         202,     'to',    0,        0,          0 ),
-             array( 504,         202,     'from',  0,        0,          0 ),
-             array( 504,         201,     'to',    0,        0,          0 ),
+             array( 501,         201,     'from',  0,        0,          LOCAL_MAIL_MESSAGE_DELETED ),
+             array( 501,         202,     'to',    0,        1,          LOCAL_MAIL_MESSAGE_VISIBLE ),
+             array( 501,         203,     'cc',    1,        0,          LOCAL_MAIL_MESSAGE_VISIBLE ),
+             array( 502,         201,     'from',  0,        0,          LOCAL_MAIL_MESSAGE_VISIBLE ),
+             array( 503,         201,     'from',  0,        0,          LOCAL_MAIL_MESSAGE_VISIBLE ),
+             array( 503,         202,     'to',    0,        0,          LOCAL_MAIL_MESSAGE_VISIBLE ),
+             array( 504,         202,     'from',  0,        0,          LOCAL_MAIL_MESSAGE_VISIBLE ),
+             array( 504,         201,     'to',    0,        0,          LOCAL_MAIL_MESSAGE_VISIBLE ),
         ));
         $this->loadRecords('local_mail_message_labels', array(
             array('messageid', 'labelid'),
@@ -345,7 +357,7 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertEquals($this->user1, $result->sender());
         $this->assertFalse($result->unread(201));
         $this->assertFalse($result->starred(201));
-        $this->assertTrue($result->deleted(201));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_DELETED, $result->deleted(201));
         $this->assertCount(1, $result->recipients('to'));
         $this->assertCount(1, $result->recipients('cc'));
         $this->assertCount(0, $result->recipients('bcc'));
@@ -353,10 +365,10 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertContains($this->user3, $result->recipients('cc'));
         $this->assertFalse($result->unread(202));
         $this->assertTrue($result->starred(202));
-        $this->assertFalse($result->deleted(202));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_VISIBLE, $result->deleted(202));
         $this->assertTrue($result->unread(203));
         $this->assertFalse($result->starred(203));
-        $this->assertFalse($result->deleted(203));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_VISIBLE, $result->deleted(203));
         $this->assertCount(2, $result->labels());
         $this->assertContains($label1, $result->labels());
         $this->assertContains($label2, $result->labels());
@@ -705,11 +717,11 @@ class local_mail_message_test extends local_mail_testcase {
         $message->add_label($label2);
         $message->set_starred(201, true);
 
-        $message->set_deleted(201, true);
-        $message->set_deleted(202, true);
+        $message->set_deleted(201, LOCAL_MAIL_MESSAGE_DELETED);
+        $message->set_deleted(202, LOCAL_MAIL_MESSAGE_DELETED);
 
-        $this->assertTrue($message->deleted(201));
-        $this->assertTrue($message->deleted(202));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_DELETED, $message->deleted(201));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_DELETED, $message->deleted(202));
         $this->assertNotIndex(201, 'sent', 0, $message->id());
         $this->assertNotIndex(201, 'starred', 0, $message->id());
         $this->assertNotIndex(201, 'course', $message->course()->id, $message->id());
@@ -721,11 +733,11 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertIndex(202, 'trash', 0, $message->time(), $message->id(), true);
         $this->assertMessage($message);
 
-        $message->set_deleted(201, false);
-        $message->set_deleted(202, false);
+        $message->set_deleted(201, LOCAL_MAIL_MESSAGE_VISIBLE);
+        $message->set_deleted(202, LOCAL_MAIL_MESSAGE_VISIBLE);
 
-        $this->assertFalse($message->deleted(201));
-        $this->assertFalse($message->deleted(202));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_VISIBLE, $message->deleted(201));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_VISIBLE, $message->deleted(202));
         $this->assertIndex(201, 'sent', 0, $message->time(), $message->id(), false);
         $this->assertIndex(201, 'starred', 0, $message->time(), $message->id(), false);
         $this->assertIndex(201, 'course', $message->course()->id, $message->time(), $message->id(), false);
@@ -738,18 +750,49 @@ class local_mail_message_test extends local_mail_testcase {
         $this->assertMessage($message);
     }
 
+    public function test_set_invisible() {
+        $label1 = local_mail_label::create(201, 'label1');
+        $label2 = local_mail_label::create(202, 'label2');
+        $message = local_mail_message::create(201, 101);
+        $message->add_recipient('to', 202);
+        $message->send();
+        $message->add_label($label1);
+        $message->add_label($label2);
+        $message->set_starred(201, true);
+
+        $message->set_deleted(201, LOCAL_MAIL_MESSAGE_DELETED);
+        $message->set_deleted(202, LOCAL_MAIL_MESSAGE_DELETED);
+
+        $message->set_invisible(201);
+        $message->set_invisible(202);
+
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_INVISIBLE, $message->deleted(201));
+        $this->assertEquals(LOCAL_MAIL_MESSAGE_INVISIBLE, $message->deleted(202));
+        $this->assertNotIndex(201, 'sent', 0, $message->id());
+        $this->assertNotIndex(201, 'starred', 0, $message->id());
+        $this->assertNotIndex(201, 'course', $message->course()->id, $message->id());
+        $this->assertNotIndex(201, 'label', $label1->id(), $message->id());
+        $this->assertNotIndex(202, 'inbox', 0, $message->id());
+        $this->assertNotIndex(202, 'course', $message->course()->id, $message->id());
+        $this->assertNotIndex(202, 'label', $label2->id(), $message->id());
+        $this->assertNotIndex(201, 'sent', 0, $message->id());
+        $this->assertNotIndex(201, 'trash', 0, $message->time(), $message->id(), false);
+        $this->assertNotIndex(202, 'trash', 0, $message->time(), $message->id(), true);
+        $this->assertMessage($message);
+    }
+
     public function test_set_deleted_draft() {
         $message = local_mail_message::create(201, 101);
 
-        $message->set_deleted(201, true);
+        $message->set_deleted(201, LOCAL_MAIL_MESSAGE_DELETED);
 
-        $this->assertTrue($message->deleted(201));
+        $this->assertEquals(1, $message->deleted(201));
         $this->assertNotIndex(201, 'drafts', 0, $message->id());
         $this->assertNotIndex(201, 'course', $message->course()->id, $message->id());
         $this->assertIndex(201, 'trash', 0, $message->time(), $message->id(), false);
         $this->assertMessage($message);
 
-        $message->set_deleted(201, false);
+        $message->set_deleted(201, LOCAL_MAIL_MESSAGE_VISIBLE);
 
         $this->assertIndex(201, 'drafts', 0, $message->time(), $message->id(), false);
         $this->assertIndex(201, 'course', $message->course()->id, $message->time(), $message->id(), false);
