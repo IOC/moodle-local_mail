@@ -309,7 +309,7 @@ function local_mail_setstarred ($messages, $bool, $search, $data = false) {
     if ($data and !$data['mailview'] and $data['type'] == 'starred' and !$bool) {
         $totalcount = local_mail_message::count_index($USER->id, $data['type'], $data['itemid']);
         if ($data['offset'] > $totalcount - 1) {
-            $data['offset'] = min(0, max(0, $data['offset'] - $data['mailpagesize']));
+            $data['offset'] = max(0, $data['offset'] - $data['mailpagesize']);
         }
         if (!empty($search)) {
             return local_mail_searchmessages($data['type'], $data['itemid'], $search, $data['offset']);
@@ -362,7 +362,7 @@ function local_mail_setdelete($messages, $bool, $itemid, $type, $offset, $mailpa
         }
     }
     if ($offset > $totalcount - 1) {
-        $offset = min(0, $offset - $mailpagesize);
+        $offset = max(0, $offset - $mailpagesize);
     }
 
     if (!empty($search)) {
@@ -395,7 +395,7 @@ function local_mail_discard($messages, $itemid, $type, $offset, $mailpagesize, $
         }
     }
     if ($offset > $totalcount - 1) {
-        $offset = min(0, $offset - $mailpagesize);
+        $offset = max(0, $offset - $mailpagesize);
     }
 
     if (!empty($search)) {
@@ -479,7 +479,7 @@ function local_mail_assignlabels($messages, $labelids, $labeltsids, $data, $sear
             return local_mail_searchmessages($data['type'], $data['itemid'], $search, false);
         } else {
             if ($data['offset'] > $totalcount - 1) {
-                $data['offset'] = min(0, max(0, $data['offset'] - $data['mailpagesize']));
+                $data['offset'] = max(0, $data['offset'] - $data['mailpagesize']);
             }
             $messages = local_mail_message::fetch_index($USER->id, $data['type'], $data['itemid'],
                                                         $data['offset'], $data['mailpagesize']);

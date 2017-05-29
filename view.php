@@ -530,7 +530,7 @@ if ($removelbl) {
             }
         }
         if ($offset > $totalcount - 1) {
-            $url->offset = min(0, $offset - $mailpagesize);
+            $url->offset = max(0, $offset - $mailpagesize);
         } else {
             $url->offset = $offset;
         }
