@@ -9,11 +9,14 @@ new item in the navigation block called "My Mail".
 
 Project page: http://github.com/IOC/moodle-local-mail
 
+Source code of the mobile addon:
+https://github.com/albertgasset/moodlemobile-local_mail
+
 Authors
 -------
 
 Marc Català <reskit@gmail.com>
-Albert Gasset <albert.gasset@gmail.com>
+Albert Gasset <albertgasset@fsfe.org>
 
 Installation
 ------------
