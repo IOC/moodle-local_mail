@@ -1,4 +1,4 @@
-YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', 'moodle-form-dateselector', 'datatype-date', 'calendar-base', function(Y) {
+YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse', 'panel', 'datatable-base', 'dd-plugin', 'moodle-form-dateselector', 'datatype-date', 'calendar-base', 'anim', function(Y) {
 
     var mail_message_view = false;
     var mail_checkbox_labels_default = {};
@@ -43,6 +43,18 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
         mail_define_label_handlers();
         mail_fixed_toolbar_buttons();
         mail_show_hide_toolbar_buttons();
+    };
+
+    var mail_scroll_top = function() {
+        var g = new Y.Anim(
+          {
+            node: Y.UA.gecko ? 'html' : 'body',
+            to: { scrollTop: 0 },
+            duration: 0.5,
+            easing: Y.Easing.easeBoth
+          }
+        );
+        g.run();
     };
 
     var mail_define_label_handlers = function () {
@@ -854,6 +866,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                 Y.one('#local_mail_main_form').setContent(obj.html);
                 init();
                 mail_update_url();
+                mail_scroll_top();
             }
             if (obj.search) {
                 mail_perpageid = obj.search.perpageid;
