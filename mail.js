@@ -688,7 +688,7 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     };
 
     var mail_fixed_toolbar_buttons = function() {
-        var navbar = Y.one('.navbar-fixed-top');
+        var navbar = Y.one('.navbar-fixed-top,.navbar-static-top');
         var posheader = navbar.get('offsetHeight');
         var node = Y.one('.mail_toolbar');
 
@@ -1149,8 +1149,8 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             var btn = Y.one('.mail_paging input[name="' + action + '"]');
             var position = btn.getXY();
             obj.removeClass('mail_hidden');
-            position[0] += (btn.get('offsetWidth') / 2) - (obj.one('img').get('offsetWidth') / 2);
-            position[1] = btn.getXY()[1] + (obj.one('img').get('offsetHeight') / 2);
+            position[0] += (btn.get('offsetWidth') / 2) - (obj.one('img,.icon').get('offsetWidth') / 2);
+            position[1] = btn.getXY()[1] + (obj.one('img,.icon').get('offsetHeight') / 2);
             obj.setXY(position);
         }
         if (mail_doing_search) {
