@@ -235,62 +235,82 @@ class local_mail_message {
         assert(in_array($type, self::$indextypes));
         assert(empty($query['before']) or empty($query['after']));
 
-        $query['pattern'] = !empty($query['pattern']) ? $query['pattern'] : '';
-        $query['searchfrom'] = !empty($query['searchfrom']) ? $query['searchfrom'] : '';
-        $query['searchto'] = !empty($query['searchto']) ? $query['searchto'] : '';
+        $query['pattern'] = isset($query['pattern']) ? trim($query['pattern']) : '';
+        $query['searchfrom'] = isset($query['searchfrom']) ? trim($query['searchfrom']) : '';
+        $query['searchto'] = isset($query['searchto']) ? trim($query['searchto']) : '';
 
-        $sql = 'SELECT messageid FROM {local_mail_index}'
-            . ' WHERE userid = :userid AND type = :type AND item = :item';
+        $sql = 'SELECT i.messageid FROM {local_mail_index} i';
+        if ($query['pattern'] !== '' OR !empty($query['attach'])) {
+            $sql .= ' JOIN {local_mail_messages} m ON m.id = i.messageid';
+        }
+        $sql .= ' WHERE i.userid = :userid AND type = :type AND i.item = :item';
         $params = array('userid' => $userid, 'type' => $type, 'item' => $item);
         $order = 'DESC';
 
+        if ($query['pattern'] !== '') {
+            list($usersql, $userparams) = users_search_sql($query['pattern']);
+            list($rolesql, $roleparams) = $DB->get_in_or_equal(['from', 'to', 'cc'], SQL_PARAMS_NAMED, 'role');
+            $subjectsql = $DB->sql_like('m.normalizedsubject', ':pattern', false, false);
+            $contentsql = $DB->sql_like('m.normalizedcontent', ':pattern2', false, false);
+            $messageusersql =  'SELECT mu.messageid FROM {local_mail_message_users} mu'
+                . " JOIN {user} u ON u.id = mu.userid WHERE mu.role $rolesql AND $usersql";
+            $sql .= " AND (($subjectsql) OR ($contentsql) OR i.messageid IN ($messageusersql))";
+            $params['pattern'] = '%' . $DB->sql_like_escape(self::normalize_text($query['pattern'])) . '%';
+            $params['pattern2'] = $params['pattern'];
+            $params = array_merge($params, $userparams, $roleparams);
+        }
+
+        if ($query['searchfrom'] !== '') {
+            list($usersql, $userparams) = users_search_sql($query['searchfrom']);
+            $messageusersql = 'SELECT mu.messageid FROM {local_mail_message_users} mu'
+                . " JOIN {user} u ON u.id = mu.userid WHERE mu.role = :rolefrom AND $usersql";
+            $sql .=  " AND i.messageid IN ($messageusersql)";
+            $params['rolefrom'] = 'from';
+            $params = array_merge($params, $userparams);
+        }
+
+        if ($query['searchto'] !== '') {
+            list($usersql, $userparams) = users_search_sql($query['searchto']);
+            $messageusersql = 'SELECT mu.messageid FROM {local_mail_message_users} mu'
+                . " JOIN {user} u ON u.id = mu.userid WHERE mu.role = :roleto AND $usersql";
+            $sql .=  " AND i.messageid IN ($messageusersql)";
+            $params['roleto'] = 'to';
+            $params = array_merge($params, $userparams);
+        }
+
+        if (!empty($query['attach'])) {
+            $sql .= ' AND m.attachments > 0';
+        }
+
         if (!empty($query['time'])) {
-            $sql .= ' AND time <= :time';
+            $sql .= ' AND i.time <= :time';
             $params['time'] = $query['time'];
         }
 
         if (!empty($query['unread'])) {
-            $sql .= ' AND unread = 1';
+            $sql .= ' AND i.unread = 1';
         }
 
         if (!empty($query['before'])) {
             $from = self::fetch($query['before']);
-            $sql .= ' AND time <= :beforetime AND (time < :beforetime2 OR messageid < :beforeid)';
+            $sql .= ' AND i.time <= :beforetime AND (i.time < :beforetime2 OR i.messageid < :beforeid)';
             $params['beforetime'] = $from->time();
             $params['beforetime2'] = $from->time();
             $params['beforeid'] = $from->id();
         } else if (!empty($query['after'])) {
             $from = self::fetch($query['after']);
-            $sql .= ' AND time >= :aftertime AND (time > :aftertime2 OR messageid > :afterid)';
+            $sql .= ' AND i.time >= :aftertime AND (i.time > :aftertime2 OR i.messageid > :afterid)';
             $params['aftertime'] = $from->time();
             $params['aftertime2'] = $from->time();
             $params['afterid'] = $from->id();
             $order = 'ASC';
         }
 
-        $sql .= " ORDER BY time $order, messageid $order";
-        $ids = array_keys($DB->get_records_sql($sql, $params));
-        $result = array();
-        foreach (array_chunk($ids, 100) as $ids) {
-            foreach (self::fetch_many($ids) as $message) {
-                if ($message->match($userid, $query['pattern']) && $message->matchfrom($userid, $query['searchfrom'])
-                    && $message->matchto($userid, $query['searchto'])) {
-                    if (!empty($query['attach'])) {
-                        if ($message->attachments(true)) {
-                            $result[] = $message;
-                        }
-                    } else {
-                        $result[] = $message;
-                    }
-                }
-            }
-            if (!empty($query['limit']) and count($result) >= $query['limit']) {
-                array_splice($result, $query['limit']);
-                break;
-            }
-        }
-
-        return !empty($query['after']) ? array_reverse($result) : $result;
+        $sql .= " ORDER BY i.time $order, i.messageid $order";
+        $limitnum = !empty($query['limit']) ? $query['limit'] : 0;
+        $records = $DB->get_records_sql($sql, $params, 0, $limitnum);
+        $messages = self::fetch_many(array_keys($records));
+        return !empty($query['after']) ? array_reverse($messages) : $messages;
     }
 
     static public function empty_trash($userid) {
@@ -548,6 +568,13 @@ class local_mail_message {
         $record->format = $this->format = $format;
         $record->attachments = $this->attachments = $attachments;
         $record->time = $this->time = $time ?: time();
+        $record->normalizedsubject = self::normalize_text($record->subject);
+
+        $context = context_course::instance($this->course->id);
+        $content = file_rewrite_pluginfile_urls($content, 'pluginfile.php', $context->id,
+                                                'local_mail', 'message', $this->id);
+        $content = format_text($this->content, $format, ['filter' => false, 'nocache' => true]);
+        $record->normalizedcontent = self::normalize_text(html_to_text($content, 0, false));
 
         $transaction = $DB->start_delegated_transaction();
         $DB->update_record('local_mail_messages', $record);
@@ -856,72 +883,9 @@ class local_mail_message {
         return isset($this->users[$userid]);
     }
 
-    private function match($userid, $pattern) {
-        $normalize = function($text) {
-            return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
-        };
-
-        $pattern = $normalize($pattern);
-
-        $matchtext = function($text) use ($normalize, $pattern) {
-            return strpos($normalize($text), $pattern) !== false;
-        };
-
-        $users = array_merge(array($this->sender()), $this->recipients());
-        if (!$pattern or $matchtext($this->subject()) or
-            array_filter(array_map('fullname', $users), $matchtext)) {
-            return true;
-        }
-        $context = context_course::instance($this->course->id);
-        $content = file_rewrite_pluginfile_urls($this->content, 'pluginfile.php', $context->id,
-                                            'local_mail', 'message', $this->id);
-        $html = format_text($content, $this->format());
-        return $matchtext(html_to_text($html));
-    }
-
-    private function matchfrom ($userid, $pattern) {
-        $normalize = function($text) {
-            return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
-        };
-
-        $pattern = $normalize($pattern);
-
-        if (!$pattern) {
-            return true;
-        }
-
-        $matchtext = function($text) use ($normalize, $pattern) {
-            return strpos($normalize($text), $pattern) !== false;
-        };
-
-        $sender = $this->sender();
-        return $matchtext(fullname($sender));;
-    }
-
-    private function matchto ($userid, $pattern) {
-        $normalize = function($text) {
-            return strtolower(trim(preg_replace('/\s+/', ' ', $text)));
-        };
-
-        $pattern = $normalize($pattern);
-
-        if (!$pattern) {
-            return true;
-        }
-
-        $matchtext = function($text) use ($normalize, $pattern) {
-            return strpos($normalize($text), $pattern) !== false;
-        };
-
-        $recipients = $this->recipients();
-
-        foreach ($recipients as $recipient) {
-            if ($matchtext(fullname($recipient))) {
-                return $matchtext(fullname($recipient));;
-            }
-        }
-
-        return false;
+    private static function normalize_text($text) {
+        // Replaces non-alphanumeric characters with a space.
+        return trim(preg_replace('/(*UTF8)[^\p{L}\p{N}]+/', ' ', $text));
     }
 
     private function set_references($message) {

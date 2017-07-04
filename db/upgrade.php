@@ -131,5 +131,114 @@ function xmldb_local_mail_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016070104, 'local', 'mail');
     }
 
+    if ($oldversion < 2017070400) {
+
+        // Define field normalizedsubject to be added to local_mail_messages.
+        $table = new xmldb_table('local_mail_messages');
+        $field = new xmldb_field('normalizedsubject', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'time');
+
+        // Conditionally launch add field normalizedsubject.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Mail savepoint reached.
+        upgrade_plugin_savepoint(true, 2017070400, 'local', 'mail');
+    }
+
+    if ($oldversion < 2017070401) {
+
+        // Define field normalizedcontent to be added to local_mail_messages.
+        $table = new xmldb_table('local_mail_messages');
+        $field = new xmldb_field('normalizedcontent', XMLDB_TYPE_TEXT, null, null, null, null, null, 'normalizedsubject');
+
+        // Conditionally launch add field normalizedcontent.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Mail savepoint reached.
+        upgrade_plugin_savepoint(true, 2017070401, 'local', 'mail');
+    }
+
+    if ($oldversion < 2017070402) {
+
+        $normalize = function($text) {
+            return trim(preg_replace('/(*UTF8)[^\p{L}\p{N}]+/', ' ', $text));
+        };
+        $lastid = 0;
+        while (true) {
+            $transaction = $DB->start_delegated_transaction();
+            $select = 'id > :lastid AND normalizedsubject IS NULL';
+            $params = ['lastid' => $lastid];
+            $fields = 'id, courseid, subject, content, format';
+            $records = $DB->get_records_select('local_mail_messages', $select, $params, 'id', $fields, 0, 100);
+            foreach ($records as $record) {
+                $context = context_course::instance($record->courseid);
+                $content = file_rewrite_pluginfile_urls($record->content, 'pluginfile.php', $context->id,
+                                                        'local_mail', 'message', $record->id);
+                $content = format_text($record->content, $record->format, ['filter' => false, 'nocache' => true]);
+                $data = new stdClass;
+                $data->id = $record->id;
+                $data->normalizedsubject = $normalize($record->subject);
+                $data->normalizedcontent = $normalize(html_to_text($content, 0, false));
+                $DB->update_record('local_mail_messages', $data);
+                $lastid = $record->id;
+            }
+            $transaction->allow_commit();
+            if (!$records) {
+                break;
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2017070402, 'local', 'mail');
+    }
+
+    if ($oldversion < 2017070403) {
+
+        // Define index userid_type_item_time (not unique) to be dropped form local_mail_index.
+        $table = new xmldb_table('local_mail_index');
+        $index = new xmldb_index('userid_type_item_time', XMLDB_INDEX_NOTUNIQUE, array('userid', 'type', 'item', 'time'));
+
+        // Conditionally launch drop index userid_type_item_time.
+        if ($dbman->index_exists($table, $index)) {
+            $dbman->drop_index($table, $index);
+        }
+
+        // Mail savepoint reached.
+        upgrade_plugin_savepoint(true, 2017070403, 'local', 'mail');
+    }
+
+    if ($oldversion < 2017070404) {
+
+        // Remove duplicate entries, so the unique index can be created.
+        $sql = 'SELECT t1.id
+                FROM {local_mail_index} t1
+                JOIN {local_mail_index} t2
+                ON t1.id > t2.id
+                AND t1.userid = t2.userid
+                AND t1.type = t2.type
+                AND t1.item = t2.item
+                AND t1.time = t2.time
+                AND t1.messageid = t2.messageid';
+        $rs = $DB->get_recordset_sql($sql, []);
+        foreach ($rs as $record) {
+            $DB->delete_records('local_mail_index', ['id' => $record->id]);
+        }
+        $rs->close();
+
+        // Define index userid_type_item_time_messageid (unique) to be added to local_mail_index.
+        $table = new xmldb_table('local_mail_index');
+        $index = new xmldb_index('userid_type_item_time_messageid', XMLDB_INDEX_UNIQUE, array('userid', 'type', 'item', 'time', 'messageid'));
+
+        // Conditionally launch add index userid_type_item_time_messageid.
+        if (!$dbman->index_exists($table, $index)) {
+            $dbman->add_index($table, $index);
+        }
+
+        // Mail savepoint reached.
+        upgrade_plugin_savepoint(true, 2017070404, 'local', 'mail');
+    }
+
     return true;
 }
