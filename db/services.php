@@ -41,6 +41,14 @@ $functions = array(
         'type' => 'read',
         'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile'),
     ),
+    'local_mail_search_index' => array(
+        'classname' => 'local_mail_external',
+        'methodname' => 'search_index',
+        'classpath' => 'local/mail/externallib.php',
+        'description' => 'Search messages from the index.',
+        'type' => 'read',
+        'services' => array(MOODLE_OFFICIAL_MOBILE_SERVICE, 'local_mobile'),
+    ),
     'local_mail_get_message' => array(
         'classname' => 'local_mail_external',
         'methodname' => 'get_message',

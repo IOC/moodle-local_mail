@@ -272,9 +272,10 @@ class local_mail_message {
         if ($query['searchto'] !== '') {
             list($usersql, $userparams) = users_search_sql($query['searchto']);
             $messageusersql = 'SELECT mu.messageid FROM {local_mail_message_users} mu'
-                . " JOIN {user} u ON u.id = mu.userid WHERE mu.role = :roleto AND $usersql";
+                . " JOIN {user} u ON u.id = mu.userid WHERE (mu.role = :roleto OR mu.role = :rolecc) AND $usersql";
             $sql .=  " AND i.messageid IN ($messageusersql)";
             $params['roleto'] = 'to';
+            $params['rolecc'] = 'cc';
             $params = array_merge($params, $userparams);
         }
 

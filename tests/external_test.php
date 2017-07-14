@@ -181,136 +181,192 @@ class local_mail_external_test extends advanced_testcase {
         // Mesages in the inbox of user 3.
 
         $result = local_mail_external::get_index('inbox', 0, 1, 2);
-
         external_api::validate_parameters(local_mail_external::get_index_returns(), $result);
-        $this->assertEquals([
-            'totalcount' => 4,
-            'messages' => [[
-                'id' => $message3->id(),
-                'subject' => $message3->subject(),
-                'attachments' => 0,
-                'draft' => false,
-                'time' => $message3->time(),
-                'unread' => false,
-                'starred' => true,
-                'course' => [
-                    'id' => $this->course2->id,
-                    'shortname' => $this->course2->shortname,
-                ],
-                'sender' => [
-                    'id' => $this->user2->id,
-                    'fullname' => fullname($this->user2),
-                    'pictureurl' => $this->picture_url($this->user2),
-                ],
-                'recipients' => [[
-                    'type' => 'to',
-                    'id' => $this->user3->id,
-                    'fullname' => fullname($this->user3),
-                    'pictureurl' => $this->picture_url($this->user3),
-                ], [
-                    'type' => 'to',
-                    'id' => $this->user4->id,
-                    'fullname' => fullname($this->user4),
-                    'pictureurl' => $this->picture_url($this->user4),
-                ]],
-                'labels' => [[
-                    'id' => $label1->id(),
-                    'name' => $label1->name(),
-                    'color' => $label1->color(),
-                ]],
-            ], [
-                'id' => $message2->id(),
-                'subject' => $message2->subject(),
-                'attachments' => 3,
-                'draft' => false,
-                'time' => $message2->time(),
-                'unread' => true,
-                'starred' => false,
-                'course' => [
-                    'id' => $this->course1->id,
-                    'shortname' => $this->course1->shortname,
-                ],
-                'sender' => [
-                    'id' => $this->user1->id,
-                    'fullname' => fullname($this->user1),
-                    'pictureurl' => $this->picture_url($this->user1),
-                ],
-                'recipients' => [[
-                    'type' => 'to',
-                    'id' => $this->user3->id,
-                    'fullname' => fullname($this->user3),
-                    'pictureurl' => $this->picture_url($this->user3),
-                ], [
-                    'type' => 'cc',
-                    'id' => $this->user4->id,
-                    'fullname' => fullname($this->user4),
-                    'pictureurl' => $this->picture_url($this->user4),
-                ]],
-                'labels' => [],
-            ]],
-        ], $result);
+        $this->assertEquals($this->index_response(4, [$message3, $message2]), $result);
 
         // Messages in the course 2 of user 3.
 
         $result = local_mail_external::get_index('course', $this->course2->id, 0, 0);
-
         external_api::validate_parameters(local_mail_external::get_index_returns(), $result);
-        $this->assertEquals([
-            'totalcount' => 2,
-            'messages' => [[
-                'id' => $message5->id(),
-                'subject' => $message5->subject(),
-                'time' => $message5->time(),
-                'draft' => true,
-                'unread' => false,
-                'starred' => false,
-                'attachments' => 2,
-                'course' => [
-                    'id' => $this->course2->id,
-                    'shortname' => $this->course2->shortname,
-                ],
-                'sender' => [
-                    'id' => $this->user3->id,
-                    'fullname' => fullname($this->user3),
-                    'pictureurl' => $this->picture_url($this->user3),
-                ],
-                'recipients' => [],
-                'labels' => [],
-            ], [
-                'id' => $message3->id(),
-                'subject' => $message3->subject(),
-                'attachments' => 0,
-                'draft' => false,
-                'time' => $message3->time(),
-                'unread' => false,
-                'starred' => true,
-                'course' => [
-                    'id' => $this->course2->id,
-                    'shortname' => $this->course2->shortname,
-                ],
-                'sender' => [
-                    'id' => $this->user2->id,
-                    'fullname' => fullname($this->user2),
-                    'pictureurl' => $this->picture_url($this->user2),
-                ],
-                'recipients' => [[
-                    'type' => 'to',
-                    'id' => $this->user3->id,
-                    'fullname' => fullname($this->user3),
-                    'pictureurl' => $this->picture_url($this->user3),
-                ], [
-                    'type' => 'to',
-                    'id' => $this->user4->id,
-                    'fullname' => fullname($this->user4),
-                    'pictureurl' => $this->picture_url($this->user4),
-                ]],
-                'labels' => [[
-                    'id' => $label1->id(),
-                    'name' => $label1->name(),
-                    'color' => $label1->color(),
-                ]],
-            ]],
-        ], $result);
+        $this->assertEquals($this->index_response(2, [$message5, $message3]), $result);
+    }
+
+    public function test_search_index() {
+        $this->setUser($this->user3->id);
+
+        $label1 = local_mail_label::create($this->user3->id, 'Label 1', 'red');
+        $label2 = local_mail_label::create($this->user3->id, 'Label 2', 'blue');
+
+        $message1 = local_mail_message::create($this->user1->id, $this->course1->id);
+        $message1->save('Subject 1', 'Content 1', FORMAT_HTML, 0);
+        $message1->add_recipient('to', $this->user3->id);
+        $message1->send(1470000001);
+        $message1->set_unread($this->user3->id, false);
+        $message1->set_starred($this->user3->id, true);
+
+        $message2 = local_mail_message::create($this->user1->id, $this->course1->id);
+        $message2->save('Subject 2 (Test)', 'Content 2', FORMAT_HTML, 3);
+        $message2->add_recipient('to', $this->user3->id);
+        $message2->add_recipient('cc', $this->user4->id);
+        $message2->add_recipient('bcc', $this->user5->id);
+        $message2->send(1470000002);
+        $message2->set_unread($this->user3->id, false);
+
+        $message3 = local_mail_message::create($this->user2->id, $this->course2->id);
+        $message3->save('Subject 3', 'Content 3 (Test)', FORMAT_HTML, 0);
+        $message3->add_recipient('to', $this->user3->id);
+        $message3->add_recipient('to', $this->user4->id);
+        $message3->send(1470000003);
+        $message3->set_unread($this->user3->id, false);
+        $message3->set_starred($this->user3->id, true);
+        $message3->add_label($label1);
+
+        $message4 = local_mail_message::create($this->user1->id, $this->course1->id);
+        $message4->save('Subject 4', 'Content 4', FORMAT_HTML, 0);
+        $message4->add_recipient('to', $this->user3->id);
+        $message4->send(1470000004);
+        $message4->add_label($label1);
+
+        $message5 = local_mail_message::create($this->user2->id, $this->course1->id);
+        $message5->save('Subject 5', 'Content 5', FORMAT_HTML, 1);
+        $message5->add_recipient('to', $this->user3->id);
+        $message5->send(1470000004);
+        $message5->set_unread($this->user3->id, false);
+
+        $message6 = local_mail_message::create($this->user1->id, $this->course1->id);
+        $message6->save('Subject 6', 'Content 6 (Test)', FORMAT_HTML, 0);
+        $message6->add_recipient('to', $this->user3->id);
+        $message6->add_recipient('bcc', $this->user4->id);
+        $message6->send(1470000005);
+        $message6->add_label($label1);
+
+        $message7 = local_mail_message::create($this->user1->id, $this->course2->id);
+        $message7->save('Subject 7', 'Content 7', FORMAT_HTML, 0);
+        $message7->add_recipient('to', $this->user2->id);
+        $message7->add_recipient('bcc', $this->user3->id);
+        $message7->send(1470000006);
+
+        $message8 = local_mail_message::create($this->user3->id, $this->course2->id);
+        $message8->save('Subject 8', 'Content 8', FORMAT_HTML, 2, 1470000007);
+
+        $message9 = local_mail_message::create($this->user1->id, $this->course2->id);
+        $message9->save('Subject 9', 'Content 9', FORMAT_HTML, 0);
+        $message9->add_recipient('to', $this->user3->id);
+        $message9->send(1470000007);
+        $message9->set_deleted($this->user3->id, true);
+
+        $message10 = local_mail_message::create($this->user3->id, $this->course2->id);
+        $message10->save('Subject 10', 'Content 10', FORMAT_HTML, 0);
+        $message10->add_recipient('to', $this->user1->id);
+        $message10->send(1470000008);
+
+        // All messages in the inbox.
+        $result = local_mail_external::search_index('inbox', null, []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message7, $message6, $message5, $message4, $message3, $message2, $message1]);
+        $this->assertEquals($expected, $result);
+
+        // Some messages in the inbox.
+        $result = local_mail_external::search_index('inbox', null, ['limit' => 3]);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message7, $message6, $message5]);
+        $this->assertEquals($expected, $result);
+
+        // Some messages in the inbox, older than the message 5.
+        $result = local_mail_external::search_index('inbox', null, ['beforeid' => $message5->id(), 'limit' => 3]);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message4, $message3, $message2]);
+        $this->assertEquals($expected, $result);
+
+        // Some messages in the inbox, newer than the message 4.
+        $result = local_mail_external::search_index('inbox', null, ['afterid' => $message4->id(), 'limit' => 2]);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message6, $message5]);
+        $this->assertEquals($expected, $result);
+
+        // Unread messages in the inbox.
+        $result = local_mail_external::search_index('inbox', null, ['unread' => true]);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message7, $message6, $message4]);
+        $this->assertEquals($expected, $result);
+
+        // Messages with attachments in the inbox.
+        $result = local_mail_external::search_index('inbox', null, ['attachments' => true]);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message5, $message2]);
+        $this->assertEquals($expected, $result);
+
+        // Messages older than a timestamp in the inbox.
+        $result = local_mail_external::search_index('inbox', null, ['time' => 1470000003]);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message3, $message2, $message1]);
+        $this->assertEquals($expected, $result);
+
+        // Messages in the inbox that contain "test".
+        $result = local_mail_external::search_index('inbox', null, ['content' => 'test']);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message6, $message3, $message2]);
+        $this->assertEquals($expected, $result);
+
+        // Messages in the inbox send by "Buristaki".
+        $result = local_mail_external::search_index('inbox', null, ['sender' => 'Buristaki']);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message5, $message3]);
+        $this->assertEquals($expected, $result);
+
+        // Messages sin the inbox send to "Dupsal".
+        $result = local_mail_external::search_index('inbox', null, ['recipients' => 'Dupsal']);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(7, [$message3, $message2]);
+        $this->assertEquals($expected, $result);
+
+        // Starred messages.
+        $result = local_mail_external::search_index('starred', null, []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(2, [$message3, $message1]);
+        $this->assertEquals($expected, $result);
+
+        // Drafts.
+        $result = local_mail_external::search_index('drafts', null, []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(1, [$message8]);
+        $this->assertEquals($expected, $result);
+
+        // Sent messages.
+        $result = local_mail_external::search_index('sent', null, []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(1, [$message10]);
+        $this->assertEquals($expected, $result);
+
+        // Messages in trash.
+        $result = local_mail_external::search_index('trash', null, []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(1, [$message9]);
+        $this->assertEquals($expected, $result);
+
+        // Messages in course 2.
+        $result = local_mail_external::search_index('course', $this->course2->id, []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(4, [$message10, $message8, $message7, $message3]);
+        $this->assertEquals($expected, $result);
+
+        // Messages in course 3.
+        $result = local_mail_external::search_index('course', $this->course3->id, []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(0, []);
+        $this->assertEquals($expected, $result);
+
+        // Messages in label 1.
+        $result = local_mail_external::search_index('label', $label1->id(), []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(3, [$message6, $message4, $message3]);
+        $this->assertEquals($expected, $result);
+
+        // Messages in label 2.
+        $result = local_mail_external::search_index('label', $label2->id(), []);
+        external_api::validate_parameters(local_mail_external::search_index_returns(), $result);
+        $expected = $this->index_response(0, []);
+        $this->assertEquals($expected, $result);
     }
 
     public function test_get_message() {
@@ -708,5 +764,61 @@ class local_mail_external_test extends advanced_testcase {
         $userpicture = new user_picture($user);
         $userpicture->size = 1;
         return $userpicture->get_url($PAGE)->out(false);
+    }
+
+    private function index_response($totalcount, array $messages) {
+        global $USER;
+
+        $result = [
+            'totalcount' => $totalcount,
+            'messages' => [],
+        ];
+
+        foreach ($messages as $message) {
+            $sender = [
+                'id' => $message->sender()->id,
+                'fullname' => fullname($message->sender()),
+                'pictureurl' => $this->picture_url($message->sender()),
+            ];
+            $recipients = [];
+            foreach (['to', 'cc'] as $type) {
+                foreach ($message->recipients($type) as $user) {
+                    $userpicture = new user_picture($user);
+                    $userpicture->size = 1;
+                    $recipients[] = [
+                        'type' => $type,
+                        'id' => $user->id,
+                        'fullname' => fullname($user),
+                        'pictureurl' => $this->picture_url($user),
+                    ];
+                }
+            }
+            $labels = [];
+            foreach ($message->labels($USER->id) as $label) {
+                $labels[] = [
+                    'id' => $label->id(),
+                    'name' => $label->name(),
+                    'color' => $label->color(),
+                ];
+            }
+            $result['messages'][] = [
+                'id' => $message->id(),
+                'subject' => $message->subject(),
+                'attachments' => $message->attachments(true),
+                'draft' => $message->draft(),
+                'time' => $message->time(),
+                'unread' => $message->unread($USER->id),
+                'starred' => $message->starred($USER->id),
+                'course' => [
+                    'id' => $message->course()->id,
+                    'shortname' => $message->course()->shortname,
+                ],
+                'sender' => $sender,
+                'recipients' => $recipients,
+                'labels' => $labels,
+            ];
+        }
+
+        return $result;
     }
 }

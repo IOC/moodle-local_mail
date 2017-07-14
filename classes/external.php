@@ -222,6 +222,169 @@ class local_mail_external extends external_api {
         return $result;
     }
 
+    public static function search_index_parameters() {
+        return new external_function_parameters([
+            'type' => new external_value(PARAM_ALPHA, 'Type of index: inbox, starred, drafts, sent, trash, course or label'),
+            'itemid' => new external_value(PARAM_INT, 'ID of the course or label of the index'),
+            'query' => new external_single_structure([
+                'beforeid' => new external_value(PARAM_INT, 'ID of the message where to start searching older messages', VALUE_OPTIONAL),
+                'afterid' => new external_value(PARAM_INT, 'ID of the message where to start searching newer messages', VALUE_OPTIONAL),
+                'content' => new external_value(PARAM_TEXT, 'Text to search then contents of the message', VALUE_OPTIONAL),
+                'sender' => new external_value(PARAM_TEXT, 'Text to search the name of the sender', VALUE_OPTIONAL),
+                'recipients' => new external_value(PARAM_TEXT, 'Text to search the names of the recipients', VALUE_OPTIONAL),
+                'unread' => new external_value(PARAM_BOOL, 'Search only unread messsages', VALUE_OPTIONAL),
+                'attachments' => new external_value(PARAM_BOOL, 'Search only messages with attachments', VALUE_OPTIONAL),
+                'time' => new external_value(PARAM_INT, 'Search only messages older than this timestamp', VALUE_OPTIONAL),
+                'limit' => new external_value(PARAM_INT, 'Maximum number of messages to return', VALUE_OPTIONAL),
+            ]),
+        ]);
+    }
+
+    public static function search_index_returns() {
+        return new external_single_structure([
+            'totalcount' => new external_value(PARAM_INT, 'Total number of messages in the index'),
+            'messages' => new external_multiple_structure(
+                new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Id of the message'),
+                    'subject' => new external_value(PARAM_TEXT, 'Subject of the message'),
+                    'attachments' => new external_value(PARAM_INT, 'Number of attachments'),
+                    'draft' => new external_value(PARAM_BOOL, 'Draft status'),
+                    'time' => new external_value(PARAM_INT, 'Time of the message'),
+                    'unread' => new external_value(PARAM_BOOL, 'Unread status'),
+                    'starred' => new external_value(PARAM_BOOL, 'Starred status'),
+                    'course' => new external_single_structure([
+                        'id' => new external_value(PARAM_INT, 'Id of the course'),
+                        'shortname' => new external_value(PARAM_TEXT, 'Short name of the course'),
+                    ]),
+                    'sender' => new external_single_structure([
+                        'id' => new external_value(PARAM_INT, 'Id of the user'),
+                        'fullname' => new external_value(PARAM_RAW, 'Full name of the user'),
+                        'pictureurl' => new external_value(PARAM_URL, 'User image profile URL'),
+                    ]),
+                    'recipients' => new external_multiple_structure(
+                        new external_single_structure([
+                            'type' => new external_value(PARAM_ALPHA, 'Role of the user: "to", "cc" or "bcc"'),
+                            'id' => new external_value(PARAM_INT, 'Id of the user'),
+                            'fullname' => new external_value(PARAM_RAW, 'Full name of the user'),
+                            'pictureurl' => new external_value(PARAM_URL, 'User image profile URL'),
+                        ])
+                    ),
+                    'labels' => new external_multiple_structure(
+                        new external_single_structure([
+                            'id' => new external_value(PARAM_INT, 'Id of the label'),
+                            'name' => new external_value(PARAM_TEXT, 'Name of the label'),
+                            'color' => new external_value(PARAM_ALPHA, 'Color of the label'),
+                        ])
+                    ),
+                ])
+            ),
+        ]);
+    }
+
+    public static function search_index($type, $itemid, $query) {
+        global $PAGE, $USER;
+
+        $params = ['type' => $type, 'itemid' => $itemid, 'query' => $query];
+        $params = self::validate_parameters(self::search_index_parameters(), $params);
+
+        $courseid = ($params['type'] == 'course' ? $params['itemid'] : SITEID);
+        $context = context_course::instance($courseid);
+        self::validate_context($context);
+
+        if ($params['type'] == 'course') {
+            require_capability('local/mail:usemail', $context);
+        }
+
+        $totalcount = local_mail_message::count_index($USER->id, $params['type'], (int) $params['itemid']);
+
+        $query = [];
+        if (!empty($params['query']['beforeid'])) {
+            $query['before'] = (int) $params['query']['beforeid'];
+        }
+        if (!empty($params['query']['afterid']) and empty($params['query']['beforeid'])) {
+            $query['after'] = (int) $params['query']['afterid'];
+        }
+        if (!empty($params['query']['content'])) {
+            $query['pattern'] = $params['query']['content'];
+        }
+        if (!empty($params['query']['sender'])) {
+            $query['searchfrom'] = $params['query']['sender'];
+        }
+        if (!empty($params['query']['recipients'])) {
+            $query['searchto'] = $params['query']['recipients'];
+        }
+        if (!empty($params['query']['unread'])) {
+            $query['unread'] = true;
+        }
+        if (!empty($params['query']['attachments'])) {
+            $query['attach'] = true;
+        }
+        if (!empty($params['query']['time'])) {
+            $query['time'] = $params['query']['time'];
+        }
+        if (!empty($params['query']['limit'])) {
+            $query['limit'] = (int) $params['query']['limit'];
+        }
+
+        $messages = local_mail_message::search_index($USER->id, $params['type'], (int) $params['itemid'], $query);
+
+        $result = [
+            'totalcount' => $totalcount,
+            'messages' => [],
+        ];
+
+        foreach ($messages as $message) {
+            $sender = $message->sender();
+            $userpicture = new user_picture($sender);
+            $userpicture->size = 1;
+            $sender = [
+                'id' => $sender->id,
+                'fullname' => fullname($sender),
+                'pictureurl' => $userpicture->get_url($PAGE)->out(false),
+            ];
+            $recipients = [];
+            foreach (['to', 'cc'] as $type) {
+                foreach ($message->recipients($type) as $user) {
+                    $userpicture = new user_picture($user);
+                    $userpicture->size = 1;
+                    $recipients[] = [
+                        'type' => $type,
+                        'id' => $user->id,
+                        'fullname' => fullname($user),
+                        'pictureurl' => $userpicture->get_url($PAGE)->out(false),
+                    ];
+                }
+            }
+            $labels = [];
+            foreach ($message->labels($USER->id) as $label) {
+                $labels[] = [
+                    'id' => $label->id(),
+                    'name' => $label->name(),
+                    'color' => $label->color(),
+                ];
+            }
+            $course = $message->course();
+            $result['messages'][] = [
+                'id' => $message->id(),
+                'subject' => $message->subject(),
+                'attachments' => $message->attachments(true),
+                'draft' => $message->draft(),
+                'time' => $message->time(),
+                'unread' => $message->unread($USER->id),
+                'starred' => $message->starred($USER->id),
+                'course' => [
+                    'id' => $course->id,
+                    'shortname' => $course->shortname,
+                ],
+                'sender' => $sender,
+                'recipients' => $recipients,
+                'labels' => $labels,
+            ];
+        }
+
+        return $result;
+    }
+
     public static function get_message_parameters() {
         return new external_function_parameters([
             'id' => new external_value(PARAM_INT, 'ID of the message'),
