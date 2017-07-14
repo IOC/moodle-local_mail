@@ -21,6 +21,10 @@ require_once("$CFG->dirroot/local/mail/locallib.php");
 
 class local_mail_external extends external_api {
 
+    public static function get_unread_count_parameters() {
+        return new external_function_parameters([]);
+    }
+
     public static function get_unread_count_returns() {
         return new external_value(PARAM_INT, 'Number of unread messages');
     }
