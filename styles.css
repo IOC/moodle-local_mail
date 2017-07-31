@@ -86,6 +86,8 @@
     margin: 125px auto auto;
     vertical-align: middle;
     opacity: 0.5;
+    height: auto;
+    width: auto;
 }
 
 .mail_search_loading {
@@ -99,6 +101,8 @@
 .mail_search_loading .loading_icon {
     vertical-align: middle;
     opacity: 0.5;
+    height: auto;
+    width: auto;
 }
 
 .mail_loading_small {
