@@ -179,9 +179,9 @@ function local_mail_extend_navigation($root) {
         $PAGE->requires->js('/local/mail/users.js');
     }
 
-    // Block progress.
+    // Block completion_progress.
 
-    if ($PAGE->url->compare(new moodle_url('/blocks/progress/overview.php'), URL_MATCH_BASE)) {
+    if ($PAGE->url->compare(new moodle_url('/blocks/completion_progress/overview.php'), URL_MATCH_BASE)) {
         $userid = optional_param('id', false, PARAM_INT);
         $vars = array('course' => $COURSE->id);
         $PAGE->requires->string_for_js('choosedots', 'moodle');
