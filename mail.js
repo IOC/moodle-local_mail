@@ -863,7 +863,10 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
             alert(obj.msgerror);
         } else {
             if (obj.html) {
-                Y.one('#local_mail_main_form').setContent(obj.html);
+                var newNodes = Y.one('#local_mail_main_form').setContent(obj.html);
+                require(['core/event'], function(event) {
+                    event.notifyFilterContentUpdated(newNodes.getDOMNode());
+                });
                 init();
                 mail_update_url();
                 mail_scroll_top();
