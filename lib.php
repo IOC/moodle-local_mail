@@ -33,11 +33,61 @@ function local_mail_extend_navigation($root) {
         return;
     }
 
+    // User profile.
+
+    if (empty($CFG->messaging) and
+        $PAGE->url->compare(new moodle_url('/user/view.php'), URL_MATCH_BASE)) {
+        $userid = optional_param('id', false, PARAM_INT);
+        if (local_mail_valid_recipient($userid)) {
+            $vars = array('course' => $COURSE->id, 'recipient' => $userid);
+            $PAGE->requires->string_for_js('sendmessage', 'local_mail');
+            $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
+            $PAGE->requires->js('/local/mail/user.js');
+        }
+    }
+
+    // Users list.
+
+    if (empty($CFG->messaging) and
+        $PAGE->url->compare(new moodle_url('/user/index.php'), URL_MATCH_BASE)) {
+        $userid = optional_param('id', false, PARAM_INT);
+        $vars = array('course' => $COURSE->id);
+        $PAGE->requires->string_for_js('choosedots', 'moodle');
+        $PAGE->requires->strings_for_js(array(
+                'bulkmessage',
+                'to',
+                'cc',
+                'bcc',
+                ), 'local_mail');
+        $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
+        $PAGE->requires->js('/local/mail/users.js');
+    }
+
+    // Block completion_progress.
+
+    if ($PAGE->url->compare(new moodle_url('/blocks/completion_progress/overview.php'), URL_MATCH_BASE)) {
+        $userid = optional_param('id', false, PARAM_INT);
+        $vars = array('course' => $COURSE->id);
+        $PAGE->requires->string_for_js('choosedots', 'moodle');
+        $PAGE->requires->strings_for_js(array(
+                'bulkmessage',
+                'to',
+                'cc',
+                'bcc',
+                ), 'local_mail');
+        $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
+        $PAGE->requires->js('/local/mail/users.js');
+    }
+
+    // Add "My mail" navigation if enabled.
+
+    if (!get_config('local_mail', 'legacynav')) {
+        return;
+    }
+
     $courses = local_mail_get_my_courses();
 
     $count = local_mail_message::count_menu($USER->id);
-
-    // My mail.
 
     $text = get_string('mymail', 'local_mail');
     if (!empty($count->inbox)) {
@@ -148,52 +198,6 @@ function local_mail_extend_navigation($root) {
     $text = get_string('preferences');
     $url = new moodle_url('/local/mail/preferences.php');
     $node->add(s($text), $url);
-
-    // User profile.
-
-    if (empty($CFG->messaging) and
-        $PAGE->url->compare(new moodle_url('/user/view.php'), URL_MATCH_BASE)) {
-        $userid = optional_param('id', false, PARAM_INT);
-        if (local_mail_valid_recipient($userid)) {
-            $vars = array('course' => $COURSE->id, 'recipient' => $userid);
-            $PAGE->requires->string_for_js('sendmessage', 'local_mail');
-            $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
-            $PAGE->requires->js('/local/mail/user.js');
-        }
-    }
-
-    // Users list.
-
-    if (empty($CFG->messaging) and
-        $PAGE->url->compare(new moodle_url('/user/index.php'), URL_MATCH_BASE)) {
-        $userid = optional_param('id', false, PARAM_INT);
-        $vars = array('course' => $COURSE->id);
-        $PAGE->requires->string_for_js('choosedots', 'moodle');
-        $PAGE->requires->strings_for_js(array(
-                'bulkmessage',
-                'to',
-                'cc',
-                'bcc',
-                ), 'local_mail');
-        $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
-        $PAGE->requires->js('/local/mail/users.js');
-    }
-
-    // Block completion_progress.
-
-    if ($PAGE->url->compare(new moodle_url('/blocks/completion_progress/overview.php'), URL_MATCH_BASE)) {
-        $userid = optional_param('id', false, PARAM_INT);
-        $vars = array('course' => $COURSE->id);
-        $PAGE->requires->string_for_js('choosedots', 'moodle');
-        $PAGE->requires->strings_for_js(array(
-                'bulkmessage',
-                'to',
-                'cc',
-                'bcc',
-                ), 'local_mail');
-        $PAGE->requires->js_init_code('M.local_mail = ' . json_encode($vars));
-        $PAGE->requires->js('/local/mail/users.js');
-    }
 }
 
 function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
@@ -220,4 +224,134 @@ function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
     }
 
     send_stored_file($file, 0, 0, true, $options);
+}
+
+/**
+ * Renders the navigation bar link.
+ *
+ * @param renderer_base $renderer
+ * @return string The HTML
+ */
+function local_mail_render_navbar_output(\renderer_base $renderer) {
+    global $CFG, $COURSE, $PAGE, $USER;
+
+    if (!isloggedin() or isguestuser() or user_not_fully_set_up($USER) or
+            get_user_preferences('auth_forcepasswordchange') or
+            ($CFG->sitepolicy and !$USER->policyagreed and !is_siteadmin())) {
+        return '';
+    }
+
+    $composeurl = new moodle_url('/local/mail/compose.php');
+    if ($PAGE->url->compare($composeurl, URL_MATCH_BASE)) {
+        $composeurl->param('m', $PAGE->url->param('m'));
+    } else {
+        $composeurl = new moodle_url('/local/mail/create.php');
+        if ($COURSE->id != SITEID) {
+            $composeurl->param('c', $COURSE->id);
+            $composeurl->param('sesskey', sesskey());
+        }
+    }
+
+    $preferencesurl = new moodle_url('/local/mail/preferences.php');
+    $viewurl = new moodle_url('/local/mail/view.php');
+
+    $activetype = null;
+    $activecourseid = null;
+    $activelabelid = null;
+    if ($PAGE->url->compare($viewurl, URL_MATCH_BASE)) {
+        $activetype = $PAGE->url->param('t');
+        if ($activetype == 'course') {
+            $activecourseid = $PAGE->url->param('c');
+        } else if ($activetype == 'label') {
+            $activelabelid = $PAGE->url->param('l');
+        }
+    }
+
+    $count = local_mail_message::count_menu($USER->id);
+
+    $context = [
+        'activetype' => $activetype,
+        'activecourseid' => $activecourseid,
+        'activelabelid' => $activelabelid,
+        'composeurl' => $composeurl->out(),
+        'preferencesurl' => $preferencesurl->out(),
+        'viewurl' => $viewurl->out(),
+        'count' => isset($count->inbox) ? $count->inbox : 0,
+        'items' => [
+            [
+                'url' => new moodle_url($viewurl, ['t' => 'inbox']),
+                'icon' => 'inbox',
+                'text' => get_string('inbox', 'local_mail'),
+                'unread' => isset($count->inbox) ? $count->inbox : 0,
+                'active' => ($activetype == 'inbox'),
+            ],
+            [
+                'url' => new moodle_url($viewurl, ['t' => 'starred']),
+                'icon' => 'starred',
+                'text' => get_string('starred', 'local_mail'),
+                'active' => ($activetype == 'starred'),
+            ],
+            [
+                'url' => new moodle_url($viewurl, ['t' => 'drafts']),
+                'icon' => 'drafts',
+                'text' => get_string('drafts', 'local_mail'),
+                'drafts' => isset($count->drafts) ? $count->drafts : 0,
+                'active' => ($activetype == 'drafts'),
+            ],
+            [
+                'url' => new moodle_url($viewurl, ['t' => 'sent']),
+                'icon' => 'sent',
+                'text' => get_string('sentmail', 'local_mail'),
+                'active' => ($activetype == 'sent'),
+            ],
+        ],
+    ];
+
+    foreach (local_mail_label::fetch_user($USER->id) as $label) {
+        $context['items'][] = [
+            'url' => new moodle_url($viewurl, ['t' => 'label', 'l' => $label->id()]),
+            'icon' => 'label',
+            'text' => $label->name(),
+            'unread' => isset($count->labels[$label->id()]) ? $count->labels[$label->id()] : 0,
+            'active' => ($activelabelid == $label->id()),
+        ];
+    }
+
+    foreach (local_mail_get_my_courses() as $course) {
+        $context['items'][] = [
+            'url' => new moodle_url($viewurl, ['t' => 'course', 'c' => $course->id]),
+            'icon' => 'course',
+            'text' => $course->shortname,
+            'title' => $course->fullname,
+            'unread' => isset($count->courses[$course->id]) ? $count->courses[$course->id] : 0,
+            'dimmed' => !$course->visible,
+            'active' => ($activecourseid == $course->id),
+        ];
+    }
+
+    $context['items'][] = [
+        'url' => new moodle_url($viewurl, ['t' => 'trash']),
+        'icon' => 'trash',
+        'text' => get_string('trash', 'local_mail'),
+        'active' => ($activetype == 'trash'),
+    ];
+
+    return $renderer->render_from_template('local_mail/navbar_popover', $context);
+}
+
+/**
+ * Get icon mapping for font-awesome.
+ */
+function local_mail_get_fontawesome_icon_map() {
+    return [
+        'local_mail:compose' => 'fa-pencil-square-o',
+        'local_mail:course' => 'fa-university',
+        'local_mail:drafts' => 'fa-file',
+        'local_mail:icon' => 'fa-envelope',
+        'local_mail:inbox' => 'fa-inbox',
+        'local_mail:label' => 'fa-tag',
+        'local_mail:sent' => 'fa-paper-plane',
+        'local_mail:starred' => 'fa-star',
+        'local_mail:trash' => 'fa-trash',
+    ];
 }

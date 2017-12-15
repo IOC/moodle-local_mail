@@ -44,5 +44,11 @@ if ($hassiteconfig) {
     $description = get_string('configenablebackupdesc', 'local_mail');
     $settings->add(new admin_setting_configcheckbox('local_mail/enablebackup', $title, $description, 1));
 
+    // Legacy navigation.
+    $title = get_string('configlegacynav', 'local_mail');
+    $description = get_string('configlegacynavdesc', 'local_mail');
+    $default = moodle_major_version() < 3.2 ? '1' : '0';
+    $settings->add(new admin_setting_configcheckbox('local_mail/legacynav', $title, $description, $default));
+
     $ADMIN->add('localplugins', $settings);
 }

@@ -73,27 +73,65 @@ function local_mail_format_content($message) {
 }
 
 function local_mail_setup_page($course, $url) {
-    global $DB, $PAGE;
-
-    require_login($course->id, false);
+    global $PAGE, $USER;
 
     $PAGE->set_url($url);
-    $title = get_string('mymail', 'local_mail');
-    $PAGE->set_title($course->shortname . ': ' . $title);
     $PAGE->set_pagelayout('standard');
-    $PAGE->set_heading($course->fullname);
     $PAGE->requires->css('/local/mail/styles.css');
 
-    if ($course->id != SITEID) {
-        $PAGE->navbar->add(get_string('mymail', 'local_mail'));
-        $urlcompose = new moodle_url('/local/mail/compose.php');
-        $urlrecipients = new moodle_url('/local/mail/recipients.php');
-        if ($url->compare($urlcompose, URL_MATCH_BASE) or
-            $url->compare($urlrecipients, URL_MATCH_BASE)) {
-            $text = get_string('compose', 'local_mail');
-            $urlcompose->param('m', $url->param('m'));
-            $PAGE->navbar->add($text, $urlcompose);
+    if (get_config('local_mail', 'legacynav')) {
+        // Legacy navigation.
+        require_login($course->id, false);
+        $title = get_string('mymail', 'local_mail');
+        $PAGE->set_title($course->shortname . ': ' . $title);
+        $PAGE->set_heading($course->fullname);
+        return;
+    }
+
+    // New navigation.
+
+    require_login(SITEID, false);
+    $PAGE->set_title(get_string('pluginname', 'local_mail'));
+    $PAGE->set_context(context_user::instance($USER->id));
+
+    $PAGE->navbar->add(get_string('pluginname', 'local_mail'));
+
+    $composeurl = new moodle_url('/local/mail/compose.php');
+    $createurl = new moodle_url('/local/mail/create.php');
+    $preferencesurl = new moodle_url('/local/mail/preferences.php');
+    $viewurl = new moodle_url('/local/mail/view.php');
+
+    $navtitle = null;
+    $navurl = null;
+
+    if ($url->compare(new moodle_url('/local/mail/compose.php'), URL_MATCH_BASE)) {
+        $navtitle = get_string('compose', 'local_mail');
+    } else if ($url->compare(new moodle_url('/local/mail/create.php'), URL_MATCH_BASE)) {
+        $navtitle = get_string('compose', 'local_mail');
+    } else if ($url->compare(new moodle_url('/local/mail/preferences.php'), URL_MATCH_BASE)) {
+        $navtitle = get_string('preferences');
+    } else if ($url->compare(new moodle_url('/local/mail/view.php'), URL_MATCH_BASE)) {
+        $type = $url->param('t');
+        $navurl = new moodle_url('/local/mail/view.php', ['t' => $type]);
+        if (in_array($type, ['inbox', 'starred', 'drafts', 'trash'])) {
+            $navtitle = get_string($url->param('t'), 'local_mail');
+        } else if ($type == 'sent') {
+            $navtitle = get_string('sentmail', 'local_mail');
+        } else if ($type == 'course') {
+            $navurl->param('c', $url->param('c'));
+            $navtitle = $course->shortname;
+        } else if ($type == 'label') {
+            $label = local_mail_label::fetch($url->param('l'));
+            if ($label) {
+                $navurl->param('l', $label->id());
+                $navtitle = $label->name();
+            }
         }
+    }
+
+    if ($navtitle !== null) {
+        $PAGE->set_title(get_string('pluginname', 'local_mail') . ': ' . $navtitle);
+        $PAGE->navbar->add($navtitle, $navurl);
     }
 }
 
