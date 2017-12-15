@@ -53,6 +53,7 @@ class local_mail_external extends external_api {
                     'shortname' => new external_value(PARAM_TEXT, 'Short name of the course'),
                     'fullname' => new external_value(PARAM_TEXT, 'Full name of the course'),
                     'unread' => new external_value(PARAM_INT, 'Number of unread messages'),
+                    'visible' => new external_value(PARAM_BOOL, 'Course visibility'),
                 ])
             ),
             'labels' => new external_multiple_structure(
@@ -85,6 +86,7 @@ class local_mail_external extends external_api {
                 'shortname' => $course->shortname,
                 'fullname' => $course->fullname,
                 'unread' => isset($count->courses[$course->id]) ? $count->courses[$course->id] : 0,
+                'visible' => !empty($course->visible),
             ];
         }
 

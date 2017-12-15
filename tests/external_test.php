@@ -79,7 +79,11 @@ class local_mail_external_test extends advanced_testcase {
     }
 
     public function test_get_menu() {
+        course_change_visibility($this->course2->id, false);
         $this->setUser($this->user3->id);
+        // Assign teacher role so it can view hidden courses.
+        $roleid = key(get_archetype_roles('teacher'));
+        role_assign($roleid, $this->user3->id, context_system::instance());
 
         $label1 = local_mail_label::create($this->user3->id, 'Label 1');
         $label2 = local_mail_label::create($this->user3->id, 'Label 2');
@@ -118,16 +122,19 @@ class local_mail_external_test extends advanced_testcase {
             'shortname' => $this->course1->shortname,
             'fullname' => $this->course1->fullname,
             'unread' => 2,
-        ], [
-            'id' => $this->course2->id,
-            'shortname' => $this->course2->shortname,
-            'fullname' => $this->course2->fullname,
-            'unread' => 1,
+            'visible' => true,
         ], [
             'id' => $this->course3->id,
             'shortname' => $this->course3->shortname,
             'fullname' => $this->course3->fullname,
             'unread' => 0,
+            'visible' => true,
+        ], [
+            'id' => $this->course2->id,
+            'shortname' => $this->course2->shortname,
+            'fullname' => $this->course2->fullname,
+            'unread' => 1,
+            'visible' => false,
         ]];
         $this->assertEquals($courses, $result['courses']);
         $labels = [[
