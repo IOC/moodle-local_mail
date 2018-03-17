@@ -304,6 +304,12 @@ function local_mail_render_navbar_output(\renderer_base $renderer) {
                 'text' => get_string('sentmail', 'local_mail'),
                 'active' => ($activetype == 'sent'),
             ],
+            [
+                'url' => new moodle_url($viewurl, ['t' => 'trash']),
+                'icon' => 'trash',
+                'text' => get_string('trash', 'local_mail'),
+                'active' => ($activetype == 'trash'),
+            ],
         ],
     ];
 
@@ -328,13 +334,6 @@ function local_mail_render_navbar_output(\renderer_base $renderer) {
             'active' => ($activecourseid == $course->id),
         ];
     }
-
-    $context['items'][] = [
-        'url' => new moodle_url($viewurl, ['t' => 'trash']),
-        'icon' => 'trash',
-        'text' => get_string('trash', 'local_mail'),
-        'active' => ($activetype == 'trash'),
-    ];
 
     return $renderer->render_from_template('local_mail/navbar_popover', $context);
 }
