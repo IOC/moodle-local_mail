@@ -21,6 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+define('AJAX_SCRIPT', true);
+
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once($CFG->dirroot . '/local/mail/lib.php');
 
@@ -363,6 +365,7 @@ function local_mail_setread($messages, $bool, $mailview = false) {
     }
     return array(
         'info' => local_mail_get_info(),
+        'navbar' => local_mail_render_navbar_context(),
         'html' => $content
     );
 }
@@ -388,6 +391,7 @@ function local_mail_setdelete($messages, $bool, $itemid, $type, $offset, $mailpa
         $data = local_mail_searchmessages($type, $itemid, $search, $offset);
         $data['info'] = local_mail_get_info();
         $data['undo'] = implode(",", $ids);
+        $data['navbar'] = local_mail_render_navbar_context();
         return $data;
     } else {
         $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
@@ -395,6 +399,7 @@ function local_mail_setdelete($messages, $bool, $itemid, $type, $offset, $mailpa
     }
     return array(
         'info' => local_mail_get_info(),
+        'navbar' => local_mail_render_navbar_context(),
         'html' => $content,
         'undo' => implode(",", $ids)
     );
@@ -419,6 +424,7 @@ function local_mail_hide($messages, $itemid, $type, $offset, $mailpagesize, $sea
     if (!empty($search)) {
         $data = local_mail_searchmessages($type, $itemid, $search, $offset);
         $data['info'] = local_mail_get_info();
+        $data['navbar'] = local_mail_render_navbar_context();
         return $data;
     } else {
         $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
@@ -426,6 +432,7 @@ function local_mail_hide($messages, $itemid, $type, $offset, $mailpagesize, $sea
     }
     return array(
         'info' => local_mail_get_info(),
+        'navbar' => local_mail_render_navbar_context(),
         'html' => $content
     );
 }
@@ -440,6 +447,7 @@ function local_mail_empty_trash($itemid, $type, $mailpagesize) {
 
     return array(
         'info' => local_mail_get_info(),
+        'navbar' => local_mail_render_navbar_context(),
         'html' => $content
     );
 }
@@ -464,6 +472,7 @@ function local_mail_discard($messages, $itemid, $type, $offset, $mailpagesize, $
     if (!empty($search)) {
         $data = local_mail_searchmessages($type, $itemid, $search, $offset);
         $data['info'] = local_mail_get_info();
+        $data['navbar'] = local_mail_render_navbar_context();
         return $data;
     } else {
         $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
@@ -471,6 +480,7 @@ function local_mail_discard($messages, $itemid, $type, $offset, $mailpagesize, $
     }
     return array(
         'info' => local_mail_get_info(),
+        'navbar' => local_mail_render_navbar_context(),
         'html' => $content,
     );
 }
@@ -551,6 +561,7 @@ function local_mail_assignlabels($messages, $labelids, $labeltsids, $data, $sear
     }
     return array(
         'info' => local_mail_get_info(),
+        'navbar' => local_mail_render_navbar_context(),
         'html' => $content
     );
 }
@@ -657,6 +668,7 @@ function local_mail_getmail($message, $type, $reply, $offset, $labelid) {
     $content = preg_replace('/^<div>|<\/div>$/', '', $content);
     return array(
         'info' => local_mail_get_info(),
+        'navbar' => local_mail_render_navbar_context(),
         'html' => $content
     );
 }

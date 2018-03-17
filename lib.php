@@ -227,18 +227,32 @@ function local_mail_pluginfile($course, $cm, $context, $filearea, $args,
 }
 
 /**
- * Renders the navigation bar link.
+ * Renders the navigation bar popover.
  *
  * @param renderer_base $renderer
  * @return string The HTML
  */
 function local_mail_render_navbar_output(\renderer_base $renderer) {
+    $context = local_mail_render_navbar_context();
+    if (!$context) {
+        return '';
+    }
+
+    return $renderer->render_from_template('local_mail/navbar_popover', $context);
+}
+
+/**
+ * Context of the navigation bar popover template.
+ *
+ * @return array
+ */
+function local_mail_render_navbar_context() {
     global $CFG, $COURSE, $PAGE, $USER;
 
     if (!isloggedin() or isguestuser() or user_not_fully_set_up($USER) or
             get_user_preferences('auth_forcepasswordchange') or
             ($CFG->sitepolicy and !$USER->policyagreed and !is_siteadmin())) {
-        return '';
+        return null;
     }
 
     $composeurl = new moodle_url('/local/mail/compose.php');
@@ -279,43 +293,43 @@ function local_mail_render_navbar_output(\renderer_base $renderer) {
         'count' => isset($count->inbox) ? $count->inbox : 0,
         'items' => [
             [
-                'url' => new moodle_url($viewurl, ['t' => 'inbox']),
+                'url' => (string) new moodle_url($viewurl, ['t' => 'inbox']),
                 'icon' => 'inbox',
                 'text' => get_string('inbox', 'local_mail'),
                 'unread' => isset($count->inbox) ? $count->inbox : 0,
                 'active' => ($activetype == 'inbox'),
             ],
             [
-                'url' => new moodle_url($viewurl, ['t' => 'starred']),
+                'url' => (string) new moodle_url($viewurl, ['t' => 'starred']),
                 'icon' => 'starred',
                 'text' => get_string('starred', 'local_mail'),
                 'active' => ($activetype == 'starred'),
             ],
             [
-                'url' => new moodle_url($viewurl, ['t' => 'drafts']),
+                'url' => (string) new moodle_url($viewurl, ['t' => 'drafts']),
                 'icon' => 'drafts',
                 'text' => get_string('drafts', 'local_mail'),
                 'drafts' => isset($count->drafts) ? $count->drafts : 0,
                 'active' => ($activetype == 'drafts'),
             ],
             [
-                'url' => new moodle_url($viewurl, ['t' => 'sent']),
+                'url' => (string) new moodle_url($viewurl, ['t' => 'sent']),
                 'icon' => 'sent',
                 'text' => get_string('sentmail', 'local_mail'),
                 'active' => ($activetype == 'sent'),
             ],
             [
-                'url' => new moodle_url($viewurl, ['t' => 'trash']),
+                'url' => (string) new moodle_url($viewurl, ['t' => 'trash']),
                 'icon' => 'trash',
                 'text' => get_string('trash', 'local_mail'),
                 'active' => ($activetype == 'trash'),
-            ],
+            ]
         ],
     ];
 
     foreach (local_mail_label::fetch_user($USER->id) as $label) {
         $context['items'][] = [
-            'url' => new moodle_url($viewurl, ['t' => 'label', 'l' => $label->id()]),
+            'url' => (string) new moodle_url($viewurl, ['t' => 'label', 'l' => $label->id()]),
             'icon' => 'label',
             'text' => $label->name(),
             'unread' => isset($count->labels[$label->id()]) ? $count->labels[$label->id()] : 0,
@@ -325,7 +339,7 @@ function local_mail_render_navbar_output(\renderer_base $renderer) {
 
     foreach (local_mail_get_my_courses() as $course) {
         $context['items'][] = [
-            'url' => new moodle_url($viewurl, ['t' => 'course', 'c' => $course->id]),
+            'url' => (string) new moodle_url($viewurl, ['t' => 'course', 'c' => $course->id]),
             'icon' => 'course',
             'text' => $course->shortname,
             'title' => $course->fullname,
@@ -335,7 +349,7 @@ function local_mail_render_navbar_output(\renderer_base $renderer) {
         ];
     }
 
-    return $renderer->render_from_template('local_mail/navbar_popover', $context);
+    return $context;
 }
 
 /**

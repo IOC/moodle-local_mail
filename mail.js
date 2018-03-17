@@ -956,6 +956,17 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
                     }));
                 }
             }
+            if (obj.navbar) {
+                require(['jquery', 'core/templates', 'core/notification'], function($, templates, notification) {
+                    var element = $('#nav-mail-popover-container');
+                    if (!element.length) {
+                        return;
+                    }
+                    templates.render('local_mail/navbar_popover', obj.navbar).then(function(html, js) {
+                        templates.replaceNode(element, html, js);
+                    }).fail(notification.exception);
+                });
+            }
             // Undo last action.
             if (obj.undo && mail_undo_function != 'undo') {
                 var msg = M.util.get_string('undo' + mail_undo_function, 'local_mail', obj.undo.split(',').length);
