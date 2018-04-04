@@ -73,7 +73,7 @@ function local_mail_format_content($message) {
 }
 
 function local_mail_setup_page($course, $url) {
-    global $PAGE, $USER;
+    global $PAGE;
 
     $PAGE->set_url($url);
     $PAGE->set_pagelayout('standard');
@@ -90,9 +90,9 @@ function local_mail_setup_page($course, $url) {
 
     // New navigation.
 
-    require_login(SITEID, false);
+    require_login($course->id, false);
     $PAGE->set_title(get_string('pluginname', 'local_mail'));
-    $PAGE->set_context(context_user::instance($USER->id));
+    $PAGE->set_context(context_course::instance($course->id));
 
     $PAGE->navbar->add(get_string('pluginname', 'local_mail'));
 
