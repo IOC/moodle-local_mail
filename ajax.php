@@ -623,7 +623,7 @@ function local_mail_getmail($message, $type, $reply, $offset, $labelid) {
     $content .= $OUTPUT->container_start('mail_subject');
     $title = s($message->subject());
     $content .= $mailoutput->label_message($message, $type, $labelid, true);
-    $content .= $OUTPUT->heading($title, 3, '');
+    $content .= html_writer::tag('h3', $title);
     if ($type !== 'trash') {
         $content .= $mailoutput->starred($message, $USER->id, $type, 0, true);
     }
