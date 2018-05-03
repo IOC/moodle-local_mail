@@ -59,7 +59,21 @@ $perpageid  = optional_param('perpageid', 0, PARAM_INT);
 define('MAIL_MAXUSERS', 100);
 
 $courseid = ($type == 'course' ? $itemid : $SITE->id);
-require_login($courseid);
+
+$url = new moodle_url('/local/mail/view.php', array('t' => $type));
+if ($type == 'course') {
+    $url->param('c', $courseid);
+} else if ($type == 'label') {
+    $url->param('l', $itemid);
+}
+if ($action == 'viewmail' && !empty($msgs)) {
+    $url->param('m', $msgs);
+}
+if (!$course = $DB->get_record('course', array('id' => $courseid))) {
+    echo json_encode(array('msgerror' => get_string('invalidcourse', 'error')));
+    die;
+}
+local_mail_setup_page($course, $url);
 
 if ($courseid != $SITE->id) {
     $context = context_course::instance($courseid);
@@ -519,6 +533,7 @@ function local_mail_setgoback($itemid, $type, $offset, $mailpagesize, $search) {
     $messages = local_mail_message::fetch_index($USER->id, $type, $itemid, $offset, $mailpagesize);
     return array(
         'info' => '',
+        'navbar' => local_mail_render_navbar_context(),
         'html' => local_mail_print_messages($itemid, $type, $offset, $messages, $totalcount)
     );
 }
@@ -592,8 +607,6 @@ function local_mail_setperpage($itemid, $type, $offset, $mailpagesize, $search) 
 function local_mail_print_messages($itemid, $type, $offset, $messages, $totalcount) {
     global $PAGE, $USER;
 
-    $url = new moodle_url('/local/mail/view.php', array('t' => $type));
-    $PAGE->set_url($url);
     $mailoutput = $PAGE->get_renderer('local_mail');
     $content = $mailoutput->view(array(
         'type' => $type,
@@ -609,10 +622,6 @@ function local_mail_print_messages($itemid, $type, $offset, $messages, $totalcou
 
 function local_mail_getmail($message, $type, $reply, $offset, $labelid) {
     global $PAGE, $OUTPUT, $USER;
-
-    $url = new moodle_url('/local/mail/view.php', array('t' => $type));
-    $url->param('m', $message->id());
-    $PAGE->set_url($url);
 
     $message->set_unread($USER->id, false);
     $mailoutput = $PAGE->get_renderer('local_mail');
@@ -942,8 +951,6 @@ function local_mail_searchmessages($type, $itemid, $query, $offset = false, $per
 
     $prev = $next = false;
     $date = $nummsgs = '';
-    $url = new moodle_url('/local/mail/view.php', array('t' => $type));
-    $PAGE->set_url($url);
     $mailoutput = $PAGE->get_renderer('local_mail');
     if (!empty($query['time'])) {
         $date = $query['time'];
