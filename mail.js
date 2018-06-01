@@ -688,13 +688,16 @@ YUI(M.yui.loader, {lang: M.local_mail_lang}).use('io-base', 'node', 'json-parse'
     };
 
     var mail_fixed_toolbar_buttons = function() {
-        var navbar = Y.one('.navbar-fixed-top,.navbar-static-top,.fixed-top.navbar');
-        var posheader = navbar.get('offsetHeight');
+        var navbar = Y.one('.navbar-fixed-top,' +
+                        '.navbar-static-top,' +
+                        '.fixed-top.navbar,' +
+                        '#essentialnavbar .navbar');
+        var posheader = (navbar ? navbar.get('offsetHeight') : 0);
         var node = Y.one('.mail_toolbar');
 
         if (window.scrollY > posheader) {
             node.addClass('fixed');
-            if (navbar.getStyle('position') != 'fixed') {
+            if (navbar && navbar.getStyle('position') != 'fixed') {
                 node.setStyle('top', '0');
             } else {
                 node.setStyle('top', posheader + 'px');
