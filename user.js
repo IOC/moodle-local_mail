@@ -2,6 +2,10 @@ YUI(M.yui.loader).use('node', function(Y) {
     Y.on('domready', function() {
         var node = Y.one('.userprofile');
         if (node) {
+            var selector = node.one('.page-context-header');
+            if (selector) {
+                node = selector;
+            }
             var html = '<div class="local_mail_sendmessage">' +
                 '<form action="' + M.cfg.wwwroot + '/local/mail/create.php" method="post">' +
                 '<input type="hidden" name="c" value="' + M.local_mail.course +'" />' +
