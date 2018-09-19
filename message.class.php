@@ -532,6 +532,10 @@ class local_mail_message {
             $subject = 'RE: ' . $this->subject;
         }
 
+        if (strlen($subject) > 100) {
+            $subject = core_text::substr($subject, 0, 97) . '...';
+        }
+
         $transaction = $DB->start_delegated_transaction();
 
         $message = self::create($userid, $this->course->id, $time);
