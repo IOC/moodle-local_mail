@@ -765,14 +765,15 @@ class local_mail_renderer extends plugin_renderer_base {
             'class' => 'local_mail_form mail_hidden'
         );
         $content = html_writer::start_tag('div', $attributes);
+        $context = context_course::instance($courseid);
 
-        if ($COURSE->groupmode == SEPARATEGROUPS and empty($owngroups[0])) {
+        if ($COURSE->groupmode == SEPARATEGROUPS and !has_capability('moodle/site:accessallgroups', $context)
+            and empty($owngroups[0])) {
             return '';
         }
         $content .= html_writer::start_tag('div', array('class' => 'mail_recipients_toolbar'));
 
         // Roles.
-        $context = context_course::instance($courseid);
         $roles = role_get_names($context);
         $userroles = local_mail_get_user_roleids($userid, $context);
         $mailsamerole = has_capability('local/mail:mailsamerole', $context);
