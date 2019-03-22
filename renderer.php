@@ -298,11 +298,11 @@ class local_mail_renderer extends plugin_renderer_base {
         return $output;
     }
 
-    public function reply($enabled = true) {
+    public function reply($enabled = true, $fromsend = false) {
         $label = get_string('reply', 'local_mail');
         $attributes = array(
             'type' => 'submit',
-            'name' => 'reply',
+            'name' => $fromsend ? 'replysend' : 'reply',
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
@@ -349,11 +349,11 @@ class local_mail_renderer extends plugin_renderer_base {
         return html_writer::empty_tag('input', $attributes);
     }
 
-    public function replyall($enabled = false) {
+    public function replyall($enabled = false, $fromsend = false) {
         $label = get_string('replyall', 'local_mail');
         $attributes = array(
             'type' => 'submit',
-            'name' => 'replyall',
+            'name' => $fromsend ? 'replysendall' : 'replyall',
             'value' => $label,
             'class' => 'mail_button singlebutton'
         );
@@ -1085,7 +1085,7 @@ class local_mail_renderer extends plugin_renderer_base {
             if ($message->sender()->id !== $USER->id) {
                 $output .= $this->toolbar('reply', $message->course()->id, array('replyall' => ($totalusers > 1)));
             } else {
-                $output .= $this->toolbar('forward', $message->course()->id);
+                $output .= $this->toolbar('forward', $message->course()->id, array('replyall' => ($totalusers > 1)));
             }
         }
         $output .= $this->output->container_end();
@@ -1109,7 +1109,10 @@ class local_mail_renderer extends plugin_renderer_base {
             $toolbardown = true;
         } else if ($type === 'forward') {
             $viewcourse = array_key_exists($courseid, local_mail_get_my_courses());
-            $output = $this->forward($viewcourse);
+            $output = $this->reply($viewcourse, true);
+            // All recipients.
+            $output .= $this->replyall(($viewcourse and $replyall), true);
+            $output .= $this->forward($viewcourse);
             $toolbardown = true;
         } else {
             $toggle = $this->toggle_buttons();
