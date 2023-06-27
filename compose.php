@@ -55,6 +55,38 @@ if ($remove) {
 
 // Set up form.
 
+// The following 3 functions sanitize the content of the mail
+
+
+function escapeJsEvent($value){
+    return preg_replace('/\s?(on\w+)(\s*=\s*"[^"]*")/i', '', $value);       
+}
+
+function removeScriptTag($text)
+{
+    $search = array("'<script[^>]*?>.*?</script>'si",
+             "'<iframe[^>]*?>.*?</iframe>'si");
+
+    $replace = array('','');
+
+    $text = preg_replace($search, $replace, $text);
+
+    return preg_replace_callback("'&#(\d+);'", function ($m) {
+        return chr($m[1]);
+    }, $text);
+}
+
+function filterText($value)
+{
+    if(!$value) return $value;
+    
+    return escapeJsEvent(removeScriptTag($value));
+}
+
+
+
+
+
 $data = array();
 $customdata = array();
 $customdata['message'] = $message;
@@ -72,7 +104,9 @@ $format = $message->format() >= 0 ? $message->format() : editors_get_preferred_f
 $data['course'] = $message->course()->id;
 $data['subject'] = $message->subject();
 $data['content']['format'] = $format;
-$data['content']['text'] = $content;
+
+$data['content']['text'] = $content; // Get content from draft
+
 $data['content']['itemid'] = $draftareaid;
 $data['attachments'] = $draftareaid;
 $mform->set_data($data);
@@ -98,7 +132,9 @@ if ($data = $mform->get_data()) {
 
     $files = $fs->get_area_files($PAGE->context->id, 'local_mail', 'message', $message->id(), 'filename', false);
 
-    $message->save(trim($data->subject), $content, $data->content['format'], count($files));
+    // Using filterText() to sanitize user input ($content)
+    $message->save(trim($data->subject), filterText($content), $data->content['format'], count($files)); // Save mail content
+    
 
     // Select recipients.
     if (!empty($data->recipients)) {
